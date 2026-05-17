@@ -3,416 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GestMaestro — Sistema de Gestión de Maestranza</title>
+<title>GestMaestro — Sanatorio San José</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700;800&display=swap');
-
-  :root {
-    --bg: #0d1117;
-    --bg2: #161b23;
-    --bg3: #1e2530;
-    --border: #2a3340;
-    --blue: #3b82f6;
-    --blue-dim: #1e3a5f;
-    --teal: #14b8a6;
-    --teal-dim: #0d3d38;
-    --red: #ef4444;
-    --red-dim: #4c1515;
-    --amber: #f59e0b;
-    --amber-dim: #4a2f06;
-    --green: #22c55e;
-    --green-dim: #0f3320;
-    --purple: #a855f7;
-    --text: #e2e8f0;
-    --text2: #8b98aa;
-    --text3: #4a5568;
-    --font: 'Sora', sans-serif;
-    --mono: 'DM Mono', monospace;
-    --radius: 10px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ---- PANTALLAS DE AUTH ---- */
-  .auth-screen {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: radial-gradient(ellipse at 60% 30%, #1a2d4a 0%, #0d1117 60%);
-    padding: 24px;
-  }
-  .auth-screen.active { display: flex; }
-
-  .auth-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 40px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 0 60px rgba(59,130,246,0.08);
-  }
-
-  .logo { font-size: 28px; font-weight: 800; color: var(--blue); letter-spacing: -1px; margin-bottom: 4px; }
-  .logo span { color: var(--teal); }
-  .auth-sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
-
-  .auth-tabs {
-    display: flex;
-    gap: 4px;
-    background: var(--bg3);
-    border-radius: 10px;
-    padding: 4px;
-    margin-bottom: 24px;
-  }
-
-  .auth-tab {
-    flex: 1;
-    text-align: center;
-    padding: 9px;
-    border-radius: 7px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--text2);
-    transition: all .2s;
-  }
-  .auth-tab.active { background: var(--blue); color: white; }
-
-  .field-group { margin-bottom: 16px; }
-  .field-label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-
-  select, input[type="password"], input[type="text"], input[type="number"] {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 14px;
-    padding: 12px 14px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  select:focus, input:focus { border-color: var(--blue); }
-
-  .btn-primary {
-    width: 100%;
-    background: var(--blue);
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-family: var(--font);
-    font-size: 15px;
-    font-weight: 700;
-    padding: 14px;
-    cursor: pointer;
-    transition: background .2s, transform .1s;
-    margin-top: 8px;
-  }
-  .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-primary:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; transform: none; }
-
-  .auth-switch { text-align: center; font-size: 13px; color: var(--text2); margin-top: 16px; }
-  .auth-switch a { color: var(--blue); cursor: pointer; text-decoration: none; font-weight: 600; }
-
-  .auth-msg {
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 13px;
-    margin-bottom: 16px;
-    display: none;
-  }
-  .auth-msg.error { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); display: block; }
-  .auth-msg.success { background: var(--green-dim); border: 1px solid var(--green); color: var(--green); display: block; }
-  .auth-msg.info { background: var(--blue-dim); border: 1px solid var(--blue); color: var(--blue); display: block; }
-
-  .pending-screen {
-    text-align: center;
-    padding: 20px 0;
-  }
-  .pending-icon { font-size: 52px; margin-bottom: 16px; }
-  .pending-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-  .pending-msg { font-size: 13px; color: var(--text2); line-height: 1.6; }
-
-  /* ---- LOADING ---- */
-  .loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid var(--border);
-    border-top-color: var(--blue);
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-msg { font-size: 13px; color: var(--text2); }
-
-  /* ---- APP ---- */
-  #app { display: none; height: 100vh; flex-direction: row; }
-
-  .sidebar {
-    width: 240px; min-width: 240px;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    height: 100vh; position: sticky; top: 0;
-  }
-
-  .sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
-  .sidebar-logo .logo { font-size: 20px; margin-bottom: 2px; }
-  .sidebar-logo .auth-sub { margin-bottom: 0; font-size: 12px; }
-
-  .sidebar-user {
-    margin: 12px 16px;
-    background: var(--bg3);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-    font-size: 12px;
-  }
-  .role-badge {
-    display: inline-block;
-    background: var(--blue-dim); color: var(--blue);
-    border-radius: 20px; padding: 2px 10px;
-    font-size: 10px; font-weight: 600; margin-bottom: 4px;
-    text-transform: uppercase; letter-spacing: .5px;
-  }
-  .sb-name { font-weight: 600; font-size: 13px; }
-
-  .nav { flex: 1; padding: 8px 12px; overflow-y: auto; }
-  .nav-section { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); padding: 16px 8px 6px; }
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 8px;
-    font-size: 13px; font-weight: 500; color: var(--text2);
-    cursor: pointer; transition: background .15s, color .15s; margin-bottom: 2px;
-  }
-  .nav-item:hover { background: var(--bg3); color: var(--text); }
-  .nav-item.active { background: var(--blue-dim); color: var(--blue); }
-  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
-
-  .sidebar-logout { padding: 12px 16px; border-top: 1px solid var(--border); }
-  .btn-logout {
-    width: 100%; background: transparent; border: 1px solid var(--border);
-    color: var(--text2); border-radius: 8px; padding: 9px;
-    font-family: var(--font); font-size: 12px; cursor: pointer; transition: all .2s;
-  }
-  .btn-logout:hover { border-color: var(--red); color: var(--red); }
-
-  .main-content { flex: 1; overflow-y: auto; padding: 28px; background: var(--bg); }
-
-  .page { display: none; }
-  .page.active { display: block; }
-
-  .page-header {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px;
-  }
-  .page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-  .page-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
-
-  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
-  .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 28px; }
-
-  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-  .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 8px; }
-  .stat-val { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
-  .stat-meta { font-size: 12px; color: var(--text2); margin-top: 6px; }
-
-  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; }
-  .card-body { padding: 16px 20px; }
-
-  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 12px; margin-bottom: 24px; }
-  .room-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: all .2s; }
-  .room-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: var(--shadow); }
-  .room-num { font-size: 22px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
-  .room-status { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; padding: 3px 8px; border-radius: 20px; display: inline-block; }
-
-  .s-ok { background: var(--green-dim); color: var(--green); }
-  .s-pending { background: var(--amber-dim); color: var(--amber); }
-  .s-busy { background: var(--blue-dim); color: var(--blue); }
-  .s-alta { background: var(--red-dim); color: var(--red); }
-
-  .iso-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
-  .iso-contacto { background: #1a3d4a; color: #38bdf8; }
-  .iso-respiratorio { background: #3d2a0a; color: #fbbf24; }
-  .iso-aire { background: #3d1a1a; color: #f87171; }
-  .iso-protector { background: #1a3d2a; color: #4ade80; }
-  .iso-ninguno { background: var(--bg3); color: var(--text3); }
-
-  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .data-table th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--text2); border-bottom: 1px solid var(--border); }
-  .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table tr:hover td { background: var(--bg3); }
-
-  .badge { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; }
-  .badge-blue { background: var(--blue-dim); color: var(--blue); }
-  .badge-green { background: var(--green-dim); color: var(--green); }
-  .badge-red { background: var(--red-dim); color: var(--red); }
-  .badge-amber { background: var(--amber-dim); color: var(--amber); }
-  .badge-teal { background: var(--teal-dim); color: var(--teal); }
-  .badge-purple { background: #2d1a4a; color: var(--purple); }
-
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .form-field { display: flex; flex-direction: column; gap: 6px; }
-  .form-field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--text2); }
-
-  textarea {
-    width: 100%; background: var(--bg3); border: 1px solid var(--border);
-    border-radius: var(--radius); color: var(--text); font-family: var(--font);
-    font-size: 14px; padding: 12px 14px; outline: none; resize: vertical; min-height: 80px;
-    transition: border-color .2s;
-  }
-  textarea:focus { border-color: var(--blue); }
-
-  .btn-sm {
-    background: var(--blue); color: white; border: none; border-radius: 7px;
-    font-family: var(--font); font-size: 12px; font-weight: 600; padding: 8px 14px;
-    cursor: pointer; transition: background .2s;
-  }
-  .btn-sm:hover { background: #2563eb; }
-  .btn-sm.secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
-  .btn-sm.secondary:hover { background: var(--border); color: var(--text); }
-  .btn-sm.danger { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
-
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 100; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(0,0,0,.6); position: relative; }
-  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
-  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg3); border: none; color: var(--text2); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 14px; }
-  .modal-close:hover { color: var(--text); }
-
-  .toast { position: fixed; bottom: 24px; right: 24px; border-radius: var(--radius); padding: 14px 20px; font-size: 13px; font-weight: 600; z-index: 200; display: none; animation: slideIn .3s ease; }
-  @keyframes slideIn { from { transform: translateX(40px); opacity:0; } to { transform: translateX(0); opacity:1; } }
-
-  .timeline { display: flex; flex-direction: column; }
-  .timeline-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
-  .timeline-item:not(:last-child)::before { content:''; position:absolute; left:17px; top:32px; width:2px; background:var(--border); bottom:0; }
-  .timeline-dot { width:34px; min-width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; background:var(--bg3); border:2px solid var(--border); }
-  .timeline-content { flex:1; }
-  .timeline-time { font-size:11px; color:var(--text2); font-family:var(--mono); }
-  .timeline-msg { font-size:13px; margin-top:2px; }
-
-  .progress-bar { height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; }
-  .progress-fill { height:100%; border-radius:3px; transition:width .5s ease; }
-
-  .section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text2); margin-bottom:12px; }
-  .supervisor-note { background:var(--blue-dim); border:1px solid var(--blue); border-radius:8px; padding:12px 16px; font-size:12px; color:var(--blue); margin-bottom:20px; }
-
-  ::-webkit-scrollbar { width:6px; }
-  ::-webkit-scrollbar-track { background:var(--bg); }
-  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
-
-  @media (max-width: 768px) {
-    .grid-4 { grid-template-columns: repeat(2,1fr); }
-    .grid-3 { grid-template-columns: 1fr; }
-    .grid-2 { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
-  }
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b23;--bg3:#1e2530;--border:#2a3340;--blue:#3b82f6;--blue-dim:#1e3a5f;--teal:#14b8a6;--teal-dim:#0d3d38;--red:#ef4444;--red-dim:#4c1515;--amber:#f59e0b;--amber-dim:#4a2f06;--green:#22c55e;--green-dim:#0f3320;--purple:#a855f7;--orange:#f97316;--orange-dim:#4a1f06;--text:#e2e8f0;--text2:#8b98aa;--text3:#4a5568;--font:'Sora',sans-serif;--mono:'DM Mono',monospace;--radius:10px;--shadow:0 4px 24px rgba(0,0,0,0.4);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.auth-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at 60% 30%,#1a2d4a 0%,#0d1117 60%);padding:24px;}
+.auth-screen.active{display:flex;}
+.auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:36px;width:100%;max-width:440px;box-shadow:0 0 60px rgba(59,130,246,0.08);}
+.logo{font-size:28px;font-weight:800;color:var(--blue);letter-spacing:-1px;margin-bottom:4px;}
+.logo span{color:var(--teal);}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+.auth-tabs{display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:20px;}
+.auth-tab{flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .2s;}
+.auth-tab.active{background:var(--blue);color:white;}
+.field-group{margin-bottom:14px;}
+.field-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+select,input[type="password"],input[type="text"]{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:14px;padding:11px 14px;outline:none;transition:border-color .2s;}
+select:focus,input:focus{border-color:var(--blue);}
+.btn-primary{width:100%;background:var(--blue);color:white;border:none;border-radius:var(--radius);font-family:var(--font);font-size:15px;font-weight:700;padding:13px;cursor:pointer;transition:background .2s,transform .1s;margin-top:6px;}
+.btn-primary:hover{background:#2563eb;transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0);}
+.auth-msg{border-radius:8px;padding:11px 14px;font-size:13px;margin-bottom:14px;display:none;}
+.auth-msg.error{background:var(--red-dim);border:1px solid var(--red);color:var(--red);display:block;}
+.auth-msg.success{background:var(--green-dim);border:1px solid var(--green);color:var(--green);display:block;}
+.loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-msg{font-size:13px;color:var(--text2);}
+#app{display:none;height:100vh;flex-direction:row;}
+.sidebar{width:240px;min-width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;}
+.sidebar-logo{padding:18px 18px 14px;border-bottom:1px solid var(--border);}
+.sidebar-logo .logo{font-size:20px;margin-bottom:2px;}
+.sidebar-user{margin:10px 14px;background:var(--bg3);border-radius:var(--radius);padding:10px 12px;}
+.role-badge{display:inline-block;background:var(--blue-dim);color:var(--blue);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;}
+.sb-name{font-weight:600;font-size:13px;}
+.nav{flex:1;padding:6px 10px;overflow-y:auto;}
+.nav-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:14px 8px 5px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;margin-bottom:2px;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:var(--blue-dim);color:var(--blue);}
+.nav-item .icon{font-size:15px;width:20px;text-align:center;}
+.nav-badge{background:var(--red);color:white;border-radius:20px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:auto;}
+.sidebar-logout{padding:10px 14px;border-top:1px solid var(--border);}
+.btn-logout{width:100%;background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:8px;font-family:var(--font);font-size:12px;cursor:pointer;transition:all .2s;}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
+.main-content{flex:1;overflow-y:auto;padding:24px;background:var(--bg);}
+.page{display:none;}.page.active{display:block;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:6px;}
+.stat-val{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.stat-meta{font-size:12px;color:var(--text2);margin-top:5px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;}
+.card-body{padding:14px 18px;}
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px;}
+.room-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;transition:all .2s;}
+.room-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow);}
+.room-num{font-size:20px;font-weight:800;letter-spacing:-1px;margin-bottom:4px;}
+.room-status{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:20px;display:inline-block;}
+.s-ok{background:var(--green-dim);color:var(--green);}
+.s-pending{background:var(--amber-dim);color:var(--amber);}
+.s-busy{background:var(--blue-dim);color:var(--blue);}
+.s-alta{background:var(--red-dim);color:var(--red);}
+.iso-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;margin-top:3px;}
+.iso-contacto{background:#1a3d4a;color:#38bdf8;}
+.iso-respiratorio{background:#3d2a0a;color:#fbbf24;}
+.iso-aire{background:#3d1a1a;color:#f87171;}
+.iso-protector{background:#1a3d2a;color:#4ade80;}
+.iso-ninguno{background:var(--bg3);color:var(--text3);}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{text-align:left;padding:9px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);border-bottom:1px solid var(--border);}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--bg3);}
+.badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:20px;}
+.badge-blue{background:var(--blue-dim);color:var(--blue);}
+.badge-green{background:var(--green-dim);color:var(--green);}
+.badge-red{background:var(--red-dim);color:var(--red);}
+.badge-amber{background:var(--amber-dim);color:var(--amber);}
+.badge-teal{background:var(--teal-dim);color:var(--teal);}
+.badge-purple{background:#2d1a4a;color:var(--purple);}
+.badge-orange{background:var(--orange-dim);color:var(--orange);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.form-field label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);}
+textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:14px;padding:11px 14px;outline:none;resize:vertical;min-height:75px;transition:border-color .2s;}
+textarea:focus{border-color:var(--blue);}
+.btn-sm{background:var(--blue);color:white;border:none;border-radius:7px;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 13px;cursor:pointer;transition:background .2s;}
+.btn-sm:hover{background:#2563eb;}
+.btn-sm.secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.btn-sm.secondary:hover{background:var(--border);color:var(--text);}
+.btn-sm.success{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
+.btn-sm.danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:520px;width:90%;box-shadow:0 0 60px rgba(0,0,0,.6);position:relative;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:18px;}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--bg3);border:none;color:var(--text2);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:14px;}
+.toast{position:fixed;bottom:20px;right:20px;border-radius:var(--radius);padding:12px 18px;font-size:13px;font-weight:600;z-index:200;display:none;animation:slideIn .3s ease;max-width:300px;}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.progress-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:10px;}
+.supervisor-note{background:var(--blue-dim);border:1px solid var(--blue);border-radius:8px;padding:11px 14px;font-size:12px;color:var(--blue);margin-bottom:16px;}
+.alert-box{border-radius:8px;padding:11px 14px;font-size:12px;margin-bottom:14px;}
+.alert-red{background:var(--red-dim);border:1px solid var(--red);color:var(--red);}
+.alert-amber{background:var(--amber-dim);border:1px solid var(--amber);color:var(--amber);}
+.urgency-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.urgency-btn{padding:12px 6px;border-radius:10px;border:2px solid var(--border);background:var(--bg3);color:var(--text2);font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s;line-height:1.4;}
+.urgency-btn.sel-normal{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+.urgency-btn.sel-urgente{border-color:var(--amber);background:var(--amber-dim);color:var(--amber);}
+.urgency-btn.sel-critico{border-color:var(--red);background:var(--red-dim);color:var(--red);}
+.sol-card{background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid var(--border);}
+.sol-card.critico{border-left-color:var(--red);}
+.sol-card.urgente{border-left-color:var(--amber);}
+.sol-card.normal{border-left-color:var(--green);}
+.sol-card.resuelta{opacity:.45;}
+.sol-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.sol-sector{font-weight:700;font-size:13px;}
+.sol-time{font-size:11px;color:var(--text2);font-family:var(--mono);}
+.sol-body{font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;}
+.sol-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.success-card{text-align:center;padding:16px 0;}
+.success-icon{font-size:48px;margin-bottom:12px;}
+.success-title{font-size:18px;font-weight:800;margin-bottom:8px;}
+.success-msg{font-size:13px;color:var(--text2);line-height:1.6;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:768px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}.sidebar{display:none;}}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div class="loading-overlay" id="loading" style="display:none">
   <div class="spinner"></div>
   <div class="loading-msg" id="loading-msg">Verificando...</div>
 </div>
 
-<!-- LOGIN -->
+<!-- LOGIN MAESTRANZA -->
 <div class="auth-screen active" id="screen-login">
   <div class="auth-card">
     <div class="logo">Gest<span>Maestro</span></div>
     <div class="auth-sub">Sanatorio San José · Maestranza y Ropería</div>
-
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchTab('login')">Ingresar</div>
       <div class="auth-tab" onclick="switchTab('registro')">Primer acceso</div>
     </div>
-
-    <!-- FORMULARIO LOGIN -->
     <div id="form-login">
       <div class="auth-msg" id="login-msg"></div>
-      <div class="field-group">
-        <div class="field-label">Nombre completo</div>
-        <input type="text" id="login-nombre" placeholder="Ej: González Ana" />
-      </div>
-      <div class="field-group">
-        <div class="field-label">PIN de 4 dígitos</div>
-        <input type="password" id="login-pin" placeholder="••••" maxlength="4" />
-      </div>
-      <button class="btn-primary" id="btn-login" onclick="doLogin()">Ingresar</button>
+      <div class="field-group"><div class="field-label">Nombre completo</div><input type="text" id="login-nombre" placeholder="Ej: González Ana" /></div>
+      <div class="field-group"><div class="field-label">PIN de 4 dígitos</div><input type="password" id="login-pin" placeholder="••••" maxlength="4" /></div>
+      <button class="btn-primary" onclick="doLogin()">Ingresar</button>
+      <div style="text-align:center;margin-top:14px"><a onclick="showScreen('screen-sector')" style="color:var(--teal);font-size:13px;cursor:pointer;font-weight:600">¿Sos de otro servicio del sanatorio? Ingresá acá →</a></div>
     </div>
-
-    <!-- FORMULARIO REGISTRO -->
     <div id="form-registro" style="display:none">
       <div class="auth-msg" id="registro-msg"></div>
-      <div class="field-group">
-        <div class="field-label">Nombre completo</div>
-        <input type="text" id="reg-nombre" placeholder="Ej: Rodríguez Marcela" />
+      <div class="field-group"><div class="field-label">Nombre completo</div><input type="text" id="reg-nombre" placeholder="Ej: Rodríguez Marcela" /></div>
+      <div class="field-group"><div class="field-label">Turno / Sector</div>
+        <select id="reg-turno"><option value="">— Seleccioná tu turno —</option><option>Mañana</option><option>Tarde</option><option>Noche A</option><option>Noche B</option><option>Ropería</option></select>
       </div>
-      <div class="field-group">
-        <div class="field-label">Turno / Sector</div>
-        <select id="reg-turno">
-          <option value="">— Seleccioná tu turno —</option>
-          <option>Mañana</option>
-          <option>Tarde</option>
-          <option>Noche A</option>
-          <option>Noche B</option>
-          <option>Ropería</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <div class="field-label">Elegí tu PIN de 4 dígitos</div>
-        <input type="password" id="reg-pin" placeholder="••••" maxlength="4" />
-      </div>
-      <div class="field-group">
-        <div class="field-label">Confirmá tu PIN</div>
-        <input type="password" id="reg-pin2" placeholder="••••" maxlength="4" />
-      </div>
-      <button class="btn-primary" id="btn-registro" onclick="doRegistro()">Solicitar acceso</button>
+      <div class="field-group"><div class="field-label">PIN de 4 dígitos</div><input type="password" id="reg-pin" placeholder="••••" maxlength="4" /></div>
+      <div class="field-group"><div class="field-label">Confirmá tu PIN</div><input type="password" id="reg-pin2" placeholder="••••" maxlength="4" /></div>
+      <button class="btn-primary" onclick="doRegistro()">Solicitar acceso</button>
     </div>
-
   </div>
 </div>
 
-<!-- PENDIENTE DE APROBACIÓN -->
+<!-- SECTOR: SOLICITUDES -->
+<div class="auth-screen" id="screen-sector">
+  <div class="auth-card">
+    <div class="logo">Gest<span>Maestro</span></div>
+    <div class="auth-sub">Solicitud de servicio a Maestranza</div>
+    <div class="auth-msg" id="sector-msg"></div>
+    <div id="sector-selector">
+      <div class="field-group"><div class="field-label">Tu servicio</div>
+        <select id="sector-nombre">
+          <option value="">— Seleccioná —</option>
+          <option>Enfermería Internación</option><option>Enfermería Áreas Críticas</option>
+          <option>Enfermería Quirófano</option><option>Admisión y Egreso</option>
+          <option>Seguridad</option><option>Mantenimiento</option>
+          <option>Imágenes</option><option>Laboratorio</option><option>Guardia Médica</option>
+        </select>
+      </div>
+      <div class="field-group"><div class="field-label">PIN del servicio</div><input type="password" id="sector-pin" placeholder="••••" maxlength="4" /></div>
+      <button class="btn-primary" onclick="doSectorLogin()">Continuar</button>
+      <div style="text-align:center;margin-top:14px"><a onclick="showScreen('screen-login')" style="color:var(--text2);font-size:13px;cursor:pointer">← Volver al login de maestranza</a></div>
+    </div>
+    <div id="sector-form" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+        <span style="font-size:28px" id="sf-icon">🏥</span>
+        <div><div style="font-size:16px;font-weight:800" id="sf-nombre">—</div><div style="font-size:11px;color:var(--text2)">Solicitud a Maestranza</div></div>
+      </div>
+      <div class="field-group"><label class="field-label">Tu nombre completo</label><input type="text" id="sf-persona" placeholder="Ej: Martínez Laura" /></div>
+      <div class="field-group"><label class="field-label">Lugar / Habitación</label><input type="text" id="sf-lugar" placeholder="Ej: Hab. 205, Pasillo piso 2..." /></div>
+      <div class="field-group"><label class="field-label">Tipo de intervención</label>
+        <select id="sf-tipo">
+          <option value="">— Seleccioná —</option>
+          <option>Derrame / limpieza de fluidos</option>
+          <option>Limpieza urgente de habitación</option>
+          <option>Preparación de habitación para ingreso</option>
+          <option>Retiro de residuos</option>
+          <option>Limpieza de área común</option>
+          <option>Problema con ropa de cama</option>
+          <option>Limpieza de baño</option>
+          <option>Otro (detallar en descripción)</option>
+        </select>
+      </div>
+      <div class="field-label" style="margin-bottom:8px">Nivel de urgencia</div>
+      <div class="urgency-grid">
+        <button class="urgency-btn" onclick="selectUrgency('normal',this)">🟢<br>Normal<br><span style="font-weight:400;font-size:10px">Cuando puedan</span></button>
+        <button class="urgency-btn" onclick="selectUrgency('urgente',this)">🟡<br>Urgente<br><span style="font-weight:400;font-size:10px">Antes de 30 min</span></button>
+        <button class="urgency-btn" onclick="selectUrgency('critico',this)">🔴<br>Crítico<br><span style="font-weight:400;font-size:10px">Inmediato</span></button>
+      </div>
+      <div class="form-field"><label class="field-label">Descripción detallada</label><textarea id="sf-desc" placeholder="Describí qué pasó y qué necesitás..."></textarea></div>
+      <button class="btn-primary" onclick="enviarSolicitud()">Enviar solicitud a Maestranza</button>
+    </div>
+    <div id="sector-success" style="display:none">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Solicitud enviada</div>
+        <div class="success-msg" id="success-detail">Pedido recibido por el equipo de maestranza.</div>
+      </div>
+      <button class="btn-primary" style="margin-top:20px" onclick="resetSectorForm()">Hacer otra solicitud</button>
+    </div>
+  </div>
+</div>
+
+<!-- PENDIENTE -->
 <div class="auth-screen" id="screen-pendiente">
   <div class="auth-card">
     <div class="logo">Gest<span>Maestro</span></div>
-    <div class="pending-screen">
-      <div class="pending-icon">⏳</div>
-      <div class="pending-title">Registro enviado</div>
-      <div class="pending-msg">
-        Tu solicitud fue recibida correctamente.<br><br>
-        El/la jefe/a del servicio debe aprobar tu acceso antes de que puedas ingresar.<br><br>
-        Una vez aprobado, podrás ingresar con tu nombre y PIN.
-      </div>
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:48px;margin-bottom:14px">⏳</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px">Registro enviado</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">El jefe del servicio debe aprobar tu acceso.<br>Una vez aprobado podés ingresar con tu nombre y PIN.</div>
     </div>
-    <button class="btn-primary" style="margin-top:24px" onclick="switchTab('login'); showScreen('screen-login')">Volver al login</button>
+    <button class="btn-primary" style="margin-top:20px" onclick="switchTab('login');showScreen('screen-login')">Volver al login</button>
   </div>
 </div>
 
@@ -429,39 +264,20 @@
     </div>
     <nav class="nav">
       <div class="nav-section">Principal</div>
-      <div class="nav-item active" data-page="dashboard" onclick="navTo(this)">
-        <span class="icon">🏠</span> Dashboard
-      </div>
-      <div class="nav-item" data-page="habitaciones" onclick="navTo(this)">
-        <span class="icon">🛏️</span> Habitaciones
-      </div>
+      <div class="nav-item active" data-page="dashboard" onclick="navTo(this)"><span class="icon">🏠</span> Dashboard</div>
+      <div class="nav-item" data-page="habitaciones" onclick="navTo(this)"><span class="icon">🛏️</span> Habitaciones</div>
       <div class="nav-section">Gestión</div>
-      <div class="nav-item" data-page="novedades" onclick="navTo(this)" id="nav-novedades">
-        <span class="icon">📋</span> Novedades
-      </div>
-      <div class="nav-item" data-page="residuos" onclick="navTo(this)" id="nav-residuos">
-        <span class="icon">🗑️</span> Residuos Patogénicos
-      </div>
-      <div class="nav-item" data-page="roperia" onclick="navTo(this)" id="nav-roperia">
-        <span class="icon">👕</span> Ropería
-      </div>
-      <div class="nav-item" data-page="insumos" onclick="navTo(this)" id="nav-insumos">
-        <span class="icon">📦</span> Insumos y Amenities
-      </div>
+      <div class="nav-item" data-page="solicitudes" onclick="navTo(this)" id="nav-solicitudes"><span class="icon">🔔</span> Solicitudes <span class="nav-badge" id="badge-sol" style="display:none">0</span></div>
+      <div class="nav-item" data-page="novedades" onclick="navTo(this)" id="nav-novedades"><span class="icon">📋</span> Novedades</div>
+      <div class="nav-item" data-page="residuos" onclick="navTo(this)" id="nav-residuos"><span class="icon">🗑️</span> Residuos</div>
+      <div class="nav-item" data-page="roperia" onclick="navTo(this)" id="nav-roperia"><span class="icon">👕</span> Ropería</div>
+      <div class="nav-item" data-page="insumos" onclick="navTo(this)" id="nav-insumos"><span class="icon">📦</span> Insumos</div>
       <div class="nav-section">Administración</div>
-      <div class="nav-item" data-page="requerimientos" onclick="navTo(this)" id="nav-reqs">
-        <span class="icon">📝</span> Requerimientos
-      </div>
-      <div class="nav-item" data-page="personal" onclick="navTo(this)" id="nav-personal">
-        <span class="icon">👥</span> Personal y Turnos
-      </div>
-      <div class="nav-item" data-page="monitoreo" onclick="navTo(this)" id="nav-monitor">
-        <span class="icon">👁️</span> Monitoreo Jefatura
-      </div>
+      <div class="nav-item" data-page="requerimientos" onclick="navTo(this)" id="nav-reqs"><span class="icon">📝</span> Requerimientos</div>
+      <div class="nav-item" data-page="personal" onclick="navTo(this)" id="nav-personal"><span class="icon">👥</span> Personal</div>
+      <div class="nav-item" data-page="monitoreo" onclick="navTo(this)" id="nav-monitor"><span class="icon">👁️</span> Monitoreo Jefatura</div>
     </nav>
-    <div class="sidebar-logout">
-      <button class="btn-logout" onclick="doLogout()">⬅ Cerrar sesión</button>
-    </div>
+    <div class="sidebar-logout"><button class="btn-logout" onclick="doLogout()">⬅ Cerrar sesión</button></div>
   </div>
 
   <div class="main-content">
@@ -469,42 +285,44 @@
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="page-header">
-        <div>
-          <div class="page-title">Dashboard</div>
-          <div class="page-sub" id="dash-date">—</div>
-        </div>
+        <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-date">—</div></div>
         <div class="badge badge-green" id="turno-badge">—</div>
       </div>
+      <div id="dash-alerts"></div>
       <div class="grid-4">
         <div class="stat-card"><div class="stat-label">Habitaciones OK</div><div class="stat-val" style="color:var(--green)">18</div><div class="stat-meta">de 28 habitaciones</div></div>
-        <div class="stat-card"><div class="stat-label">Limpiezas Pendientes</div><div class="stat-val" style="color:var(--amber)">6</div><div class="stat-meta">en cola de turno</div></div>
-        <div class="stat-card"><div class="stat-label">Altas Hoy</div><div class="stat-val" style="color:var(--blue)">4</div><div class="stat-meta">limpiezas terminales</div></div>
-        <div class="stat-card"><div class="stat-label">Aislamientos Activos</div><div class="stat-val" style="color:var(--red)">3</div><div class="stat-meta">contacto + respiratorio</div></div>
+        <div class="stat-card"><div class="stat-label">Pendientes limpieza</div><div class="stat-val" style="color:var(--amber)">6</div><div class="stat-meta">en cola de turno</div></div>
+        <div class="stat-card" id="stat-sol" style="cursor:pointer" onclick="navToPage('solicitudes')"><div class="stat-label">Solicitudes activas</div><div class="stat-val" id="stat-sol-num" style="color:var(--orange)">0</div><div class="stat-meta">de otros servicios</div></div>
+        <div class="stat-card"><div class="stat-label">Altas hoy</div><div class="stat-val" style="color:var(--blue)">4</div><div class="stat-meta">limpiezas terminales</div></div>
       </div>
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><span>⚡ Actividad Reciente</span></div>
-          <div class="card-body">
-            <div class="timeline">
-              <div class="timeline-item"><div class="timeline-dot">✅</div><div class="timeline-content"><div class="timeline-time">09:42 · Operario M. Rodríguez</div><div class="timeline-msg">Limpieza terminal — Hab. 214 completada</div></div></div>
-              <div class="timeline-item"><div class="timeline-dot">🗑️</div><div class="timeline-content"><div class="timeline-time">09:15 · Operario L. Pereyra</div><div class="timeline-msg">Extracción residuos patogénicos — Piso 2</div></div></div>
-              <div class="timeline-item"><div class="timeline-dot">🛏️</div><div class="timeline-content"><div class="timeline-time">08:50 · Supervisora A. González</div><div class="timeline-msg">Alta registrada — Hab. 308 (prepaga VIP)</div></div></div>
-            </div>
-          </div>
+          <div class="card-header"><span>🔔 Solicitudes Recientes</span><button class="btn-sm secondary" onclick="navToPage('solicitudes')">Ver todas</button></div>
+          <div class="card-body" id="dash-sol-preview"><div style="color:var(--text2);font-size:13px">Sin solicitudes pendientes.</div></div>
         </div>
         <div class="card">
           <div class="card-header"><span>📊 Progreso del Turno</span></div>
           <div class="card-body">
-            <div style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Limpiezas completadas</span><span style="color:var(--green)">18/28</span></div><div class="progress-bar"><div class="progress-fill" style="width:64%;background:var(--green)"></div></div></div>
-            <div style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Limpiezas terminales</span><span style="color:var(--blue)">3/4</span></div><div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--blue)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Amenities repuestos</span><span style="color:var(--teal)">2/4</span></div><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--teal)"></div></div></div>
+            <div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Limpiezas completadas</span><span style="color:var(--green)">18/28</span></div><div class="progress-bar"><div class="progress-fill" style="width:64%;background:var(--green)"></div></div></div>
+            <div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Limpiezas terminales</span><span style="color:var(--blue)">3/4</span></div><div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--blue)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Solicitudes resueltas</span><span id="prog-sol-txt" style="color:var(--teal)">0/0</span></div><div class="progress-bar"><div class="progress-fill" id="prog-sol-bar" style="width:0%;background:var(--teal)"></div></div></div>
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header"><span>🏥 Habitaciones (Vista rápida)</span><button class="btn-sm secondary" onclick="navToPage('habitaciones')">Ver todas</button></div>
-        <div class="card-body"><div id="rooms-quick" class="rooms-grid"></div></div>
+    </div>
+
+    <!-- SOLICITUDES -->
+    <div class="page" id="page-solicitudes">
+      <div class="page-header">
+        <div><div class="page-title">🔔 Solicitudes de Servicio</div><div class="page-sub">Pedidos de intervención desde otros sectores</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm secondary" onclick="filtrarSol('')">Todas</button>
+          <button class="btn-sm secondary" onclick="filtrarSol('activas')">Activas</button>
+          <button class="btn-sm danger" onclick="filtrarSol('critico')">🔴 Críticas</button>
+        </div>
       </div>
+      <div id="sol-alert-critico" style="display:none" class="alert-box alert-red">🚨 Hay solicitudes críticas que requieren atención inmediata.</div>
+      <div id="sol-container"><div style="color:var(--text2);font-size:13px;padding:20px 0">Aún no hay solicitudes registradas.</div></div>
     </div>
 
     <!-- HABITACIONES -->
@@ -518,50 +336,41 @@
           <button class="btn-sm secondary" onclick="filterRooms('iso')">Con Aislamiento</button>
         </div>
       </div>
-      <div id="rooms-full-grid" class="rooms-grid"></div>
+      <div id="rooms-grid" class="rooms-grid"></div>
     </div>
 
     <!-- NOVEDADES -->
     <div class="page" id="page-novedades">
       <div class="page-header"><div><div class="page-title">Novedades del Turno</div><div class="page-sub">Partes, ausencias y comunicaciones</div></div><button class="btn-sm" onclick="openModal('modal-novedad')">+ Nueva Novedad</button></div>
-      <div class="card"><table class="data-table"><thead><tr><th>Fecha / Hora</th><th>Personal</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
-      <tbody>
-        <tr><td style="font-family:var(--mono);font-size:12px">17/05 08:05</td><td>García, Marcela</td><td><span class="badge badge-red">Parte médico</span></td><td>Aviso por enfermedad — 2h antes del turno tarde</td><td><span class="badge badge-green">Validado</span></td></tr>
-        <tr><td style="font-family:var(--mono);font-size:12px">16/05 22:50</td><td>Romero, Diego</td><td><span class="badge badge-amber">Cambio turno</span></td><td>Solicitud de cambio eventual — urgencia familiar</td><td><span class="badge badge-amber">Pendiente RRHH</span></td></tr>
-      </tbody></table></div>
+      <div class="card"><table class="data-table"><thead><tr><th>Fecha/Hora</th><th>Personal</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
+      <tbody><tr><td style="font-family:var(--mono);font-size:12px">17/05 08:05</td><td>García, Marcela</td><td><span class="badge badge-red">Parte médico</span></td><td>Aviso por enfermedad — 2h antes turno tarde</td><td><span class="badge badge-green">Validado</span></td></tr></tbody></table></div>
     </div>
 
     <!-- RESIDUOS -->
     <div class="page" id="page-residuos">
       <div class="page-header"><div><div class="page-title">Residuos Patogénicos</div><div class="page-sub">Control de extracción y manifiestos</div></div><button class="btn-sm" onclick="openModal('modal-residuo')">+ Registrar Retiro</button></div>
       <div class="grid-3">
-        <div class="stat-card"><div class="stat-label">Último retiro empresa</div><div class="stat-val" style="color:var(--teal);font-size:20px">16/05 · 18:30</div><div class="stat-meta">BioResiduos S.A.</div></div>
-        <div class="stat-card"><div class="stat-label">Peso registrado hoy</div><div class="stat-val" style="color:var(--blue)">12.4<span style="font-size:18px"> kg</span></div><div class="stat-meta">Manifiesto N° 00842</div></div>
-        <div class="stat-card"><div class="stat-label">Próximo retiro estimado</div><div class="stat-val" style="color:var(--amber);font-size:20px">Hoy 18:00</div><div class="stat-meta">Confirmar con empresa</div></div>
+        <div class="stat-card"><div class="stat-label">Último retiro</div><div class="stat-val" style="color:var(--teal);font-size:18px">16/05 · 18:30</div><div class="stat-meta">BioResiduos S.A.</div></div>
+        <div class="stat-card"><div class="stat-label">Peso registrado hoy</div><div class="stat-val" style="color:var(--blue)">12.4<span style="font-size:16px"> kg</span></div><div class="stat-meta">Manifiesto N° 00842</div></div>
+        <div class="stat-card"><div class="stat-label">Próximo retiro</div><div class="stat-val" style="color:var(--amber);font-size:18px">Hoy 18:00</div><div class="stat-meta">Confirmar con empresa</div></div>
       </div>
-      <div class="card"><div class="card-header"><span>📋 Manifiestos del Mes</span></div>
-      <table class="data-table"><thead><tr><th>Fecha</th><th>N° Manifiesto</th><th>Peso (kg)</th><th>Empresa</th><th>Responsable</th><th>Estado</th></tr></thead>
-      <tbody>
-        <tr><td>16/05</td><td style="font-family:var(--mono)">00842</td><td>12.4</td><td>BioResiduos S.A.</td><td>González A.</td><td><span class="badge badge-green">Firmado</span></td></tr>
-        <tr><td>15/05</td><td style="font-family:var(--mono)">00841</td><td>10.8</td><td>BioResiduos S.A.</td><td>González A.</td><td><span class="badge badge-green">Firmado</span></td></tr>
-      </tbody></table></div>
     </div>
 
     <!-- ROPERÍA -->
     <div class="page" id="page-roperia">
-      <div class="page-header"><div><div class="page-title">Ropería</div><div class="page-sub">Control de entrega y recepción con lavandería externa</div></div><button class="btn-sm" onclick="openModal('modal-roperia')">+ Registrar Movimiento</button></div>
+      <div class="page-header"><div><div class="page-title">Ropería</div><div class="page-sub">Control de entrega y recepción</div></div><button class="btn-sm" onclick="openModal('modal-roperia')">+ Registrar Movimiento</button></div>
       <div class="grid-3">
-        <div class="stat-card"><div class="stat-label">Entregado hoy (sucio)</div><div class="stat-val" style="color:var(--red)">142</div><div class="stat-meta">prendas — Lavandy SRL</div></div>
-        <div class="stat-card"><div class="stat-label">Recibido hoy (limpio)</div><div class="stat-val" style="color:var(--green)">138</div><div class="stat-meta">prendas — Lavandy SRL</div></div>
+        <div class="stat-card"><div class="stat-label">Entregado hoy</div><div class="stat-val" style="color:var(--red)">142</div><div class="stat-meta">prendas sucias</div></div>
+        <div class="stat-card"><div class="stat-label">Recibido hoy</div><div class="stat-val" style="color:var(--green)">138</div><div class="stat-meta">prendas limpias</div></div>
         <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label">Diferencia</div><div class="stat-val" style="color:var(--amber)">-4</div><div class="stat-meta">⚠️ Informar a jefatura</div></div>
       </div>
     </div>
 
     <!-- INSUMOS -->
     <div class="page" id="page-insumos">
-      <div class="page-header"><div><div class="page-title">Insumos y Amenities</div><div class="page-sub">Control semanal de consumo y stock</div></div><button class="btn-sm" onclick="openModal('modal-insumo')">+ Reportar Faltante</button></div>
-      <div class="card"><div class="card-header"><span>🧴 Amenities — Sectores Prepaga</span></div>
-      <table class="data-table"><thead><tr><th>Ítem</th><th>Stock Actual</th><th>Mínimo</th><th>Estado</th></tr></thead>
+      <div class="page-header"><div><div class="page-title">Insumos y Amenities</div><div class="page-sub">Control semanal de stock</div></div><button class="btn-sm" onclick="openModal('modal-insumo')">+ Reportar Faltante</button></div>
+      <div class="card"><div class="card-header"><span>📦 Stock Actual</span></div>
+      <table class="data-table"><thead><tr><th>Ítem</th><th>Stock</th><th>Mínimo</th><th>Estado</th></tr></thead>
       <tbody>
         <tr><td>Shampoo en sobre</td><td>24 u.</td><td>20</td><td><span class="badge badge-green">OK</span></td></tr>
         <tr><td>Crema de enjuague</td><td>18 u.</td><td>20</td><td><span class="badge badge-amber">Bajo</span></td></tr>
@@ -572,23 +381,32 @@
 
     <!-- REQUERIMIENTOS -->
     <div class="page" id="page-requerimientos">
-      <div class="page-header"><div><div class="page-title">Requerimientos</div><div class="page-sub">Solicitudes del personal</div></div><button class="btn-sm" onclick="openModal('modal-req')">+ Nuevo Requerimiento</button></div>
+      <div class="page-header"><div><div class="page-title">Requerimientos</div><div class="page-sub">Solicitudes internas del personal</div></div><button class="btn-sm" onclick="openModal('modal-req')">+ Nuevo Requerimiento</button></div>
       <div class="card"><table class="data-table"><thead><tr><th>Fecha</th><th>Solicitante</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
-      <tbody>
-        <tr><td>17/05</td><td>Torres, Raúl</td><td><span class="badge badge-blue">Vacaciones</span></td><td>Solicitud vacaciones 10-20 junio</td><td><span class="badge badge-amber">Pendiente supervisor</span></td></tr>
-      </tbody></table></div>
+      <tbody><tr><td>17/05</td><td>Torres, Raúl</td><td><span class="badge badge-blue">Vacaciones</span></td><td>Solicitud vacaciones 10-20 junio</td><td><span class="badge badge-amber">Pendiente supervisor</span></td></tr></tbody></table></div>
     </div>
 
     <!-- PERSONAL -->
     <div class="page" id="page-personal">
-      <div class="page-header"><div><div class="page-title">Personal y Turnos</div><div class="page-sub">Programación del equipo</div></div></div>
-      <div class="card">
-        <div class="card-header"><span>👥 Usuarios Registrados en el Sistema</span><a href="https://docs.google.com/spreadsheets/d/13o6o3yeYEPuSY8pecZqLoiwanymrdkUh63QbNtWXQ5Q" target="_blank" class="btn-sm secondary">Ver planilla completa</a></div>
-        <div class="card-body">
-          <div class="supervisor-note">⚠️ Para aprobar nuevos usuarios o cambiar perfiles, abrí la planilla de Google Sheets y cambiá el valor de la columna <strong>Estado</strong> de <em>Pendiente</em> a <em>Aprobado</em>, y asigná el <strong>Perfil</strong> correspondiente.</div>
-          <p style="font-size:13px;color:var(--text2)">Todos los registros de usuarios se gestionan directamente desde Google Sheets.</p>
-        </div>
-      </div>
+      <div class="page-header"><div><div class="page-title">Personal y Turnos</div></div></div>
+      <div class="card"><div class="card-header"><span>👥 Gestión de Usuarios</span><a href="https://docs.google.com/spreadsheets/d/13o6o3yeYEPuSY8pecZqLoiwanymrdkUh63QbNtWXQ5Q" target="_blank" class="btn-sm secondary">Abrir planilla</a></div>
+      <div class="card-body"><div class="supervisor-note">Para aprobar usuarios: abrí la planilla y cambiá <strong>Estado</strong> de "Pendiente" a "Aprobado" y escribí el <strong>Perfil</strong> en minúscula:<br><strong>jefe / supervisor / operario / roperia</strong></div></div></div>
+      <div class="card"><div class="card-header"><span>🔐 PINes de Sectores Externos</span></div>
+      <div class="card-body">
+        <div class="supervisor-note">Entregá estos PINes a cada sector. Solo usarlos para solicitar intervenciones a maestranza.</div>
+        <table class="data-table"><thead><tr><th>Sector</th><th>PIN</th></tr></thead>
+        <tbody>
+          <tr><td>🏥 Enfermería Internación</td><td style="font-family:var(--mono);font-weight:700">1001</td></tr>
+          <tr><td>🫀 Enfermería Áreas Críticas</td><td style="font-family:var(--mono);font-weight:700">1002</td></tr>
+          <tr><td>🔪 Enfermería Quirófano</td><td style="font-family:var(--mono);font-weight:700">1003</td></tr>
+          <tr><td>🚪 Admisión y Egreso</td><td style="font-family:var(--mono);font-weight:700">1004</td></tr>
+          <tr><td>🛡️ Seguridad</td><td style="font-family:var(--mono);font-weight:700">1005</td></tr>
+          <tr><td>🔧 Mantenimiento</td><td style="font-family:var(--mono);font-weight:700">1006</td></tr>
+          <tr><td>📡 Imágenes</td><td style="font-family:var(--mono);font-weight:700">1007</td></tr>
+          <tr><td>🧪 Laboratorio</td><td style="font-family:var(--mono);font-weight:700">1008</td></tr>
+          <tr><td>🚨 Guardia Médica</td><td style="font-family:var(--mono);font-weight:700">1009</td></tr>
+        </tbody></table>
+      </div></div>
     </div>
 
     <!-- MONITOREO -->
@@ -596,21 +414,16 @@
       <div class="page-header"><div><div class="page-title">🔒 Monitoreo — Jefatura</div><div class="page-sub">Vista privada en tiempo real</div></div><span class="badge badge-red">Solo Jefatura</span></div>
       <div id="monitoreo-block">
         <div class="grid-3">
-          <div class="stat-card" style="border-color:var(--purple)"><div class="stat-label">Supervisora activa</div><div class="stat-val" style="color:var(--purple);font-size:18px">González, A.</div><div class="stat-meta">Turno mañana</div></div>
-          <div class="stat-card"><div class="stat-label">Tareas OK hoy</div><div class="stat-val" style="color:var(--green)">18</div><div class="stat-meta">Registradas</div></div>
-          <div class="stat-card"><div class="stat-label">Alertas sin resolver</div><div class="stat-val" style="color:var(--amber)">2</div><div class="stat-meta">Ropería + insumos</div></div>
+          <div class="stat-card" style="border-color:var(--purple)"><div class="stat-label">Supervisora activa</div><div class="stat-val" style="color:var(--purple);font-size:16px">González, A.</div><div class="stat-meta">Turno mañana</div></div>
+          <div class="stat-card"><div class="stat-label">Sol. resueltas hoy</div><div class="stat-val" id="mon-res" style="color:var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Sol. pendientes</div><div class="stat-val" id="mon-pend" style="color:var(--amber)">0</div></div>
         </div>
-        <div class="card"><div class="card-header"><span>🕐 Actividad por Operario/a</span></div>
-        <table class="data-table"><thead><tr><th>Personal</th><th>Última acción</th><th>Habitación</th><th>Hora</th><th>Estado</th></tr></thead>
-        <tbody>
-          <tr><td>Rodríguez, M.</td><td>Limpieza OK</td><td>214</td><td style="font-family:var(--mono)">09:42</td><td><span class="badge badge-green">Activo</span></td></tr>
-          <tr><td>Pereyra, L.</td><td>Extracción residuos</td><td>Piso 2</td><td style="font-family:var(--mono)">09:15</td><td><span class="badge badge-green">Activo</span></td></tr>
-        </tbody></table></div>
+        <div class="card"><div class="card-header"><span>📋 Todas las Solicitudes del Día</span></div><div class="card-body" id="mon-sol-list"><div style="color:var(--text2);font-size:13px">Sin solicitudes aún.</div></div></div>
       </div>
       <div id="monitoreo-denied" style="display:none;text-align:center;padding:60px 20px">
         <div style="font-size:48px;margin-bottom:16px">🔒</div>
         <div style="font-size:18px;font-weight:700;margin-bottom:8px">Acceso restringido</div>
-        <div style="color:var(--text2);font-size:14px">Esta sección es exclusiva de la Jefatura del Servicio.</div>
+        <div style="color:var(--text2);font-size:14px">Exclusivo de la Jefatura.</div>
       </div>
     </div>
 
@@ -621,343 +434,231 @@
 <div class="modal-overlay" id="modal-novedad"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-novedad')">✕</button>
   <div class="modal-title">Nueva Novedad</div>
-  <div class="form-row"><div class="form-field"><label>Tipo</label><select><option>Parte médico / Ausencia</option><option>Cambio de turno</option><option>Horas extras feriado</option><option>Otro</option></select></div><div class="form-field"><label>Personal</label><input type="text" placeholder="Nombre del agente" /></div></div>
-  <div class="form-field" style="margin-bottom:16px"><label>Descripción</label><textarea placeholder="Detalle la novedad..."></textarea></div>
+  <div class="form-row"><div class="form-field"><label>Tipo</label><select><option>Parte médico / Ausencia</option><option>Cambio de turno</option><option>Horas extras feriado</option><option>Otro</option></select></div><div class="form-field"><label>Personal</label><input type="text" placeholder="Nombre" /></div></div>
+  <div class="form-field"><label>Descripción</label><textarea></textarea></div>
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-novedad')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-novedad','Novedad registrada')">Registrar</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-residuo"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-residuo')">✕</button>
   <div class="modal-title">Registrar Retiro de Residuos</div>
-  <div class="form-row"><div class="form-field"><label>N° Manifiesto</label><input type="text" placeholder="Ej: 00843" /></div><div class="form-field"><label>Peso (kg)</label><input type="text" placeholder="Ej: 12.4" /></div></div>
+  <div class="form-row"><div class="form-field"><label>N° Manifiesto</label><input type="text" /></div><div class="form-field"><label>Peso (kg)</label><input type="text" /></div></div>
   <div class="form-row"><div class="form-field"><label>Empresa</label><input type="text" /></div><div class="form-field"><label>Responsable</label><input type="text" /></div></div>
-  <div class="form-field" style="margin-bottom:16px"><label>Observaciones</label><textarea></textarea></div>
+  <div class="form-field"><label>Observaciones</label><textarea></textarea></div>
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-residuo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-residuo','Manifiesto registrado')">Guardar</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-roperia"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-roperia')">✕</button>
   <div class="modal-title">Movimiento de Ropería</div>
-  <div class="form-row"><div class="form-field"><label>Entregado (sucio)</label><input type="text" placeholder="Cantidad" /></div><div class="form-field"><label>Recibido (limpio)</label><input type="text" placeholder="Cantidad" /></div></div>
-  <div class="form-row"><div class="form-field"><label>Empresa</label><input type="text" /></div><div class="form-field"><label>Responsable</label><input type="text" /></div></div>
-  <div class="form-field" style="margin-bottom:16px"><label>Observaciones</label><textarea></textarea></div>
+  <div class="form-row"><div class="form-field"><label>Entregado (sucio)</label><input type="text" /></div><div class="form-field"><label>Recibido (limpio)</label><input type="text" /></div></div>
+  <div class="form-field"><label>Observaciones</label><textarea></textarea></div>
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-roperia')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-roperia','Movimiento registrado')">Guardar</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-insumo"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-insumo')">✕</button>
   <div class="modal-title">Reportar Faltante</div>
-  <div class="form-field" style="margin-bottom:16px"><label>Ítem</label><select><option>Shampoo en sobre</option><option>Crema de enjuague</option><option>Cepillo dental</option><option>Jabón tocador</option><option>Guantes descartables</option><option>Hipoclorito de sodio</option><option>Otro</option></select></div>
-  <div class="form-row"><div class="form-field"><label>Stock actual</label><input type="text" placeholder="Cantidad" /></div><div class="form-field"><label>Urgencia</label><select><option>Normal</option><option>Bajo stock</option><option>🚨 Crítico</option></select></div></div>
-  <div class="form-field" style="margin-bottom:16px"><label>Observaciones</label><textarea></textarea></div>
-  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-insumo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-insumo','Faltante reportado a jefatura')">Reportar</button></div>
+  <div class="form-field"><label>Ítem</label><select><option>Shampoo en sobre</option><option>Crema de enjuague</option><option>Jabón tocador</option><option>Guantes descartables</option><option>Hipoclorito de sodio</option><option>Otro</option></select></div>
+  <div class="form-row"><div class="form-field"><label>Stock actual</label><input type="text" /></div><div class="form-field"><label>Urgencia</label><select><option>Normal</option><option>Bajo stock</option><option>🚨 Crítico</option></select></div></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-insumo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-insumo','Faltante reportado')">Reportar</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-req"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-req')">✕</button>
   <div class="modal-title">Nuevo Requerimiento</div>
   <div class="form-row"><div class="form-field"><label>Tipo</label><select><option>Vacaciones</option><option>Cambio de turno eventual</option><option>Parte médico</option><option>Horas extras feriado</option><option>Insumos</option><option>Otro</option></select></div><div class="form-field"><label>Tu nombre</label><input type="text" /></div></div>
-  <div class="form-field" style="margin-bottom:16px"><label>Descripción</label><textarea></textarea></div>
-  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-req')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-req','Requerimiento enviado al supervisor/a')">Enviar</button></div>
+  <div class="form-field"><label>Descripción</label><textarea></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-req')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-req','Requerimiento enviado')">Enviar</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-hab"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-hab')">✕</button>
-  <div class="modal-title" id="modal-hab-title">Habitación —</div>
+  <div class="modal-title" id="modal-hab-title">Habitación</div>
   <div id="modal-hab-body"></div>
 </div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbzixtWLXSYC9BTbtUFVil1WTNIkD3ost0D8RFa01MnYcw0njVRc-Y3-emFixgZ3AnKk7A/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzixtWLXSYC9BTbtUFVil1WTNIkD3ost0D8RFa01MnYcw0njVRc-Y3-emFixgZ3AnKk7A/exec";
+const SECTOR_PINS={'Enfermería Internación':'1001','Enfermería Áreas Críticas':'1002','Enfermería Quirófano':'1003','Admisión y Egreso':'1004','Seguridad':'1005','Mantenimiento':'1006','Imágenes':'1007','Laboratorio':'1008','Guardia Médica':'1009'};
+const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨'};
+let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
 
-let currentUser = null;
+function switchTab(t){document.querySelectorAll('.auth-tab').forEach((x,i)=>x.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='registro')));document.getElementById('form-login').style.display=t==='login'?'block':'none';document.getElementById('form-registro').style.display=t==='registro'?'block':'none';}
+function showScreen(id){document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));if(id)document.getElementById(id).classList.add('active');}
+function showMsg(id,txt,type){const e=document.getElementById(id);e.className='auth-msg '+type;e.textContent=txt;}
+function showLoading(m){document.getElementById('loading-msg').textContent=m||'...';document.getElementById('loading').style.display='flex';}
+function hideLoading(){document.getElementById('loading').style.display='none';}
 
-// ---- AUTH ----
-function switchTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0 && tab==='login') || (i===1 && tab==='registro')));
-  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('form-registro').style.display = tab === 'registro' ? 'block' : 'none';
-  clearMsgs();
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-}
-
-function clearMsgs() {
-  ['login-msg','registro-msg'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.className = 'auth-msg'; el.textContent = ''; }
-  });
-}
-
-function showMsg(id, text, type) {
-  const el = document.getElementById(id);
-  el.className = 'auth-msg ' + type;
-  el.textContent = text;
-}
-
-function showLoading(msg) {
-  document.getElementById('loading-msg').textContent = msg || 'Procesando...';
-  document.getElementById('loading').style.display = 'flex';
-}
-
-function hideLoading() {
-  document.getElementById('loading').style.display = 'none';
-}
-
-async function doLogin() {
-  const nombre = document.getElementById('login-nombre').value.trim();
-  const pin = document.getElementById('login-pin').value.trim();
-  if (!nombre || !pin) { showMsg('login-msg','Completá todos los campos.','error'); return; }
-  if (pin.length !== 4) { showMsg('login-msg','El PIN debe tener 4 dígitos.','error'); return; }
-
+async function doLogin(){
+  const n=document.getElementById('login-nombre').value.trim(),p=document.getElementById('login-pin').value.trim();
+  if(!n||!p){showMsg('login-msg','Completá todos los campos.','error');return;}
+  if(p.length!==4){showMsg('login-msg','El PIN debe tener 4 dígitos.','error');return;}
   showLoading('Verificando acceso...');
-  try {
-    const res = await fetch(SHEET_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'login', nombre, pin })
-    });
-    const data = await res.json();
-    hideLoading();
-    if (data.ok) {
-      currentUser = { nombre: data.nombre, perfil: data.perfil };
-      launchApp();
-    } else {
-      showMsg('login-msg', data.msg, 'error');
-    }
-  } catch(e) {
-    hideLoading();
-    showMsg('login-msg','Error de conexión. Intentá de nuevo.','error');
-  }
+  try{const r=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify({action:'login',nombre:n,pin:p})});const d=await r.json();hideLoading();if(d.ok){currentUser={nombre:d.nombre,perfil:d.perfil};launchApp();}else showMsg('login-msg',d.msg,'error');}
+  catch(e){hideLoading();showMsg('login-msg','Error de conexión. Intentá de nuevo.','error');}
 }
 
-async function doRegistro() {
-  const nombre = document.getElementById('reg-nombre').value.trim();
-  const turno = document.getElementById('reg-turno').value;
-  const pin = document.getElementById('reg-pin').value.trim();
-  const pin2 = document.getElementById('reg-pin2').value.trim();
-
-  if (!nombre || !turno || !pin || !pin2) { showMsg('registro-msg','Completá todos los campos.','error'); return; }
-  if (pin.length !== 4 || isNaN(pin)) { showMsg('registro-msg','El PIN debe ser de 4 números.','error'); return; }
-  if (pin !== pin2) { showMsg('registro-msg','Los PINes no coinciden.','error'); return; }
-
+async function doRegistro(){
+  const n=document.getElementById('reg-nombre').value.trim(),t=document.getElementById('reg-turno').value,p=document.getElementById('reg-pin').value.trim(),p2=document.getElementById('reg-pin2').value.trim();
+  if(!n||!t||!p||!p2){showMsg('registro-msg','Completá todos los campos.','error');return;}
+  if(p.length!==4||isNaN(p)){showMsg('registro-msg','El PIN debe ser de 4 números.','error');return;}
+  if(p!==p2){showMsg('registro-msg','Los PINes no coinciden.','error');return;}
   showLoading('Enviando solicitud...');
-  try {
-    const res = await fetch(SHEET_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'registro', nombre, turno, pin })
-    });
-    const data = await res.json();
-    hideLoading();
-    if (data.ok) {
-      showScreen('screen-pendiente');
-    } else {
-      showMsg('registro-msg', data.msg, 'error');
-    }
-  } catch(e) {
-    hideLoading();
-    showMsg('registro-msg','Error de conexión. Intentá de nuevo.','error');
-  }
+  try{const r=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify({action:'registro',nombre:n,turno:t,pin:p})});const d=await r.json();hideLoading();if(d.ok)showScreen('screen-pendiente');else showMsg('registro-msg',d.msg,'error');}
+  catch(e){hideLoading();showMsg('registro-msg','Error de conexión.','error');}
 }
 
-function doLogout() {
-  currentUser = null;
-  document.getElementById('app').style.display = 'none';
-  showScreen('screen-login');
-  document.getElementById('login-nombre').value = '';
-  document.getElementById('login-pin').value = '';
+function doLogout(){currentUser=null;document.getElementById('app').style.display='none';showScreen('screen-login');document.getElementById('login-nombre').value='';document.getElementById('login-pin').value='';}
+
+function doSectorLogin(){
+  const s=document.getElementById('sector-nombre').value,p=document.getElementById('sector-pin').value;
+  if(!s||!p){showMsg('sector-msg','Seleccioná tu servicio e ingresá el PIN.','error');return;}
+  if(SECTOR_PINS[s]!==p){showMsg('sector-msg','PIN incorrecto para ese servicio.','error');return;}
+  currentSector=s;
+  document.getElementById('sf-nombre').textContent=s;
+  document.getElementById('sf-icon').textContent=SECTOR_ICONS[s]||'🏥';
+  document.getElementById('sector-selector').style.display='none';
+  document.getElementById('sector-form').style.display='block';
+  document.getElementById('sector-msg').className='auth-msg';
 }
 
-// ---- APP ----
-function launchApp() {
+function selectUrgency(level,btn){
+  selectedUrgency=level;
+  document.querySelectorAll('.urgency-btn').forEach(b=>b.className='urgency-btn');
+  btn.className='urgency-btn sel-'+level;
+}
+
+function enviarSolicitud(){
+  const persona=document.getElementById('sf-persona').value.trim();
+  const lugar=document.getElementById('sf-lugar').value.trim();
+  const tipo=document.getElementById('sf-tipo').value;
+  const desc=document.getElementById('sf-desc').value.trim();
+  const smEl=document.getElementById('sector-msg');
+  if(!persona||!lugar||!tipo||!selectedUrgency||!desc){smEl.className='auth-msg error';smEl.textContent='Completá todos los campos y seleccioná la urgencia.';return;}
+  const now=new Date();
+  const sol={id:solId++,sector:currentSector,persona,lugar,tipo,desc,urgency:selectedUrgency,hora:now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),fecha:now.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}),estado:'pendiente',asignadoA:'',resueltaA:''};
+  solicitudes.unshift(sol);
+  actualizarBadges();
+  document.getElementById('success-detail').innerHTML=`Pedido registrado por <strong>${currentSector}</strong>.<br>Lugar: <strong>${lugar}</strong> · Urgencia: <strong>${selectedUrgency.toUpperCase()}</strong><br>El supervisor de turno lo atenderá a la brevedad.`;
+  document.getElementById('sector-form').style.display='none';
+  document.getElementById('sector-success').style.display='block';
+}
+
+function resetSectorForm(){
+  ['sf-persona','sf-lugar','sf-desc','sector-pin'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sf-tipo').value='';
+  document.getElementById('sector-nombre').value='';
+  selectedUrgency='';currentSector=null;
+  document.querySelectorAll('.urgency-btn').forEach(b=>b.className='urgency-btn');
+  document.getElementById('sector-selector').style.display='block';
+  document.getElementById('sector-form').style.display='none';
+  document.getElementById('sector-success').style.display='none';
+  document.getElementById('sector-msg').className='auth-msg';
+}
+
+function launchApp(){
   showScreen(null);
-  document.getElementById('app').style.display = 'flex';
-
-  const perfilLabels = { jefe:'Jefe/a del Servicio', supervisor:'Supervisor/a', operario:'Operario/a', roperia:'Ropería' };
-  document.getElementById('sb-role-badge').textContent = perfilLabels[currentUser.perfil] || currentUser.perfil;
-  document.getElementById('sb-name').textContent = currentUser.nombre;
-
-  // Permisos por rol
-  const permisos = {
-    'nav-novedades': ['jefe','supervisor','operario'],
-    'nav-residuos':  ['jefe','supervisor','operario'],
-    'nav-roperia':   ['jefe','supervisor','roperia'],
-    'nav-insumos':   ['jefe','supervisor'],
-    'nav-reqs':      ['jefe','supervisor','operario','roperia'],
-    'nav-personal':  ['jefe','supervisor'],
-    'nav-monitor':   ['jefe'],
-  };
-  Object.entries(permisos).forEach(([id, roles]) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = roles.includes(currentUser.perfil) ? '' : 'none';
-  });
-
-  if (currentUser.perfil !== 'jefe') {
-    document.getElementById('monitoreo-block').style.display = 'none';
-    document.getElementById('monitoreo-denied').style.display = 'block';
-  } else {
-    document.getElementById('monitoreo-block').style.display = 'block';
-    document.getElementById('monitoreo-denied').style.display = 'none';
-  }
-
-  const now = new Date();
-  document.getElementById('dash-date').textContent = now.toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const h = now.getHours();
-  document.getElementById('turno-badge').textContent = h < 15 ? 'Turno Mañana' : h < 23 ? 'Turno Tarde' : 'Turno Noche';
-
-  renderRooms();
+  document.getElementById('app').style.display='flex';
+  const labels={jefe:'Jefe/a del Servicio',supervisor:'Supervisor/a',operario:'Operario/a',roperia:'Ropería'};
+  document.getElementById('sb-role-badge').textContent=labels[currentUser.perfil]||currentUser.perfil;
+  document.getElementById('sb-name').textContent=currentUser.nombre;
+  const perms={'nav-solicitudes':['jefe','supervisor','operario'],'nav-novedades':['jefe','supervisor','operario'],'nav-residuos':['jefe','supervisor','operario'],'nav-roperia':['jefe','supervisor','roperia'],'nav-insumos':['jefe','supervisor'],'nav-reqs':['jefe','supervisor','operario','roperia'],'nav-personal':['jefe','supervisor'],'nav-monitor':['jefe']};
+  Object.entries(perms).forEach(([id,roles])=>{const el=document.getElementById(id);if(el)el.style.display=roles.includes(currentUser.perfil)?'':'none';});
+  const isJefe=currentUser.perfil==='jefe';
+  document.getElementById('monitoreo-block').style.display=isJefe?'block':'none';
+  document.getElementById('monitoreo-denied').style.display=isJefe?'none':'block';
+  const now=new Date();
+  document.getElementById('dash-date').textContent=now.toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const h=now.getHours();
+  document.getElementById('turno-badge').textContent=h<15?'Turno Mañana':h<23?'Turno Tarde':'Turno Noche';
+  renderRooms();renderSolicitudes();actualizarBadges();
 }
 
-// ---- HABITACIONES ----
-const rooms = [
-  {num:'101',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
-  {num:'102',status:'pending',iso:'contacto',pax:2,type:'estándar'},
-  {num:'103',status:'ok',iso:'ninguno',pax:1,type:'prepaga'},
-  {num:'104',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},
-  {num:'105',status:'pending',iso:'respiratorio',pax:1,type:'estándar'},
-  {num:'106',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
-  {num:'107',status:'busy',iso:'protector',pax:1,type:'prepaga'},
-  {num:'108',status:'ok',iso:'ninguno',pax:2,type:'estándar'},
-  {num:'201',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
-  {num:'202',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},
-  {num:'203',status:'pending',iso:'ninguno',pax:1,type:'estándar'},
-  {num:'204',status:'ok',iso:'contacto',pax:1,type:'estándar'},
-  {num:'205',status:'ok',iso:'ninguno',pax:2,type:'prepaga'},
-  {num:'206',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
-  {num:'207',status:'alta',iso:'aire',pax:0,type:'estándar'},
-  {num:'208',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
-];
-
-const statusLabels = {ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta'};
-const statusClass  = {ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta'};
-const isoLabels = {contacto:'Aislam. Contacto',respiratorio:'Aislam. Gotas',aire:'Aislam. Aire',protector:'Aislam. Protector',ninguno:'Sin aislamiento'};
-const isoClass  = {contacto:'iso-contacto',respiratorio:'iso-respiratorio',aire:'iso-aire',protector:'iso-protector',ninguno:'iso-ninguno'};
-const isoEPP = {
-  contacto:'Guantes + camisolín + barbijo quirúrgico. Higiene de manos al entrar y salir.',
-  respiratorio:'Guantes + camisolín + barbijo quirúrgico. Mantener puerta cerrada.',
-  aire:'EPP completo + barbijo N95 certificado. Solo ingresar con autorización.',
-  protector:'EPP completo. Especial cuidado en calidad y profundidad de limpieza.',
-  ninguno:'EPP estándar: guantes y delantal.'
-};
-
-function makeRoomCard(r) {
-  return `<div class="room-card" onclick="openRoom('${r.num}')">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <div class="room-num">${r.num}</div>
-      <span class="badge badge-${r.type==='prepaga'?'teal':'blue'}" style="font-size:9px">${r.type}</span>
-    </div>
-    <span class="room-status ${statusClass[r.status]}">${statusLabels[r.status]}</span>
-    <div><span class="iso-tag ${isoClass[r.iso]}">${isoLabels[r.iso]}</span></div>
-    ${r.pax>0?`<div style="font-size:11px;color:var(--text2);margin-top:4px">${r.pax} paciente${r.pax>1?'s':''}</div>`:''}
-  </div>`;
+function actualizarBadges(){
+  const activas=solicitudes.filter(s=>s.estado!=='resuelta');
+  const criticas=solicitudes.filter(s=>s.estado!=='resuelta'&&s.urgency==='critico');
+  const resueltas=solicitudes.filter(s=>s.estado==='resuelta').length;
+  const total=solicitudes.length;
+  const badge=document.getElementById('badge-sol');
+  if(badge){badge.style.display=activas.length>0?'':'none';badge.textContent=activas.length;}
+  const sn=document.getElementById('stat-sol-num');if(sn)sn.textContent=activas.length;
+  const sc=document.getElementById('stat-sol');if(sc)sc.style.borderColor=criticas.length>0?'var(--red)':activas.length>0?'var(--orange)':'var(--border)';
+  const ca=document.getElementById('sol-alert-critico');if(ca)ca.style.display=criticas.length>0?'block':'none';
+  const da=document.getElementById('dash-alerts');
+  if(da)da.innerHTML=criticas.length>0?`<div class="alert-box alert-red" style="margin-bottom:20px">🚨 <strong>${criticas.length} solicitud${criticas.length>1?'es críticas':'crítica'}</strong> — <a onclick="navToPage('solicitudes')" style="color:var(--red);cursor:pointer;font-weight:700">Ver ahora →</a></div>`:'';
+  const pt=document.getElementById('prog-sol-txt');if(pt)pt.textContent=`${resueltas}/${total}`;
+  const pb=document.getElementById('prog-sol-bar');if(pb)pb.style.width=total>0?`${Math.round(resueltas/total*100)}%`:'0%';
+  renderSolPreview();
+  if(currentUser?.perfil==='jefe')renderMonitoreo();
 }
 
-function renderRooms(list) {
-  list = list || rooms;
-  const q = document.getElementById('rooms-quick');
-  const f = document.getElementById('rooms-full-grid');
-  if (q) q.innerHTML = list.slice(0,8).map(makeRoomCard).join('');
-  if (f) f.innerHTML = list.map(makeRoomCard).join('');
+function renderSolPreview(){
+  const el=document.getElementById('dash-sol-preview');if(!el)return;
+  const activas=solicitudes.filter(s=>s.estado!=='resuelta').slice(0,3);
+  if(!activas.length){el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin solicitudes pendientes.</div>';return;}
+  el.innerHTML=activas.map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:16px">${SECTOR_ICONS[s.sector]||'🏥'}</span><div style="flex:1"><div style="font-size:12px;font-weight:700">${s.sector}</div><div style="font-size:11px;color:var(--text2)">${s.lugar} · ${s.hora}</div></div><span class="badge badge-${s.urgency==='critico'?'red':s.urgency==='urgente'?'amber':'green'}">${s.urgency}</span></div>`).join('');
 }
 
-function filterRooms(f) {
-  const filtered = f==='alta' ? rooms.filter(r=>r.status==='alta')
-    : f==='pending' ? rooms.filter(r=>r.status==='pending')
-    : f==='iso' ? rooms.filter(r=>r.iso!=='ninguno')
-    : rooms;
-  renderRooms(filtered);
-}
-
-function openRoom(num) {
-  const r = rooms.find(x=>x.num===num);
-  if (!r) return;
-  document.getElementById('modal-hab-title').textContent = `Habitación ${r.num}`;
-  const canEdit = ['jefe','supervisor'].includes(currentUser?.perfil);
-  document.getElementById('modal-hab-body').innerHTML = `
-    <div style="margin-bottom:16px">
-      <div class="form-row" style="margin-bottom:8px">
-        <div><div class="section-label">Estado</div><span class="room-status ${statusClass[r.status]}">${statusLabels[r.status]}</span></div>
-        <div><div class="section-label">Tipo</div><span class="badge badge-teal">${r.type}</span></div>
+function renderSolicitudes(filtro){
+  const el=document.getElementById('sol-container');if(!el)return;
+  let lista=[...solicitudes];
+  if(filtro==='activas')lista=lista.filter(s=>s.estado!=='resuelta');
+  else if(filtro==='critico')lista=lista.filter(s=>s.urgency==='critico'&&s.estado!=='resuelta');
+  if(!lista.length){el.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px 0">No hay solicitudes en esta categoría.</div>';return;}
+  const canManage=['jefe','supervisor'].includes(currentUser?.perfil);
+  el.innerHTML=lista.map(s=>`
+    <div class="sol-card ${s.estado==='resuelta'?'resuelta':s.urgency}">
+      <div class="sol-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:22px">${SECTOR_ICONS[s.sector]||'🏥'}</span>
+          <div><div class="sol-sector">${s.sector}</div><div style="font-size:11px;color:var(--text2)">Por: ${s.persona}</div></div>
+        </div>
+        <div style="text-align:right"><div class="sol-time">${s.fecha} · ${s.hora}</div><span class="badge badge-${s.urgency==='critico'?'red':s.urgency==='urgente'?'amber':'green'}" style="margin-top:4px">${s.urgency.toUpperCase()}</span></div>
       </div>
-      <div class="section-label" style="margin-top:12px">Aislamiento</div>
-      <span class="iso-tag ${isoClass[r.iso]}" style="font-size:12px;padding:4px 10px">${isoLabels[r.iso]}</span>
-      <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-top:10px;font-size:12px;color:var(--text2)">
-        <strong style="color:var(--text)">EPP requerido:</strong> ${isoEPP[r.iso]}
+      <div class="sol-body"><strong>📍 ${s.lugar}</strong><br><strong>Tipo:</strong> ${s.tipo}<br>${s.desc}</div>
+      <div class="sol-footer">
+        ${s.estado==='resuelta'?`<span class="badge badge-green">✅ Resuelta a las ${s.resueltaA}</span>`:s.estado==='en-curso'?`<span class="badge badge-blue">⚙️ En curso — ${s.asignadoA}</span>${canManage?`<button class="btn-sm success" onclick="resolverSol(${s.id})">✅ Marcar resuelta</button>`:''}`:`<span class="badge badge-amber">⏳ Pendiente</span>${canManage?`<button class="btn-sm" onclick="tomarSol(${s.id})">Tomar / Asignar</button>`:''}`}
       </div>
-    </div>
-    ${r.pax===2?`<div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px;font-size:12px;color:var(--amber);margin-bottom:16px">⚠️ 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.</div>`:''}
-    ${r.status==='alta'?`<div style="background:var(--red-dim);border:1px solid var(--red);border-radius:8px;padding:10px;font-size:12px;color:var(--red);margin-bottom:16px">🔴 Alta: realizar limpieza terminal completa antes de nueva admisión.</div>`:''}
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-sm" onclick="markOK('${r.num}')">✅ Marcar servicio OK</button>
-      ${canEdit?`<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>`:''}
-    </div>`;
-  openModal('modal-hab');
+    </div>`).join('');
 }
 
-function markOK(num) {
-  const r = rooms.find(x=>x.num===num);
-  if (r) r.status = 'ok';
-  renderRooms();
-  closeModal('modal-hab');
-  showToast(`✅ Habitación ${num} — Servicio registrado`);
+function filtrarSol(f){renderSolicitudes(f||undefined);}
+function tomarSol(id){const s=solicitudes.find(x=>x.id===id);if(!s)return;s.estado='en-curso';s.asignadoA=currentUser.nombre;renderSolicitudes();actualizarBadges();showToast(`Solicitud de ${s.sector} tomada`);}
+function resolverSol(id){const s=solicitudes.find(x=>x.id===id);if(!s)return;const now=new Date();s.estado='resuelta';s.resueltaA=now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});renderSolicitudes();actualizarBadges();showToast(`✅ Solicitud de ${s.sector} resuelta`);}
+
+function renderMonitoreo(){
+  const res=solicitudes.filter(s=>s.estado==='resuelta').length;
+  const pend=solicitudes.filter(s=>s.estado!=='resuelta').length;
+  const mr=document.getElementById('mon-res'),mp=document.getElementById('mon-pend'),ml=document.getElementById('mon-sol-list');
+  if(mr)mr.textContent=res;if(mp)mp.textContent=pend;
+  if(ml){if(!solicitudes.length){ml.innerHTML='<div style="color:var(--text2);font-size:13px">Sin solicitudes aún.</div>';return;}
+  ml.innerHTML=solicitudes.map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:16px">${SECTOR_ICONS[s.sector]||'🏥'}</span><div style="flex:1"><div style="font-size:12px;font-weight:700">${s.sector} — ${s.persona}</div><div style="font-size:11px;color:var(--text2)">${s.lugar} · ${s.tipo}${s.asignadoA?` · <span style="color:var(--blue)">→ ${s.asignadoA}</span>`:''}</div></div><div style="text-align:right"><span class="badge badge-${s.urgency==='critico'?'red':s.urgency==='urgente'?'amber':'green'}">${s.urgency}</span><br><span class="badge badge-${s.estado==='resuelta'?'green':s.estado==='en-curso'?'blue':'amber'}" style="margin-top:3px">${s.estado}</span></div></div>`).join('');}
 }
 
-function changeStatus(num) {
-  const r = rooms.find(x=>x.num===num);
-  if (!r) return;
-  const list = ['ok','pending','busy','alta'];
-  r.status = list[(list.indexOf(r.status)+1) % list.length];
-  renderRooms();
-  closeModal('modal-hab');
-  showToast(`Estado hab. ${num}: ${statusLabels[r.status]}`);
-}
+// HABITACIONES
+const rooms=[{num:'101',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'102',status:'pending',iso:'contacto',pax:2,type:'estándar'},{num:'103',status:'ok',iso:'ninguno',pax:1,type:'prepaga'},{num:'104',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},{num:'105',status:'pending',iso:'respiratorio',pax:1,type:'estándar'},{num:'106',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'107',status:'busy',iso:'protector',pax:1,type:'prepaga'},{num:'108',status:'ok',iso:'ninguno',pax:2,type:'estándar'},{num:'201',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'202',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},{num:'203',status:'pending',iso:'ninguno',pax:1,type:'estándar'},{num:'204',status:'ok',iso:'contacto',pax:1,type:'estándar'},{num:'205',status:'ok',iso:'ninguno',pax:2,type:'prepaga'},{num:'206',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'207',status:'alta',iso:'aire',pax:0,type:'estándar'},{num:'208',status:'ok',iso:'ninguno',pax:1,type:'estándar'}];
+const sL={ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta'};
+const sC={ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta'};
+const iL={contacto:'Aislam. Contacto',respiratorio:'Aislam. Gotas',aire:'Aislam. Aire',protector:'Aislam. Protector',ninguno:'Sin aislamiento'};
+const iC={contacto:'iso-contacto',respiratorio:'iso-respiratorio',aire:'iso-aire',protector:'iso-protector',ninguno:'iso-ninguno'};
+const iE={contacto:'Guantes + camisolín + barbijo quirúrgico.',respiratorio:'Guantes + camisolín + barbijo quirúrgico. Puerta cerrada.',aire:'EPP completo + N95. Solo con autorización.',protector:'EPP completo. Limpieza profunda.',ninguno:'EPP estándar: guantes y delantal.'};
+function renderRooms(list){list=list||rooms;const g=document.getElementById('rooms-grid');if(g)g.innerHTML=list.map(r=>`<div class="room-card" onclick="openRoom('${r.num}')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="room-num">${r.num}</div><span class="badge badge-${r.type==='prepaga'?'teal':'blue'}" style="font-size:9px">${r.type}</span></div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span><div><span class="iso-tag ${iC[r.iso]}">${iL[r.iso]}</span></div>${r.pax>0?`<div style="font-size:11px;color:var(--text2);margin-top:3px">${r.pax} paciente${r.pax>1?'s':''}</div>`:''}</div>`).join('');}
+function filterRooms(f){renderRooms(f==='alta'?rooms.filter(r=>r.status==='alta'):f==='pending'?rooms.filter(r=>r.status==='pending'):f==='iso'?rooms.filter(r=>r.iso!=='ninguno'):rooms);}
+function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;document.getElementById('modal-hab-title').textContent=`Habitación ${r.num}`;const ce=['jefe','supervisor'].includes(currentUser?.perfil);document.getElementById('modal-hab-body').innerHTML=`<div style="margin-bottom:14px"><div class="form-row" style="margin-bottom:8px"><div><div class="section-label">Estado</div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span></div><div><div class="section-label">Tipo</div><span class="badge badge-teal">${r.type}</span></div></div><div class="section-label" style="margin-top:10px">Aislamiento</div><span class="iso-tag ${iC[r.iso]}" style="font-size:12px;padding:3px 9px">${iL[r.iso]}</span><div style="background:var(--bg3);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">EPP requerido:</strong> ${iE[r.iso]}</div></div>${r.pax===2?'<div class="alert-box alert-amber">⚠️ 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.</div>':''}${r.status==='alta'?'<div class="alert-box alert-red">🔴 Alta: realizar limpieza terminal completa antes de nueva admisión.</div>':''}<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-sm" onclick="markOK(\'${r.num}\')">✅ Marcar servicio OK</button>${ce?`<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>`:''}</div>`;openModal('modal-hab');}
+function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';renderRooms();closeModal('modal-hab');showToast(`✅ Hab. ${num} — Servicio registrado`);}
+function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
 
-// ---- NAV ----
-function navTo(el) {
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active');
-  navToPage(el.dataset.page);
-}
-
-function navToPage(page) {
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  const nav = document.querySelector(`[data-page="${page}"]`);
-  if (nav) { document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); nav.classList.add('active'); }
-}
-
-// ---- MODALES ----
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function submitForm(id, msg) { closeModal(id); showToast(msg); }
-
-document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); });
-});
-
-// ---- TOAST ----
-function showToast(msg, error) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.background = error ? 'var(--red-dim)' : 'var(--green-dim)';
-  t.style.borderColor = error ? 'var(--red)' : 'var(--green)';
-  t.style.color = error ? 'var(--red)' : 'var(--green)';
-  t.style.display = 'block';
-  setTimeout(()=>t.style.display='none', 3200);
-}
-
-// Enter en login
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    if (document.getElementById('form-login').style.display !== 'none') doLogin();
-    else doRegistro();
-  }
-});
+function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);}
+function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function submitForm(id,msg){closeModal(id);showToast(msg);}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
 </script>
 </body>
 </html>
