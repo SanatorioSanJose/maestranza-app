@@ -42,9 +42,9 @@
     overflow-x: hidden;
   }
 
-  /* LOGIN */
-  #login-screen {
-    display: flex;
+  /* ---- PANTALLAS DE AUTH ---- */
+  .auth-screen {
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -52,8 +52,9 @@
     background: radial-gradient(ellipse at 60% 30%, #1a2d4a 0%, #0d1117 60%);
     padding: 24px;
   }
+  .auth-screen.active { display: flex; }
 
-  .login-card {
+  .auth-card {
     background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: 18px;
@@ -63,23 +64,36 @@
     box-shadow: 0 0 60px rgba(59,130,246,0.08);
   }
 
-  .logo {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--blue);
-    letter-spacing: -1px;
-    margin-bottom: 4px;
+  .logo { font-size: 28px; font-weight: 800; color: var(--blue); letter-spacing: -1px; margin-bottom: 4px; }
+  .logo span { color: var(--teal); }
+  .auth-sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+
+  .auth-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 24px;
   }
 
-  .logo span { color: var(--teal); }
+  .auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all .2s;
+  }
+  .auth-tab.active { background: var(--blue); color: white; }
 
-  .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 32px; }
-
+  .field-group { margin-bottom: 16px; }
   .field-label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
 
-  .field-group { margin-bottom: 18px; }
-
-  select, input[type="password"], input[type="text"] {
+  select, input[type="password"], input[type="text"], input[type="number"] {
     width: 100%;
     background: var(--bg3);
     border: 1px solid var(--border);
@@ -91,7 +105,6 @@
     outline: none;
     transition: border-color .2s;
   }
-
   select:focus, input:focus { border-color: var(--blue); }
 
   .btn-primary {
@@ -108,33 +121,68 @@
     transition: background .2s, transform .1s;
     margin-top: 8px;
   }
-
   .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; transform: none; }
 
-  /* MAIN APP */
+  .auth-switch { text-align: center; font-size: 13px; color: var(--text2); margin-top: 16px; }
+  .auth-switch a { color: var(--blue); cursor: pointer; text-decoration: none; font-weight: 600; }
+
+  .auth-msg {
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .auth-msg.error { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); display: block; }
+  .auth-msg.success { background: var(--green-dim); border: 1px solid var(--green); color: var(--green); display: block; }
+  .auth-msg.info { background: var(--blue-dim); border: 1px solid var(--blue); color: var(--blue); display: block; }
+
+  .pending-screen {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .pending-icon { font-size: 52px; margin-bottom: 16px; }
+  .pending-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .pending-msg { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ---- LOADING ---- */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-msg { font-size: 13px; color: var(--text2); }
+
+  /* ---- APP ---- */
   #app { display: none; height: 100vh; flex-direction: row; }
 
-  /* SIDEBAR */
   .sidebar {
-    width: 240px;
-    min-width: 240px;
+    width: 240px; min-width: 240px;
     background: var(--bg2);
     border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: sticky;
-    top: 0;
+    display: flex; flex-direction: column;
+    height: 100vh; position: sticky; top: 0;
   }
 
-  .sidebar-logo {
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
   .sidebar-logo .logo { font-size: 20px; margin-bottom: 2px; }
-  .sidebar-logo .login-sub { margin-bottom: 0; font-size: 12px; }
+  .sidebar-logo .auth-sub { margin-bottom: 0; font-size: 12px; }
 
   .sidebar-user {
     margin: 12px 16px;
@@ -143,173 +191,83 @@
     padding: 10px 12px;
     font-size: 12px;
   }
-
-  .sidebar-user .role-badge {
+  .role-badge {
     display: inline-block;
-    background: var(--blue-dim);
-    color: var(--blue);
-    border-radius: 20px;
-    padding: 2px 10px;
-    font-size: 10px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: .5px;
+    background: var(--blue-dim); color: var(--blue);
+    border-radius: 20px; padding: 2px 10px;
+    font-size: 10px; font-weight: 600; margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: .5px;
   }
-
-  .sidebar-user .name { font-weight: 600; font-size: 13px; }
+  .sb-name { font-weight: 600; font-size: 13px; }
 
   .nav { flex: 1; padding: 8px 12px; overflow-y: auto; }
-
   .nav-section { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); padding: 16px 8px 6px; }
-
   .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text2);
-    cursor: pointer;
-    transition: background .15s, color .15s;
-    margin-bottom: 2px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; color: var(--text2);
+    cursor: pointer; transition: background .15s, color .15s; margin-bottom: 2px;
   }
-
   .nav-item:hover { background: var(--bg3); color: var(--text); }
   .nav-item.active { background: var(--blue-dim); color: var(--blue); }
   .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
 
-  .sidebar-logout {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-  }
-
+  .sidebar-logout { padding: 12px 16px; border-top: 1px solid var(--border); }
   .btn-logout {
-    width: 100%;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text2);
-    border-radius: 8px;
-    padding: 9px;
-    font-family: var(--font);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all .2s;
+    width: 100%; background: transparent; border: 1px solid var(--border);
+    color: var(--text2); border-radius: 8px; padding: 9px;
+    font-family: var(--font); font-size: 12px; cursor: pointer; transition: all .2s;
   }
-
   .btn-logout:hover { border-color: var(--red); color: var(--red); }
 
-  /* CONTENT */
-  .main-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 28px;
-    background: var(--bg);
-  }
+  .main-content { flex: 1; overflow-y: auto; padding: 28px; background: var(--bg); }
 
   .page { display: none; }
   .page.active { display: block; }
 
   .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px;
   }
-
   .page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
   .page-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
 
-  /* CARDS */
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 28px; }
 
-  .stat-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-  }
-
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
   .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 8px; }
   .stat-val { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
   .stat-meta { font-size: 12px; color: var(--text2); margin-top: 6px; }
 
-  .card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    font-weight: 700;
-  }
-
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; }
   .card-body { padding: 16px 20px; }
 
-  /* HABITACIONES */
-  .rooms-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .room-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    cursor: pointer;
-    transition: all .2s;
-    position: relative;
-  }
-
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 12px; margin-bottom: 24px; }
+  .room-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: all .2s; }
   .room-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: var(--shadow); }
-
   .room-num { font-size: 22px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
   .room-status { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; padding: 3px 8px; border-radius: 20px; display: inline-block; }
-  .room-iso { font-size: 11px; color: var(--text2); margin-top: 6px; }
 
   .s-ok { background: var(--green-dim); color: var(--green); }
   .s-pending { background: var(--amber-dim); color: var(--amber); }
   .s-busy { background: var(--blue-dim); color: var(--blue); }
   .s-alta { background: var(--red-dim); color: var(--red); }
-  .s-libre { background: var(--bg3); color: var(--text2); }
 
-  .iso-tag {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-top: 4px;
-  }
-
+  .iso-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
   .iso-contacto { background: #1a3d4a; color: #38bdf8; }
   .iso-respiratorio { background: #3d2a0a; color: #fbbf24; }
   .iso-aire { background: #3d1a1a; color: #f87171; }
   .iso-protector { background: #1a3d2a; color: #4ade80; }
   .iso-ninguno { background: var(--bg3); color: var(--text3); }
 
-  /* TABLE */
   .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .data-table th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--text2); border-bottom: 1px solid var(--border); }
   .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
   .data-table tr:last-child td { border-bottom: none; }
   .data-table tr:hover td { background: var(--bg3); }
 
-  /* BADGE */
   .badge { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; }
   .badge-blue { background: var(--blue-dim); color: var(--blue); }
   .badge-green { background: var(--green-dim); color: var(--green); }
@@ -318,120 +276,55 @@
   .badge-teal { background: var(--teal-dim); color: var(--teal); }
   .badge-purple { background: #2d1a4a; color: var(--purple); }
 
-  /* FORM */
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .form-field { display: flex; flex-direction: column; gap: 6px; }
   .form-field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--text2); }
 
   textarea {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 14px;
-    padding: 12px 14px;
-    outline: none;
-    resize: vertical;
-    min-height: 80px;
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); font-family: var(--font);
+    font-size: 14px; padding: 12px 14px; outline: none; resize: vertical; min-height: 80px;
     transition: border-color .2s;
   }
   textarea:focus { border-color: var(--blue); }
 
   .btn-sm {
-    background: var(--blue);
-    color: white;
-    border: none;
-    border-radius: 7px;
-    font-family: var(--font);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 8px 14px;
-    cursor: pointer;
-    transition: background .2s;
+    background: var(--blue); color: white; border: none; border-radius: 7px;
+    font-family: var(--font); font-size: 12px; font-weight: 600; padding: 8px 14px;
+    cursor: pointer; transition: background .2s;
   }
   .btn-sm:hover { background: #2563eb; }
   .btn-sm.secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
   .btn-sm.secondary:hover { background: var(--border); color: var(--text); }
   .btn-sm.danger { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
 
-  /* MODAL */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.7);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
-
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 0 60px rgba(0,0,0,.6);
-    position: relative;
-  }
-
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(0,0,0,.6); position: relative; }
   .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
   .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg3); border: none; color: var(--text2); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 14px; }
   .modal-close:hover { color: var(--text); }
 
-  /* TOAST */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--green-dim);
-    border: 1px solid var(--green);
-    color: var(--green);
-    border-radius: var(--radius);
-    padding: 14px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    z-index: 200;
-    display: none;
-    animation: slideIn .3s ease;
-  }
-
+  .toast { position: fixed; bottom: 24px; right: 24px; border-radius: var(--radius); padding: 14px 20px; font-size: 13px; font-weight: 600; z-index: 200; display: none; animation: slideIn .3s ease; }
   @keyframes slideIn { from { transform: translateX(40px); opacity:0; } to { transform: translateX(0); opacity:1; } }
 
-  /* TIMELINE */
-  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .timeline { display: flex; flex-direction: column; }
   .timeline-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
   .timeline-item:not(:last-child)::before { content:''; position:absolute; left:17px; top:32px; width:2px; background:var(--border); bottom:0; }
-  .timeline-dot { width: 34px; min-width:34px; height:34px; border-radius:50%; display:flex; align-items:center;justify-content:center; font-size:14px; background: var(--bg3); border:2px solid var(--border); }
+  .timeline-dot { width:34px; min-width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; background:var(--bg3); border:2px solid var(--border); }
   .timeline-content { flex:1; }
   .timeline-time { font-size:11px; color:var(--text2); font-family:var(--mono); }
   .timeline-msg { font-size:13px; margin-top:2px; }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .progress-bar { height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:3px; transition:width .5s ease; }
 
-  /* Progress bar */
-  .progress-bar { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+  .section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text2); margin-bottom:12px; }
+  .supervisor-note { background:var(--blue-dim); border:1px solid var(--blue); border-radius:8px; padding:12px 16px; font-size:12px; color:var(--blue); margin-bottom:20px; }
 
-  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 12px; }
-
-  .supervisor-note {
-    background: var(--blue-dim);
-    border: 1px solid var(--blue);
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 12px;
-    color: var(--blue);
-    margin-bottom: 20px;
-  }
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
   @media (max-width: 768px) {
     .grid-4 { grid-template-columns: repeat(2,1fr); }
@@ -443,44 +336,96 @@
 </head>
 <body>
 
+<!-- LOADING -->
+<div class="loading-overlay" id="loading" style="display:none">
+  <div class="spinner"></div>
+  <div class="loading-msg" id="loading-msg">Verificando...</div>
+</div>
+
 <!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-card">
+<div class="auth-screen active" id="screen-login">
+  <div class="auth-card">
     <div class="logo">Gest<span>Maestro</span></div>
-    <div class="login-sub">Sistema de Gestión · Maestranza y Ropería</div>
-    <div class="field-group">
-      <div class="field-label">Seleccionar perfil</div>
-      <select id="login-role">
-        <option value="">— Seleccionar —</option>
-        <option value="jefe">Jefe/a del Servicio</option>
-        <option value="supervisor">Supervisor/a de Turno</option>
-        <option value="operario">Operario/a de Maestranza</option>
-        <option value="roperia">Personal de Ropería</option>
-      </select>
+    <div class="auth-sub">Sanatorio San José · Maestranza y Ropería</div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">Ingresar</div>
+      <div class="auth-tab" onclick="switchTab('registro')">Primer acceso</div>
     </div>
-    <div class="field-group">
-      <div class="field-label">Nombre de usuario</div>
-      <input type="text" id="login-user" placeholder="Tu nombre o legajo" />
+
+    <!-- FORMULARIO LOGIN -->
+    <div id="form-login">
+      <div class="auth-msg" id="login-msg"></div>
+      <div class="field-group">
+        <div class="field-label">Nombre completo</div>
+        <input type="text" id="login-nombre" placeholder="Ej: González Ana" />
+      </div>
+      <div class="field-group">
+        <div class="field-label">PIN de 4 dígitos</div>
+        <input type="password" id="login-pin" placeholder="••••" maxlength="4" />
+      </div>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()">Ingresar</button>
     </div>
-    <div class="field-group">
-      <div class="field-label">PIN de acceso</div>
-      <input type="password" id="login-pin" placeholder="••••" maxlength="6" />
+
+    <!-- FORMULARIO REGISTRO -->
+    <div id="form-registro" style="display:none">
+      <div class="auth-msg" id="registro-msg"></div>
+      <div class="field-group">
+        <div class="field-label">Nombre completo</div>
+        <input type="text" id="reg-nombre" placeholder="Ej: Rodríguez Marcela" />
+      </div>
+      <div class="field-group">
+        <div class="field-label">Turno / Sector</div>
+        <select id="reg-turno">
+          <option value="">— Seleccioná tu turno —</option>
+          <option>Mañana</option>
+          <option>Tarde</option>
+          <option>Noche A</option>
+          <option>Noche B</option>
+          <option>Ropería</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Elegí tu PIN de 4 dígitos</div>
+        <input type="password" id="reg-pin" placeholder="••••" maxlength="4" />
+      </div>
+      <div class="field-group">
+        <div class="field-label">Confirmá tu PIN</div>
+        <input type="password" id="reg-pin2" placeholder="••••" maxlength="4" />
+      </div>
+      <button class="btn-primary" id="btn-registro" onclick="doRegistro()">Solicitar acceso</button>
     </div>
-    <button class="btn-primary" onclick="doLogin()">Ingresar al sistema</button>
+
+  </div>
+</div>
+
+<!-- PENDIENTE DE APROBACIÓN -->
+<div class="auth-screen" id="screen-pendiente">
+  <div class="auth-card">
+    <div class="logo">Gest<span>Maestro</span></div>
+    <div class="pending-screen">
+      <div class="pending-icon">⏳</div>
+      <div class="pending-title">Registro enviado</div>
+      <div class="pending-msg">
+        Tu solicitud fue recibida correctamente.<br><br>
+        El/la jefe/a del servicio debe aprobar tu acceso antes de que puedas ingresar.<br><br>
+        Una vez aprobado, podrás ingresar con tu nombre y PIN.
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top:24px" onclick="switchTab('login'); showScreen('screen-login')">Volver al login</button>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app">
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-logo">
       <div class="logo">Gest<span>Maestro</span></div>
-      <div class="login-sub">v1.0 · Sanatorio CABA</div>
+      <div class="auth-sub" style="margin-bottom:0;font-size:12px">Sanatorio San José</div>
     </div>
     <div class="sidebar-user">
       <div class="role-badge" id="sb-role-badge">—</div>
-      <div class="name" id="sb-name">—</div>
+      <div class="sb-name" id="sb-name">—</div>
     </div>
     <nav class="nav">
       <div class="nav-section">Principal</div>
@@ -490,7 +435,7 @@
       <div class="nav-item" data-page="habitaciones" onclick="navTo(this)">
         <span class="icon">🛏️</span> Habitaciones
       </div>
-      <div class="nav-section" id="nav-sec-gestion">Gestión</div>
+      <div class="nav-section">Gestión</div>
       <div class="nav-item" data-page="novedades" onclick="navTo(this)" id="nav-novedades">
         <span class="icon">📋</span> Novedades
       </div>
@@ -503,7 +448,7 @@
       <div class="nav-item" data-page="insumos" onclick="navTo(this)" id="nav-insumos">
         <span class="icon">📦</span> Insumos y Amenities
       </div>
-      <div class="nav-section" id="nav-sec-admin">Administración</div>
+      <div class="nav-section">Administración</div>
       <div class="nav-item" data-page="requerimientos" onclick="navTo(this)" id="nav-reqs">
         <span class="icon">📝</span> Requerimientos
       </div>
@@ -511,7 +456,7 @@
         <span class="icon">👥</span> Personal y Turnos
       </div>
       <div class="nav-item" data-page="monitoreo" onclick="navTo(this)" id="nav-monitor">
-        <span class="icon">👁️</span> Monitoreo (Jefatura)
+        <span class="icon">👁️</span> Monitoreo Jefatura
       </div>
     </nav>
     <div class="sidebar-logout">
@@ -519,7 +464,6 @@
     </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main-content">
 
     <!-- DASHBOARD -->
@@ -529,121 +473,47 @@
           <div class="page-title">Dashboard</div>
           <div class="page-sub" id="dash-date">—</div>
         </div>
-        <div class="badge badge-green" id="turno-badge">Turno Mañana</div>
+        <div class="badge badge-green" id="turno-badge">—</div>
       </div>
-
       <div class="grid-4">
-        <div class="stat-card">
-          <div class="stat-label">Habitaciones OK</div>
-          <div class="stat-val" style="color:var(--green)">18</div>
-          <div class="stat-meta">de 28 habitaciones</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Limpiezas Pendientes</div>
-          <div class="stat-val" style="color:var(--amber)">6</div>
-          <div class="stat-meta">en cola de turno</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Altas Hoy</div>
-          <div class="stat-val" style="color:var(--blue)">4</div>
-          <div class="stat-meta">limpiezas terminales</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Aislamientos Activos</div>
-          <div class="stat-val" style="color:var(--red)">3</div>
-          <div class="stat-meta">contacto + respiratorio</div>
-        </div>
+        <div class="stat-card"><div class="stat-label">Habitaciones OK</div><div class="stat-val" style="color:var(--green)">18</div><div class="stat-meta">de 28 habitaciones</div></div>
+        <div class="stat-card"><div class="stat-label">Limpiezas Pendientes</div><div class="stat-val" style="color:var(--amber)">6</div><div class="stat-meta">en cola de turno</div></div>
+        <div class="stat-card"><div class="stat-label">Altas Hoy</div><div class="stat-val" style="color:var(--blue)">4</div><div class="stat-meta">limpiezas terminales</div></div>
+        <div class="stat-card"><div class="stat-label">Aislamientos Activos</div><div class="stat-val" style="color:var(--red)">3</div><div class="stat-meta">contacto + respiratorio</div></div>
       </div>
-
       <div class="grid-2">
         <div class="card">
-          <div class="card-header">
-            <span>⚡ Actividad Reciente</span>
-            <span style="font-size:11px;color:var(--text2);font-weight:400">Hoy</span>
-          </div>
+          <div class="card-header"><span>⚡ Actividad Reciente</span></div>
           <div class="card-body">
             <div class="timeline">
-              <div class="timeline-item">
-                <div class="timeline-dot">✅</div>
-                <div class="timeline-content">
-                  <div class="timeline-time">09:42 · Operario M. Rodríguez</div>
-                  <div class="timeline-msg">Limpieza terminal — Hab. 214 completada</div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot">🗑️</div>
-                <div class="timeline-content">
-                  <div class="timeline-time">09:15 · Operario L. Pereyra</div>
-                  <div class="timeline-msg">Extracción residuos patogénicos — Piso 2</div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot">🛏️</div>
-                <div class="timeline-content">
-                  <div class="timeline-time">08:50 · Supervisora A. González</div>
-                  <div class="timeline-msg">Alta registrada — Hab. 308 (prepaga VIP)</div>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot">⚠️</div>
-                <div class="timeline-content">
-                  <div class="timeline-time">08:20 · Sistema</div>
-                  <div class="timeline-msg">Aislamiento de contacto activado — Hab. 115</div>
-                </div>
-              </div>
+              <div class="timeline-item"><div class="timeline-dot">✅</div><div class="timeline-content"><div class="timeline-time">09:42 · Operario M. Rodríguez</div><div class="timeline-msg">Limpieza terminal — Hab. 214 completada</div></div></div>
+              <div class="timeline-item"><div class="timeline-dot">🗑️</div><div class="timeline-content"><div class="timeline-time">09:15 · Operario L. Pereyra</div><div class="timeline-msg">Extracción residuos patogénicos — Piso 2</div></div></div>
+              <div class="timeline-item"><div class="timeline-dot">🛏️</div><div class="timeline-content"><div class="timeline-time">08:50 · Supervisora A. González</div><div class="timeline-msg">Alta registrada — Hab. 308 (prepaga VIP)</div></div></div>
             </div>
           </div>
         </div>
-
         <div class="card">
-          <div class="card-header">
-            <span>📊 Progreso del Turno</span>
-            <span style="font-size:11px;color:var(--text2);font-weight:400" id="prog-pct">64%</span>
-          </div>
+          <div class="card-header"><span>📊 Progreso del Turno</span></div>
           <div class="card-body">
-            <div style="margin-bottom:20px">
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
-                <span>Limpiezas completadas</span><span style="color:var(--green)">18/28</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:64%;background:var(--green)"></div></div>
-            </div>
-            <div style="margin-bottom:20px">
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
-                <span>Limpiezas terminales</span><span style="color:var(--blue)">3/4</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--blue)"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
-                <span>Amenities repuestos</span><span style="color:var(--teal)">2/4</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--teal)"></div></div>
-            </div>
+            <div style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Limpiezas completadas</span><span style="color:var(--green)">18/28</span></div><div class="progress-bar"><div class="progress-fill" style="width:64%;background:var(--green)"></div></div></div>
+            <div style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Limpiezas terminales</span><span style="color:var(--blue)">3/4</span></div><div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--blue)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Amenities repuestos</span><span style="color:var(--teal)">2/4</span></div><div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--teal)"></div></div></div>
           </div>
         </div>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <span>🏥 Estado de Habitaciones (Vista rápida)</span>
-          <button class="btn-sm secondary" onclick="navToPage('habitaciones')">Ver todas</button>
-        </div>
-        <div class="card-body">
-          <div id="rooms-quick" class="rooms-grid"></div>
-        </div>
+        <div class="card-header"><span>🏥 Habitaciones (Vista rápida)</span><button class="btn-sm secondary" onclick="navToPage('habitaciones')">Ver todas</button></div>
+        <div class="card-body"><div id="rooms-quick" class="rooms-grid"></div></div>
       </div>
     </div>
 
     <!-- HABITACIONES -->
     <div class="page" id="page-habitaciones">
       <div class="page-header">
-        <div>
-          <div class="page-title">Habitaciones</div>
-          <div class="page-sub">Estado de limpieza y aislamientos por sector</div>
-        </div>
+        <div><div class="page-title">Habitaciones</div><div class="page-sub">Estado de limpieza y aislamientos</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-sm secondary" onclick="filterRooms('')">Todas</button>
-          <button class="btn-sm secondary" onclick="filterRooms('alta')">⬛ Alta</button>
+          <button class="btn-sm secondary" onclick="renderRooms()">Todas</button>
+          <button class="btn-sm secondary" onclick="filterRooms('alta')">Altas</button>
           <button class="btn-sm secondary" onclick="filterRooms('pending')">Pendientes</button>
           <button class="btn-sm secondary" onclick="filterRooms('iso')">Con Aislamiento</button>
         </div>
@@ -653,323 +523,89 @@
 
     <!-- NOVEDADES -->
     <div class="page" id="page-novedades">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Novedades del Turno</div>
-          <div class="page-sub">Partes, ausencias y comunicaciones</div>
-        </div>
-        <button class="btn-sm" onclick="openModal('modal-novedad')">+ Nueva Novedad</button>
-      </div>
-      <div class="card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Fecha / Hora</th>
-              <th>Personal</th>
-              <th>Tipo</th>
-              <th>Descripción</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="novedades-tbody">
-            <tr>
-              <td style="font-family:var(--mono);font-size:12px">17/05 08:05</td>
-              <td>García, Marcela</td>
-              <td><span class="badge badge-red">Parte médico</span></td>
-              <td>Aviso por enfermedad — 2h antes del turno tarde</td>
-              <td><span class="badge badge-green">Validado</span></td>
-            </tr>
-            <tr>
-              <td style="font-family:var(--mono);font-size:12px">16/05 22:50</td>
-              <td>Romero, Diego</td>
-              <td><span class="badge badge-amber">Cambio turno</span></td>
-              <td>Solicitud de cambio eventual — urgencia familiar</td>
-              <td><span class="badge badge-amber">Pendiente RRHH</span></td>
-            </tr>
-            <tr>
-              <td style="font-family:var(--mono);font-size:12px">15/05 10:30</td>
-              <td>López, Ana</td>
-              <td><span class="badge badge-blue">Horas extras</span></td>
-              <td>Feriado 25/05 — Turno mañana completo</td>
-              <td><span class="badge badge-green">Elevado a RRHH</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="page-header"><div><div class="page-title">Novedades del Turno</div><div class="page-sub">Partes, ausencias y comunicaciones</div></div><button class="btn-sm" onclick="openModal('modal-novedad')">+ Nueva Novedad</button></div>
+      <div class="card"><table class="data-table"><thead><tr><th>Fecha / Hora</th><th>Personal</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:var(--mono);font-size:12px">17/05 08:05</td><td>García, Marcela</td><td><span class="badge badge-red">Parte médico</span></td><td>Aviso por enfermedad — 2h antes del turno tarde</td><td><span class="badge badge-green">Validado</span></td></tr>
+        <tr><td style="font-family:var(--mono);font-size:12px">16/05 22:50</td><td>Romero, Diego</td><td><span class="badge badge-amber">Cambio turno</span></td><td>Solicitud de cambio eventual — urgencia familiar</td><td><span class="badge badge-amber">Pendiente RRHH</span></td></tr>
+      </tbody></table></div>
     </div>
 
     <!-- RESIDUOS -->
     <div class="page" id="page-residuos">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Residuos Patogénicos</div>
-          <div class="page-sub">Control de extracción y manifiestos</div>
-        </div>
-        <button class="btn-sm" onclick="openModal('modal-residuo')">+ Registrar Retiro</button>
+      <div class="page-header"><div><div class="page-title">Residuos Patogénicos</div><div class="page-sub">Control de extracción y manifiestos</div></div><button class="btn-sm" onclick="openModal('modal-residuo')">+ Registrar Retiro</button></div>
+      <div class="grid-3">
+        <div class="stat-card"><div class="stat-label">Último retiro empresa</div><div class="stat-val" style="color:var(--teal);font-size:20px">16/05 · 18:30</div><div class="stat-meta">BioResiduos S.A.</div></div>
+        <div class="stat-card"><div class="stat-label">Peso registrado hoy</div><div class="stat-val" style="color:var(--blue)">12.4<span style="font-size:18px"> kg</span></div><div class="stat-meta">Manifiesto N° 00842</div></div>
+        <div class="stat-card"><div class="stat-label">Próximo retiro estimado</div><div class="stat-val" style="color:var(--amber);font-size:20px">Hoy 18:00</div><div class="stat-meta">Confirmar con empresa</div></div>
       </div>
-      <div class="grid-3" style="margin-bottom:24px">
-        <div class="stat-card">
-          <div class="stat-label">Último retiro empresa</div>
-          <div class="stat-val" style="color:var(--teal);font-size:20px">16/05 · 18:30</div>
-          <div class="stat-meta">BioResiduos S.A.</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Peso registrado hoy</div>
-          <div class="stat-val" style="color:var(--blue)">12.4<span style="font-size:18px"> kg</span></div>
-          <div class="stat-meta">Manifiesto N° 00842</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Próximo retiro estimado</div>
-          <div class="stat-val" style="color:var(--amber);font-size:20px">Hoy 18:00</div>
-          <div class="stat-meta">Confirmar con empresa</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span>📋 Manifiestos del Mes</span></div>
-        <table class="data-table">
-          <thead>
-            <tr><th>Fecha</th><th>N° Manifiesto</th><th>Peso (kg)</th><th>Empresa</th><th>Responsable</th><th>Estado</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>16/05</td><td style="font-family:var(--mono)">00842</td><td>12.4</td><td>BioResiduos S.A.</td><td>González A.</td><td><span class="badge badge-green">Firmado</span></td></tr>
-            <tr><td>15/05</td><td style="font-family:var(--mono)">00841</td><td>10.8</td><td>BioResiduos S.A.</td><td>González A.</td><td><span class="badge badge-green">Firmado</span></td></tr>
-            <tr><td>14/05</td><td style="font-family:var(--mono)">00839</td><td>14.1</td><td>BioResiduos S.A.</td><td>Martínez C.</td><td><span class="badge badge-green">Firmado</span></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="card"><div class="card-header"><span>📋 Manifiestos del Mes</span></div>
+      <table class="data-table"><thead><tr><th>Fecha</th><th>N° Manifiesto</th><th>Peso (kg)</th><th>Empresa</th><th>Responsable</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td>16/05</td><td style="font-family:var(--mono)">00842</td><td>12.4</td><td>BioResiduos S.A.</td><td>González A.</td><td><span class="badge badge-green">Firmado</span></td></tr>
+        <tr><td>15/05</td><td style="font-family:var(--mono)">00841</td><td>10.8</td><td>BioResiduos S.A.</td><td>González A.</td><td><span class="badge badge-green">Firmado</span></td></tr>
+      </tbody></table></div>
     </div>
 
     <!-- ROPERÍA -->
     <div class="page" id="page-roperia">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Ropería</div>
-          <div class="page-sub">Control de entrega y recepción de ropa con lavandería externa</div>
-        </div>
-        <button class="btn-sm" onclick="openModal('modal-roperia')">+ Registrar Movimiento</button>
-      </div>
+      <div class="page-header"><div><div class="page-title">Ropería</div><div class="page-sub">Control de entrega y recepción con lavandería externa</div></div><button class="btn-sm" onclick="openModal('modal-roperia')">+ Registrar Movimiento</button></div>
       <div class="grid-3">
-        <div class="stat-card">
-          <div class="stat-label">Entregado hoy (sucio)</div>
-          <div class="stat-val" style="color:var(--red)">142</div>
-          <div class="stat-meta">prendas — Lavandy SRL</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Recibido hoy (limpio)</div>
-          <div class="stat-val" style="color:var(--green)">138</div>
-          <div class="stat-meta">prendas — Lavandy SRL</div>
-        </div>
-        <div class="stat-card" style="border-color:var(--amber)">
-          <div class="stat-label">Diferencia</div>
-          <div class="stat-val" style="color:var(--amber)">-4</div>
-          <div class="stat-meta">⚠️ Informar a jefatura</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span>📋 Registros de la Semana</span></div>
-        <table class="data-table">
-          <thead>
-            <tr><th>Fecha</th><th>Entregado</th><th>Recibido</th><th>Dif.</th><th>Empresa</th><th>Responsable</th><th>Estado</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>17/05</td><td>142</td><td>138</td><td style="color:var(--amber)">-4</td><td>Lavandy SRL</td><td>Pérez, M.</td><td><span class="badge badge-amber">Observación</span></td></tr>
-            <tr><td>16/05</td><td>156</td><td>156</td><td style="color:var(--green)">0</td><td>Lavandy SRL</td><td>Pérez, M.</td><td><span class="badge badge-green">Conforme</span></td></tr>
-            <tr><td>15/05</td><td>148</td><td>148</td><td style="color:var(--green)">0</td><td>Lavandy SRL</td><td>Sosa, T.</td><td><span class="badge badge-green">Conforme</span></td></tr>
-          </tbody>
-        </table>
+        <div class="stat-card"><div class="stat-label">Entregado hoy (sucio)</div><div class="stat-val" style="color:var(--red)">142</div><div class="stat-meta">prendas — Lavandy SRL</div></div>
+        <div class="stat-card"><div class="stat-label">Recibido hoy (limpio)</div><div class="stat-val" style="color:var(--green)">138</div><div class="stat-meta">prendas — Lavandy SRL</div></div>
+        <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label">Diferencia</div><div class="stat-val" style="color:var(--amber)">-4</div><div class="stat-meta">⚠️ Informar a jefatura</div></div>
       </div>
     </div>
 
     <!-- INSUMOS -->
     <div class="page" id="page-insumos">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Insumos y Amenities</div>
-          <div class="page-sub">Control semanal de consumo y stock</div>
-        </div>
-        <button class="btn-sm" onclick="openModal('modal-insumo')">+ Reportar Faltante</button>
-      </div>
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-header"><span>🧴 Amenities — Sectores Prepaga</span></div>
-        <table class="data-table">
-          <thead><tr><th>Ítem</th><th>Stock Actual</th><th>Mínimo</th><th>Estado</th><th>Acción</th></tr></thead>
-          <tbody>
-            <tr><td>Shampoo en sobre</td><td>24 u.</td><td>20</td><td><span class="badge badge-green">OK</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 10px">Actualizar</button></td></tr>
-            <tr><td>Crema de enjuague</td><td>18 u.</td><td>20</td><td><span class="badge badge-amber">Bajo</span></td><td><button class="btn-sm" style="font-size:11px;padding:4px 10px">Solicitar</button></td></tr>
-            <tr><td>Cepillo dental</td><td>30 u.</td><td>20</td><td><span class="badge badge-green">OK</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 10px">Actualizar</button></td></tr>
-            <tr><td>Jabón tocador</td><td>8 u.</td><td>20</td><td><span class="badge badge-red">Crítico</span></td><td><button class="btn-sm danger" style="font-size:11px;padding:4px 10px">🚨 Urgente</button></td></tr>
-            <tr><td>Bolsa bienvenida</td><td>15 u.</td><td>12</td><td><span class="badge badge-green">OK</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 10px">Actualizar</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-header"><span>🧹 Insumos de Limpieza — Consumo Semanal</span></div>
-        <table class="data-table">
-          <thead><tr><th>Producto</th><th>Consumo sem.</th><th>Stock actual</th><th>Estado</th></tr></thead>
-          <tbody>
-            <tr><td>Hipoclorito de sodio</td><td>8.5 L</td><td>22 L</td><td><span class="badge badge-green">OK</span></td></tr>
-            <tr><td>Detergente industrial</td><td>4.2 L</td><td>6 L</td><td><span class="badge badge-amber">Bajo</span></td></tr>
-            <tr><td>Desinfectante multiuso</td><td>3.1 L</td><td>14 L</td><td><span class="badge badge-green">OK</span></td></tr>
-            <tr><td>Bolsas rojas patogénicas</td><td>48 u.</td><td>80 u.</td><td><span class="badge badge-green">OK</span></td></tr>
-            <tr><td>Guantes descartables</td><td>120 u.</td><td>40 u.</td><td><span class="badge badge-red">Crítico</span></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="page-header"><div><div class="page-title">Insumos y Amenities</div><div class="page-sub">Control semanal de consumo y stock</div></div><button class="btn-sm" onclick="openModal('modal-insumo')">+ Reportar Faltante</button></div>
+      <div class="card"><div class="card-header"><span>🧴 Amenities — Sectores Prepaga</span></div>
+      <table class="data-table"><thead><tr><th>Ítem</th><th>Stock Actual</th><th>Mínimo</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td>Shampoo en sobre</td><td>24 u.</td><td>20</td><td><span class="badge badge-green">OK</span></td></tr>
+        <tr><td>Crema de enjuague</td><td>18 u.</td><td>20</td><td><span class="badge badge-amber">Bajo</span></td></tr>
+        <tr><td>Jabón tocador</td><td>8 u.</td><td>20</td><td><span class="badge badge-red">Crítico</span></td></tr>
+        <tr><td>Guantes descartables</td><td>40 u.</td><td>100</td><td><span class="badge badge-red">Crítico</span></td></tr>
+      </tbody></table></div>
     </div>
 
     <!-- REQUERIMIENTOS -->
     <div class="page" id="page-requerimientos">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Requerimientos</div>
-          <div class="page-sub">Solicitudes del personal — Canal interno del servicio</div>
-        </div>
-        <button class="btn-sm" onclick="openModal('modal-req')">+ Nuevo Requerimiento</button>
-      </div>
-      <div class="card">
-        <table class="data-table">
-          <thead><tr><th>Fecha</th><th>Solicitante</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
-          <tbody>
-            <tr>
-              <td style="font-family:var(--mono);font-size:12px">17/05</td>
-              <td>Torres, Raúl</td>
-              <td><span class="badge badge-blue">Vacaciones</span></td>
-              <td>Solicitud vacaciones 10-20 junio</td>
-              <td><span class="badge badge-amber">Pendiente supervisor</span></td>
-            </tr>
-            <tr>
-              <td style="font-family:var(--mono);font-size:12px">16/05</td>
-              <td>Medina, Claudia</td>
-              <td><span class="badge badge-purple">Cambio turno</span></td>
-              <td>Urgencia familiar — solicita cambio turno mañana 20/05</td>
-              <td><span class="badge badge-amber">En evaluación</span></td>
-            </tr>
-            <tr>
-              <td style="font-family:var(--mono);font-size:12px">14/05</td>
-              <td>Vega, Pablo</td>
-              <td><span class="badge badge-teal">Insumos</span></td>
-              <td>Falta de guantes nitrilo — stock crítico</td>
-              <td><span class="badge badge-red">Elevado a jefatura</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="page-header"><div><div class="page-title">Requerimientos</div><div class="page-sub">Solicitudes del personal</div></div><button class="btn-sm" onclick="openModal('modal-req')">+ Nuevo Requerimiento</button></div>
+      <div class="card"><table class="data-table"><thead><tr><th>Fecha</th><th>Solicitante</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td>17/05</td><td>Torres, Raúl</td><td><span class="badge badge-blue">Vacaciones</span></td><td>Solicitud vacaciones 10-20 junio</td><td><span class="badge badge-amber">Pendiente supervisor</span></td></tr>
+      </tbody></table></div>
     </div>
 
     <!-- PERSONAL -->
     <div class="page" id="page-personal">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Personal y Turnos</div>
-          <div class="page-sub">Programación y gestión del equipo</div>
-        </div>
-      </div>
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-header"><span>📅 Programación Semanal</span></div>
-        <table class="data-table">
-          <thead><tr><th>Personal</th><th>Turno</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>Rodríguez, M.</td>
-              <td><span class="badge badge-blue">Mañana</span></td>
-              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
-            </tr>
-            <tr>
-              <td>López, A.</td>
-              <td><span class="badge badge-amber">Tarde</span></td>
-              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td>
-            </tr>
-            <tr>
-              <td>Pereyra, L.</td>
-              <td><span class="badge badge-purple">Noche A</span></td>
-              <td>✅</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>—</td><td>✅</td>
-            </tr>
-            <tr>
-              <td>Sosa, T.</td>
-              <td><span class="badge badge-teal">Ropería</span></td>
-              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="page-header"><div><div class="page-title">Personal y Turnos</div><div class="page-sub">Programación del equipo</div></div></div>
       <div class="card">
-        <div class="card-header"><span>🏖️ Planificación de Vacaciones</span></div>
+        <div class="card-header"><span>👥 Usuarios Registrados en el Sistema</span><a href="https://docs.google.com/spreadsheets/d/13o6o3yeYEPuSY8pecZqLoiwanymrdkUh63QbNtWXQ5Q" target="_blank" class="btn-sm secondary">Ver planilla completa</a></div>
         <div class="card-body">
-          <div class="supervisor-note">
-            ⚠️ <strong>Criterio de aprobación:</strong> No pueden ausentarse simultáneamente más del 25% del personal de un mismo turno. Máximo 1 persona por turno en el mismo período. Las solicitudes se evalúan por orden de presentación y antigüedad (CCT FATSA).
-          </div>
-          <table class="data-table">
-            <thead><tr><th>Personal</th><th>Período solicitado</th><th>Turno</th><th>Cobertura</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td>Torres, R.</td><td>10-20 junio</td><td><span class="badge badge-blue">Mañana</span></td><td>A confirmar</td><td><span class="badge badge-amber">Pendiente</span></td></tr>
-              <tr><td>García, M.</td><td>15-25 junio</td><td><span class="badge badge-amber">Tarde</span></td><td>A confirmar</td><td><span class="badge badge-red">⚠️ Coincide con otro</span></td></tr>
-            </tbody>
-          </table>
+          <div class="supervisor-note">⚠️ Para aprobar nuevos usuarios o cambiar perfiles, abrí la planilla de Google Sheets y cambiá el valor de la columna <strong>Estado</strong> de <em>Pendiente</em> a <em>Aprobado</em>, y asigná el <strong>Perfil</strong> correspondiente.</div>
+          <p style="font-size:13px;color:var(--text2)">Todos los registros de usuarios se gestionan directamente desde Google Sheets.</p>
         </div>
       </div>
     </div>
 
-    <!-- MONITOREO JEFATURA -->
+    <!-- MONITOREO -->
     <div class="page" id="page-monitoreo">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🔒 Monitoreo — Jefatura</div>
-          <div class="page-sub">Vista privada. Supervisión del equipo en tiempo real.</div>
-        </div>
-        <span class="badge badge-red">Solo Jefatura</span>
-      </div>
+      <div class="page-header"><div><div class="page-title">🔒 Monitoreo — Jefatura</div><div class="page-sub">Vista privada en tiempo real</div></div><span class="badge badge-red">Solo Jefatura</span></div>
       <div id="monitoreo-block">
         <div class="grid-3">
-          <div class="stat-card" style="border-color:var(--purple)">
-            <div class="stat-label">Supervisora activa</div>
-            <div class="stat-val" style="color:var(--purple);font-size:18px">González, A.</div>
-            <div class="stat-meta">Turno mañana · Conectada 07:02</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Tareas OK por supervisor</div>
-            <div class="stat-val" style="color:var(--green)">18</div>
-            <div class="stat-meta">Registradas hoy</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Alertas sin resolver</div>
-            <div class="stat-val" style="color:var(--amber)">2</div>
-            <div class="stat-meta">Ropería + insumos</div>
-          </div>
+          <div class="stat-card" style="border-color:var(--purple)"><div class="stat-label">Supervisora activa</div><div class="stat-val" style="color:var(--purple);font-size:18px">González, A.</div><div class="stat-meta">Turno mañana</div></div>
+          <div class="stat-card"><div class="stat-label">Tareas OK hoy</div><div class="stat-val" style="color:var(--green)">18</div><div class="stat-meta">Registradas</div></div>
+          <div class="stat-card"><div class="stat-label">Alertas sin resolver</div><div class="stat-val" style="color:var(--amber)">2</div><div class="stat-meta">Ropería + insumos</div></div>
         </div>
-        <div class="card" style="margin-bottom:20px">
-          <div class="card-header"><span>🕐 Actividad por Operario/a — Tiempo Real</span></div>
-          <table class="data-table">
-            <thead><tr><th>Personal</th><th>Última acción</th><th>Habitación</th><th>Hora</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td>Rodríguez, M.</td><td>Limpieza OK</td><td>214</td><td style="font-family:var(--mono)">09:42</td><td><span class="badge badge-green">Activo</span></td></tr>
-              <tr><td>Pereyra, L.</td><td>Extracción residuos</td><td>Piso 2</td><td style="font-family:var(--mono)">09:15</td><td><span class="badge badge-green">Activo</span></td></tr>
-              <tr><td>Fernández, J.</td><td>Sin actividad reciente</td><td>—</td><td style="font-family:var(--mono)">08:10</td><td><span class="badge badge-amber">Sin reporte</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card">
-          <div class="card-header"><span>📊 Rendimiento Supervisor/a — Semana</span></div>
-          <div class="card-body">
-            <div style="margin-bottom:16px">
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
-                <span>Tareas supervisadas correctamente</span><span style="color:var(--green)">94%</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:94%;background:var(--green)"></div></div>
-            </div>
-            <div style="margin-bottom:16px">
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
-                <span>Novedades registradas en tiempo</span><span style="color:var(--blue)">87%</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:87%;background:var(--blue)"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
-                <span>Manifiestos firmados sin observaciones</span><span style="color:var(--teal)">100%</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--teal)"></div></div>
-            </div>
-          </div>
-        </div>
+        <div class="card"><div class="card-header"><span>🕐 Actividad por Operario/a</span></div>
+        <table class="data-table"><thead><tr><th>Personal</th><th>Última acción</th><th>Habitación</th><th>Hora</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>Rodríguez, M.</td><td>Limpieza OK</td><td>214</td><td style="font-family:var(--mono)">09:42</td><td><span class="badge badge-green">Activo</span></td></tr>
+          <tr><td>Pereyra, L.</td><td>Extracción residuos</td><td>Piso 2</td><td style="font-family:var(--mono)">09:15</td><td><span class="badge badge-green">Activo</span></td></tr>
+        </tbody></table></div>
       </div>
       <div id="monitoreo-denied" style="display:none;text-align:center;padding:60px 20px">
         <div style="font-size:48px;margin-bottom:16px">🔒</div>
@@ -978,223 +614,229 @@
       </div>
     </div>
 
-  </div><!-- end main-content -->
-</div><!-- end app -->
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-novedad">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-novedad')">✕</button>
-    <div class="modal-title">Nueva Novedad</div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Tipo</label>
-        <select>
-          <option>Parte médico / Ausencia</option>
-          <option>Cambio de turno (eventual)</option>
-          <option>Horas extras feriado</option>
-          <option>Otro</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Personal</label>
-        <input type="text" placeholder="Nombre del agente" />
-      </div>
-    </div>
-    <div class="form-field" style="margin-bottom:16px">
-      <label>Descripción</label>
-      <textarea placeholder="Detalle la novedad..."></textarea>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-sm secondary" onclick="closeModal('modal-novedad')">Cancelar</button>
-      <button class="btn-sm" onclick="submitForm('modal-novedad','Novedad registrada correctamente')">Registrar</button>
-    </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-residuo">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-residuo')">✕</button>
-    <div class="modal-title">Registrar Retiro de Residuos</div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>N° Manifiesto</label>
-        <input type="text" placeholder="Ej: 00843" />
-      </div>
-      <div class="form-field">
-        <label>Peso (kg)</label>
-        <input type="text" placeholder="Ej: 12.4" />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Empresa</label>
-        <input type="text" placeholder="Nombre empresa habilitada" />
-      </div>
-      <div class="form-field">
-        <label>Responsable firma</label>
-        <input type="text" placeholder="Tu nombre" />
-      </div>
-    </div>
-    <div class="form-field" style="margin-bottom:16px">
-      <label>Observaciones</label>
-      <textarea placeholder="Cualquier discrepancia o novedad..."></textarea>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-sm secondary" onclick="closeModal('modal-residuo')">Cancelar</button>
-      <button class="btn-sm" onclick="submitForm('modal-residuo','Manifiesto registrado')">Guardar</button>
-    </div>
-  </div>
-</div>
+<!-- MODALES -->
+<div class="modal-overlay" id="modal-novedad"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-novedad')">✕</button>
+  <div class="modal-title">Nueva Novedad</div>
+  <div class="form-row"><div class="form-field"><label>Tipo</label><select><option>Parte médico / Ausencia</option><option>Cambio de turno</option><option>Horas extras feriado</option><option>Otro</option></select></div><div class="form-field"><label>Personal</label><input type="text" placeholder="Nombre del agente" /></div></div>
+  <div class="form-field" style="margin-bottom:16px"><label>Descripción</label><textarea placeholder="Detalle la novedad..."></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-novedad')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-novedad','Novedad registrada')">Registrar</button></div>
+</div></div>
 
-<div class="modal-overlay" id="modal-roperia">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-roperia')">✕</button>
-    <div class="modal-title">Movimiento de Ropería</div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Prendas entregadas (sucias)</label>
-        <input type="text" placeholder="Cantidad" />
-      </div>
-      <div class="form-field">
-        <label>Prendas recibidas (limpias)</label>
-        <input type="text" placeholder="Cantidad" />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Empresa lavandería</label>
-        <input type="text" placeholder="Nombre empresa" />
-      </div>
-      <div class="form-field">
-        <label>Responsable</label>
-        <input type="text" placeholder="Tu nombre" />
-      </div>
-    </div>
-    <div class="form-field" style="margin-bottom:16px">
-      <label>Observaciones / Discrepancias</label>
-      <textarea placeholder="Anotar diferencias o novedades..."></textarea>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-sm secondary" onclick="closeModal('modal-roperia')">Cancelar</button>
-      <button class="btn-sm" onclick="submitForm('modal-roperia','Movimiento registrado')">Guardar</button>
-    </div>
-  </div>
-</div>
+<div class="modal-overlay" id="modal-residuo"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-residuo')">✕</button>
+  <div class="modal-title">Registrar Retiro de Residuos</div>
+  <div class="form-row"><div class="form-field"><label>N° Manifiesto</label><input type="text" placeholder="Ej: 00843" /></div><div class="form-field"><label>Peso (kg)</label><input type="text" placeholder="Ej: 12.4" /></div></div>
+  <div class="form-row"><div class="form-field"><label>Empresa</label><input type="text" /></div><div class="form-field"><label>Responsable</label><input type="text" /></div></div>
+  <div class="form-field" style="margin-bottom:16px"><label>Observaciones</label><textarea></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-residuo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-residuo','Manifiesto registrado')">Guardar</button></div>
+</div></div>
 
-<div class="modal-overlay" id="modal-insumo">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-insumo')">✕</button>
-    <div class="modal-title">Reportar Faltante / Actualizar Stock</div>
-    <div class="form-field" style="margin-bottom:16px">
-      <label>Ítem</label>
-      <select>
-        <option>Shampoo en sobre</option>
-        <option>Crema de enjuague</option>
-        <option>Cepillo dental</option>
-        <option>Jabón tocador</option>
-        <option>Bolsa bienvenida</option>
-        <option>Hipoclorito de sodio</option>
-        <option>Detergente industrial</option>
-        <option>Guantes descartables</option>
-        <option>Bolsas rojas patogénicas</option>
-        <option>Otro</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Stock actual</label>
-        <input type="text" placeholder="Cantidad" />
-      </div>
-      <div class="form-field">
-        <label>Urgencia</label>
-        <select>
-          <option>Normal</option>
-          <option>Bajo stock</option>
-          <option>🚨 Crítico</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-field" style="margin-bottom:16px">
-      <label>Observaciones</label>
-      <textarea placeholder="Detalle adicional..."></textarea>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-sm secondary" onclick="closeModal('modal-insumo')">Cancelar</button>
-      <button class="btn-sm" onclick="submitForm('modal-insumo','Faltante reportado a jefatura')">Reportar</button>
-    </div>
-  </div>
-</div>
+<div class="modal-overlay" id="modal-roperia"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-roperia')">✕</button>
+  <div class="modal-title">Movimiento de Ropería</div>
+  <div class="form-row"><div class="form-field"><label>Entregado (sucio)</label><input type="text" placeholder="Cantidad" /></div><div class="form-field"><label>Recibido (limpio)</label><input type="text" placeholder="Cantidad" /></div></div>
+  <div class="form-row"><div class="form-field"><label>Empresa</label><input type="text" /></div><div class="form-field"><label>Responsable</label><input type="text" /></div></div>
+  <div class="form-field" style="margin-bottom:16px"><label>Observaciones</label><textarea></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-roperia')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-roperia','Movimiento registrado')">Guardar</button></div>
+</div></div>
 
-<div class="modal-overlay" id="modal-req">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-req')">✕</button>
-    <div class="modal-title">Nuevo Requerimiento</div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Tipo</label>
-        <select>
-          <option>Vacaciones</option>
-          <option>Cambio de turno eventual</option>
-          <option>Parte médico</option>
-          <option>Horas extras feriado</option>
-          <option>Insumos</option>
-          <option>Otro</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Tu nombre</label>
-        <input type="text" placeholder="Nombre completo" />
-      </div>
-    </div>
-    <div class="form-field" style="margin-bottom:16px">
-      <label>Descripción del requerimiento</label>
-      <textarea placeholder="Expliqué el motivo con el mayor detalle posible..."></textarea>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-sm secondary" onclick="closeModal('modal-req')">Cancelar</button>
-      <button class="btn-sm" onclick="submitForm('modal-req','Requerimiento enviado al supervisor/a')">Enviar</button>
-    </div>
-  </div>
-</div>
+<div class="modal-overlay" id="modal-insumo"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-insumo')">✕</button>
+  <div class="modal-title">Reportar Faltante</div>
+  <div class="form-field" style="margin-bottom:16px"><label>Ítem</label><select><option>Shampoo en sobre</option><option>Crema de enjuague</option><option>Cepillo dental</option><option>Jabón tocador</option><option>Guantes descartables</option><option>Hipoclorito de sodio</option><option>Otro</option></select></div>
+  <div class="form-row"><div class="form-field"><label>Stock actual</label><input type="text" placeholder="Cantidad" /></div><div class="form-field"><label>Urgencia</label><select><option>Normal</option><option>Bajo stock</option><option>🚨 Crítico</option></select></div></div>
+  <div class="form-field" style="margin-bottom:16px"><label>Observaciones</label><textarea></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-insumo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-insumo','Faltante reportado a jefatura')">Reportar</button></div>
+</div></div>
 
-<!-- MODAL HABITACIÓN -->
-<div class="modal-overlay" id="modal-hab">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-hab')">✕</button>
-    <div class="modal-title" id="modal-hab-title">Habitación —</div>
-    <div id="modal-hab-body"></div>
-  </div>
-</div>
+<div class="modal-overlay" id="modal-req"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-req')">✕</button>
+  <div class="modal-title">Nuevo Requerimiento</div>
+  <div class="form-row"><div class="form-field"><label>Tipo</label><select><option>Vacaciones</option><option>Cambio de turno eventual</option><option>Parte médico</option><option>Horas extras feriado</option><option>Insumos</option><option>Otro</option></select></div><div class="form-field"><label>Tu nombre</label><input type="text" /></div></div>
+  <div class="form-field" style="margin-bottom:16px"><label>Descripción</label><textarea></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-req')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-req','Requerimiento enviado al supervisor/a')">Enviar</button></div>
+</div></div>
 
-<!-- TOAST -->
+<div class="modal-overlay" id="modal-hab"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-hab')">✕</button>
+  <div class="modal-title" id="modal-hab-title">Habitación —</div>
+  <div id="modal-hab-body"></div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ---- DATA ----
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzixtWLXSYC9BTbtUFVil1WTNIkD3ost0D8RFa01MnYcw0njVRc-Y3-emFixgZ3AnKk7A/exec";
+
+let currentUser = null;
+
+// ---- AUTH ----
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0 && tab==='login') || (i===1 && tab==='registro')));
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-registro').style.display = tab === 'registro' ? 'block' : 'none';
+  clearMsgs();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function clearMsgs() {
+  ['login-msg','registro-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.className = 'auth-msg'; el.textContent = ''; }
+  });
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.className = 'auth-msg ' + type;
+  el.textContent = text;
+}
+
+function showLoading(msg) {
+  document.getElementById('loading-msg').textContent = msg || 'Procesando...';
+  document.getElementById('loading').style.display = 'flex';
+}
+
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+
+async function doLogin() {
+  const nombre = document.getElementById('login-nombre').value.trim();
+  const pin = document.getElementById('login-pin').value.trim();
+  if (!nombre || !pin) { showMsg('login-msg','Completá todos los campos.','error'); return; }
+  if (pin.length !== 4) { showMsg('login-msg','El PIN debe tener 4 dígitos.','error'); return; }
+
+  showLoading('Verificando acceso...');
+  try {
+    const res = await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'login', nombre, pin })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (data.ok) {
+      currentUser = { nombre: data.nombre, perfil: data.perfil };
+      launchApp();
+    } else {
+      showMsg('login-msg', data.msg, 'error');
+    }
+  } catch(e) {
+    hideLoading();
+    showMsg('login-msg','Error de conexión. Intentá de nuevo.','error');
+  }
+}
+
+async function doRegistro() {
+  const nombre = document.getElementById('reg-nombre').value.trim();
+  const turno = document.getElementById('reg-turno').value;
+  const pin = document.getElementById('reg-pin').value.trim();
+  const pin2 = document.getElementById('reg-pin2').value.trim();
+
+  if (!nombre || !turno || !pin || !pin2) { showMsg('registro-msg','Completá todos los campos.','error'); return; }
+  if (pin.length !== 4 || isNaN(pin)) { showMsg('registro-msg','El PIN debe ser de 4 números.','error'); return; }
+  if (pin !== pin2) { showMsg('registro-msg','Los PINes no coinciden.','error'); return; }
+
+  showLoading('Enviando solicitud...');
+  try {
+    const res = await fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'registro', nombre, turno, pin })
+    });
+    const data = await res.json();
+    hideLoading();
+    if (data.ok) {
+      showScreen('screen-pendiente');
+    } else {
+      showMsg('registro-msg', data.msg, 'error');
+    }
+  } catch(e) {
+    hideLoading();
+    showMsg('registro-msg','Error de conexión. Intentá de nuevo.','error');
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  showScreen('screen-login');
+  document.getElementById('login-nombre').value = '';
+  document.getElementById('login-pin').value = '';
+}
+
+// ---- APP ----
+function launchApp() {
+  showScreen(null);
+  document.getElementById('app').style.display = 'flex';
+
+  const perfilLabels = { jefe:'Jefe/a del Servicio', supervisor:'Supervisor/a', operario:'Operario/a', roperia:'Ropería' };
+  document.getElementById('sb-role-badge').textContent = perfilLabels[currentUser.perfil] || currentUser.perfil;
+  document.getElementById('sb-name').textContent = currentUser.nombre;
+
+  // Permisos por rol
+  const permisos = {
+    'nav-novedades': ['jefe','supervisor','operario'],
+    'nav-residuos':  ['jefe','supervisor','operario'],
+    'nav-roperia':   ['jefe','supervisor','roperia'],
+    'nav-insumos':   ['jefe','supervisor'],
+    'nav-reqs':      ['jefe','supervisor','operario','roperia'],
+    'nav-personal':  ['jefe','supervisor'],
+    'nav-monitor':   ['jefe'],
+  };
+  Object.entries(permisos).forEach(([id, roles]) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = roles.includes(currentUser.perfil) ? '' : 'none';
+  });
+
+  if (currentUser.perfil !== 'jefe') {
+    document.getElementById('monitoreo-block').style.display = 'none';
+    document.getElementById('monitoreo-denied').style.display = 'block';
+  } else {
+    document.getElementById('monitoreo-block').style.display = 'block';
+    document.getElementById('monitoreo-denied').style.display = 'none';
+  }
+
+  const now = new Date();
+  document.getElementById('dash-date').textContent = now.toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const h = now.getHours();
+  document.getElementById('turno-badge').textContent = h < 15 ? 'Turno Mañana' : h < 23 ? 'Turno Tarde' : 'Turno Noche';
+
+  renderRooms();
+}
+
+// ---- HABITACIONES ----
 const rooms = [
-  { num:'101', status:'ok', iso:'ninguno', pax:1, type:'estándar' },
-  { num:'102', status:'pending', iso:'contacto', pax:2, type:'estándar' },
-  { num:'103', status:'ok', iso:'ninguno', pax:1, type:'prepaga' },
-  { num:'104', status:'alta', iso:'ninguno', pax:0, type:'prepaga' },
-  { num:'105', status:'pending', iso:'respiratorio', pax:1, type:'estándar' },
-  { num:'106', status:'ok', iso:'ninguno', pax:1, type:'estándar' },
-  { num:'107', status:'busy', iso:'protector', pax:1, type:'prepaga' },
-  { num:'108', status:'ok', iso:'ninguno', pax:2, type:'estándar' },
-  { num:'201', status:'ok', iso:'ninguno', pax:1, type:'estándar' },
-  { num:'202', status:'alta', iso:'ninguno', pax:0, type:'prepaga' },
-  { num:'203', status:'pending', iso:'ninguno', pax:1, type:'estándar' },
-  { num:'204', status:'ok', iso:'contacto', pax:1, type:'estándar' },
-  { num:'205', status:'ok', iso:'ninguno', pax:2, type:'prepaga' },
-  { num:'206', status:'ok', iso:'ninguno', pax:1, type:'estándar' },
-  { num:'207', status:'alta', iso:'aire', pax:0, type:'estándar' },
-  { num:'208', status:'ok', iso:'ninguno', pax:1, type:'estándar' },
+  {num:'101',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
+  {num:'102',status:'pending',iso:'contacto',pax:2,type:'estándar'},
+  {num:'103',status:'ok',iso:'ninguno',pax:1,type:'prepaga'},
+  {num:'104',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},
+  {num:'105',status:'pending',iso:'respiratorio',pax:1,type:'estándar'},
+  {num:'106',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
+  {num:'107',status:'busy',iso:'protector',pax:1,type:'prepaga'},
+  {num:'108',status:'ok',iso:'ninguno',pax:2,type:'estándar'},
+  {num:'201',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
+  {num:'202',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},
+  {num:'203',status:'pending',iso:'ninguno',pax:1,type:'estándar'},
+  {num:'204',status:'ok',iso:'contacto',pax:1,type:'estándar'},
+  {num:'205',status:'ok',iso:'ninguno',pax:2,type:'prepaga'},
+  {num:'206',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
+  {num:'207',status:'alta',iso:'aire',pax:0,type:'estándar'},
+  {num:'208',status:'ok',iso:'ninguno',pax:1,type:'estándar'},
 ];
 
-const statusLabels = { ok:'OK', pending:'Pendiente', busy:'En curso', alta:'Alta', libre:'Libre' };
-const statusClass = { ok:'s-ok', pending:'s-pending', busy:'s-busy', alta:'s-alta', libre:'s-libre' };
-const isoLabels = { contacto:'Aislam. Contacto', respiratorio:'Aislam. Gotas', aire:'Aislam. Aire', protector:'Aislam. Protector', ninguno:'Sin aislamiento' };
-const isoClass = { contacto:'iso-contacto', respiratorio:'iso-respiratorio', aire:'iso-aire', protector:'iso-protector', ninguno:'iso-ninguno' };
+const statusLabels = {ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta'};
+const statusClass  = {ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta'};
+const isoLabels = {contacto:'Aislam. Contacto',respiratorio:'Aislam. Gotas',aire:'Aislam. Aire',protector:'Aislam. Protector',ninguno:'Sin aislamiento'};
+const isoClass  = {contacto:'iso-contacto',respiratorio:'iso-respiratorio',aire:'iso-aire',protector:'iso-protector',ninguno:'iso-ninguno'};
 const isoEPP = {
   contacto:'Guantes + camisolín + barbijo quirúrgico. Higiene de manos al entrar y salir.',
   respiratorio:'Guantes + camisolín + barbijo quirúrgico. Mantener puerta cerrada.',
@@ -1203,91 +845,39 @@ const isoEPP = {
   ninguno:'EPP estándar: guantes y delantal.'
 };
 
-let currentUser = { role:'', name:'' };
-
-function doLogin() {
-  const role = document.getElementById('login-role').value;
-  const name = document.getElementById('login-user').value.trim();
-  if (!role || !name) { showToast('Completá todos los campos', true); return; }
-  currentUser = { role, name };
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  setupUI();
+function makeRoomCard(r) {
+  return `<div class="room-card" onclick="openRoom('${r.num}')">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div class="room-num">${r.num}</div>
+      <span class="badge badge-${r.type==='prepaga'?'teal':'blue'}" style="font-size:9px">${r.type}</span>
+    </div>
+    <span class="room-status ${statusClass[r.status]}">${statusLabels[r.status]}</span>
+    <div><span class="iso-tag ${isoClass[r.iso]}">${isoLabels[r.iso]}</span></div>
+    ${r.pax>0?`<div style="font-size:11px;color:var(--text2);margin-top:4px">${r.pax} paciente${r.pax>1?'s':''}</div>`:''}
+  </div>`;
 }
 
-function doLogout() {
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
+function renderRooms(list) {
+  list = list || rooms;
+  const q = document.getElementById('rooms-quick');
+  const f = document.getElementById('rooms-full-grid');
+  if (q) q.innerHTML = list.slice(0,8).map(makeRoomCard).join('');
+  if (f) f.innerHTML = list.map(makeRoomCard).join('');
 }
 
-function setupUI() {
-  const r = currentUser.role;
-  document.getElementById('sb-role-badge').textContent = {jefe:'Jefe/a del Servicio', supervisor:'Supervisor/a', operario:'Operario/a', roperia:'Ropería'}[r];
-  document.getElementById('sb-name').textContent = currentUser.name;
-
-  // Permisos según rol
-  const showItems = {
-    'nav-novedades': ['jefe','supervisor','operario'],
-    'nav-residuos': ['jefe','supervisor','operario'],
-    'nav-roperia': ['jefe','supervisor','roperia'],
-    'nav-insumos': ['jefe','supervisor'],
-    'nav-reqs': ['jefe','supervisor','operario','roperia'],
-    'nav-personal': ['jefe','supervisor'],
-    'nav-monitor': ['jefe'],
-  };
-  Object.entries(showItems).forEach(([id, roles]) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = roles.includes(r) ? '' : 'none';
-  });
-
-  // Monitoreo solo jefe
-  if (r !== 'jefe') {
-    document.getElementById('monitoreo-block').style.display = 'none';
-    document.getElementById('monitoreo-denied').style.display = 'block';
-  }
-
-  // Fecha
-  const now = new Date();
-  document.getElementById('dash-date').textContent = now.toLocaleDateString('es-AR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-  const h = now.getHours();
-  const turno = h < 15 ? 'Turno Mañana' : h < 23 ? 'Turno Tarde' : 'Turno Noche';
-  document.getElementById('turno-badge').textContent = turno;
-
-  renderRooms();
+function filterRooms(f) {
+  const filtered = f==='alta' ? rooms.filter(r=>r.status==='alta')
+    : f==='pending' ? rooms.filter(r=>r.status==='pending')
+    : f==='iso' ? rooms.filter(r=>r.iso!=='ninguno')
+    : rooms;
+  renderRooms(filtered);
 }
-
-function renderRooms(filter) {
-  let list = rooms;
-  if (filter === 'alta') list = rooms.filter(r => r.status === 'alta');
-  else if (filter === 'pending') list = rooms.filter(r => r.status === 'pending');
-  else if (filter === 'iso') list = rooms.filter(r => r.iso !== 'ninguno');
-
-  const makeCard = (r) => `
-    <div class="room-card" onclick="openRoom('${r.num}')">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div class="room-num">${r.num}</div>
-        <span class="badge badge-${r.type === 'prepaga' ? 'teal' : 'blue'}" style="font-size:9px">${r.type}</span>
-      </div>
-      <span class="room-status ${statusClass[r.status]}">${statusLabels[r.status]}</span>
-      <div class="room-iso">
-        <span class="iso-tag ${isoClass[r.iso]}">${isoLabels[r.iso]}</span>
-      </div>
-      ${r.pax > 0 ? `<div style="font-size:11px;color:var(--text2);margin-top:4px">${r.pax} paciente${r.pax > 1 ? 's' : ''}</div>` : ''}
-    </div>`;
-
-  const quick = document.getElementById('rooms-quick');
-  const full = document.getElementById('rooms-full-grid');
-  if (quick) quick.innerHTML = list.slice(0,8).map(makeCard).join('');
-  if (full) full.innerHTML = list.map(makeCard).join('');
-}
-
-function filterRooms(f) { renderRooms(f || undefined); }
 
 function openRoom(num) {
-  const r = rooms.find(x => x.num === num);
+  const r = rooms.find(x=>x.num===num);
   if (!r) return;
   document.getElementById('modal-hab-title').textContent = `Habitación ${r.num}`;
-  const isJefeOrSup = ['jefe','supervisor'].includes(currentUser.role);
+  const canEdit = ['jefe','supervisor'].includes(currentUser?.perfil);
   document.getElementById('modal-hab-body').innerHTML = `
     <div style="margin-bottom:16px">
       <div class="form-row" style="margin-bottom:8px">
@@ -1300,63 +890,57 @@ function openRoom(num) {
         <strong style="color:var(--text)">EPP requerido:</strong> ${isoEPP[r.iso]}
       </div>
     </div>
-    ${r.pax === 2 ? `<div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px;font-size:12px;color:var(--amber);margin-bottom:16px">
-      ⚠️ Habitación con 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.
-    </div>` : ''}
-    ${r.status === 'alta' ? `<div style="background:var(--red-dim);border:1px solid var(--red);border-radius:8px;padding:10px;font-size:12px;color:var(--red);margin-bottom:16px">
-      🔴 Alta de paciente: realizar limpieza terminal completa antes de nueva admisión.
-    </div>` : ''}
+    ${r.pax===2?`<div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px;font-size:12px;color:var(--amber);margin-bottom:16px">⚠️ 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.</div>`:''}
+    ${r.status==='alta'?`<div style="background:var(--red-dim);border:1px solid var(--red);border-radius:8px;padding:10px;font-size:12px;color:var(--red);margin-bottom:16px">🔴 Alta: realizar limpieza terminal completa antes de nueva admisión.</div>`:''}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn-sm" onclick="markOK('${r.num}')">✅ Marcar servicio OK</button>
-      ${isJefeOrSup ? `<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>` : ''}
-    </div>
-  `;
+      ${canEdit?`<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>`:''}
+    </div>`;
   openModal('modal-hab');
 }
 
 function markOK(num) {
-  const r = rooms.find(x => x.num === num);
+  const r = rooms.find(x=>x.num===num);
   if (r) r.status = 'ok';
   renderRooms();
   closeModal('modal-hab');
-  showToast(`✅ Habitación ${num} — Servicio registrado correctamente`);
+  showToast(`✅ Habitación ${num} — Servicio registrado`);
 }
 
 function changeStatus(num) {
-  const r = rooms.find(x => x.num === num);
+  const r = rooms.find(x=>x.num===num);
   if (!r) return;
-  const statuses = ['ok','pending','busy','alta','libre'];
-  const idx = statuses.indexOf(r.status);
-  r.status = statuses[(idx + 1) % statuses.length];
+  const list = ['ok','pending','busy','alta'];
+  r.status = list[(list.indexOf(r.status)+1) % list.length];
   renderRooms();
   closeModal('modal-hab');
-  showToast(`Estado hab. ${num} actualizado a: ${statusLabels[r.status]}`);
+  showToast(`Estado hab. ${num}: ${statusLabels[r.status]}`);
 }
 
+// ---- NAV ----
 function navTo(el) {
-  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
   el.classList.add('active');
   navToPage(el.dataset.page);
 }
 
 function navToPage(page) {
-  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  const navEl = document.querySelector(`[data-page="${page}"]`);
-  if (navEl) {
-    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-    navEl.classList.add('active');
-  }
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const nav = document.querySelector(`[data-page="${page}"]`);
+  if (nav) { document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); nav.classList.add('active'); }
 }
 
+// ---- MODALES ----
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function submitForm(id, msg) { closeModal(id); showToast(msg); }
 
-function submitForm(modalId, msg) {
-  closeModal(modalId);
-  showToast(msg);
-}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); });
+});
 
+// ---- TOAST ----
 function showToast(msg, error) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1364,14 +948,15 @@ function showToast(msg, error) {
   t.style.borderColor = error ? 'var(--red)' : 'var(--green)';
   t.style.color = error ? 'var(--red)' : 'var(--green)';
   t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3200);
+  setTimeout(()=>t.style.display='none', 3200);
 }
 
-// Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
+// Enter en login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('form-login').style.display !== 'none') doLogin();
+    else doRegistro();
+  }
 });
 </script>
 </body>
