@@ -139,7 +139,7 @@ textarea:focus{border-color:var(--blue);}
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-@media(max-width:768px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}.sidebar{display:none;}}
+@media(max-width:768px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}.sidebar{display:none;position:fixed;z-index:300;height:100vh;top:0;left:0;transform:translateX(-100%);transition:transform .3s ease;}.sidebar.open{display:flex;transform:translateX(0);}.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:299;}.mobile-overlay.open{display:block;}.mobile-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}.hamburger{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:18px;cursor:pointer;}.mobile-logo{font-size:16px;font-weight:800;color:var(--blue);}.mobile-badge-sol{background:var(--red);color:white;border-radius:20px;font-size:11px;font-weight:700;padding:2px 8px;display:none;}#app{flex-direction:column;}.main-content{padding:16px;}}@media(min-width:769px){.mobile-header{display:none;}.mobile-overlay{display:none;}}
 </style>
 </head>
 <body>
@@ -280,7 +280,16 @@ textarea:focus{border-color:var(--blue);}
     <div class="sidebar-logout"><button class="btn-logout" onclick="doLogout()">⬅ Cerrar sesión</button></div>
   </div>
 
+  <!-- overlay mobile -->
+  <div class="mobile-overlay" id="mobile-overlay" onclick="closeSidebar()"></div>
+
   <div class="main-content">
+    <!-- header mobile -->
+    <div class="mobile-header">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div class="mobile-logo">Gest<span style="color:#14b8a6">Maestro</span></div>
+      <span class="mobile-badge-sol" id="mobile-badge-sol">0</span>
+    </div>
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
@@ -612,7 +621,7 @@ function actualizarBadges(){
   const resueltas=solicitudes.filter(s=>s.estado==='resuelta').length;
   const total=solicitudes.length;
   const badge=document.getElementById('badge-sol');
-  if(badge){badge.style.display=activas.length>0?'':'none';badge.textContent=activas.length;}
+  if(badge){badge.style.display=activas.length>0?'':'none';badge.textContent=activas.length;}const mb=document.getElementById('mobile-badge-sol');if(mb){mb.style.display=activas.length>0?'':'none';mb.textContent=activas.length;}
   const sn=document.getElementById('stat-sol-num');if(sn)sn.textContent=activas.length;
   const sc=document.getElementById('stat-sol');if(sc)sc.style.borderColor=criticas.length>0?'var(--red)':activas.length>0?'var(--orange)':'var(--border)';
   const ca=document.getElementById('sol-alert-critico');if(ca)ca.style.display=criticas.length>0?'block':'none';
@@ -680,7 +689,7 @@ function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;document.
 function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';renderRooms();closeModal('modal-hab');sheetPost({action:'guardarHabitacion',habitacion:num,accion:'Limpieza OK',usuario:currentUser?.nombre||'—',turno:document.getElementById('turno-badge')?.textContent||'—'});showToast(`✅ Hab. ${num} — Servicio registrado`);}
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
 
-function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);}
+function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
 function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();}
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -688,6 +697,8 @@ function submitForm(id,msg){closeModal(id);showToast(msg);}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
+function openSidebar(){document.querySelector('.sidebar').classList.add('open');document.getElementById('mobile-overlay').classList.add('open');}
+function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.getElementById('mobile-overlay').classList.remove('open');}
 </script>
 </body>
 </html>
