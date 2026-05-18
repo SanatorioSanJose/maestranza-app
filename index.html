@@ -207,6 +207,8 @@ textarea:focus{border-color:var(--blue);}
           <option>Enfermería Quirófano</option><option>Admisión y Egreso</option>
           <option>Seguridad</option><option>Mantenimiento</option>
           <option>Imágenes</option><option>Laboratorio</option><option>Guardia Médica</option>
+          <option>Hemodinamia</option><option>RR.HH.</option><option>Dirección</option>
+          <option>Legales</option><option>Calidad del Paciente</option><option>Consultorios Externos</option>
         </select>
       </div>
       <div class="field-group"><div class="field-label">PIN del servicio</div><input type="password" id="sector-pin" placeholder="••••" maxlength="4" /></div>
@@ -314,10 +316,10 @@ textarea:focus{border-color:var(--blue);}
       </div>
       <div id="dash-alerts"></div>
       <div class="grid-4">
-        <div class="stat-card"><div class="stat-label">Habitaciones OK</div><div class="stat-val" style="color:var(--green)">18</div><div class="stat-meta">de 28 habitaciones</div></div>
-        <div class="stat-card"><div class="stat-label">Pendientes limpieza</div><div class="stat-val" style="color:var(--amber)">6</div><div class="stat-meta">en cola de turno</div></div>
+        <div class="stat-card"><div class="stat-label">Habitaciones OK</div><div class="stat-val" style="color:var(--green)" id="stat-hab-ok">0</div><div class="stat-meta" id="stat-hab-total">cargando...</div></div>
+        <div class="stat-card"><div class="stat-label">Pendientes limpieza</div><div class="stat-val" style="color:var(--amber)" id="stat-hab-pend">0</div><div class="stat-meta">en cola de turno</div></div>
         <div class="stat-card" id="stat-sol" style="cursor:pointer" onclick="navToPage('solicitudes')"><div class="stat-label">Solicitudes activas</div><div class="stat-val" id="stat-sol-num" style="color:var(--orange)">0</div><div class="stat-meta">de otros servicios</div></div>
-        <div class="stat-card"><div class="stat-label">Altas hoy</div><div class="stat-val" style="color:var(--blue)">4</div><div class="stat-meta">limpiezas terminales</div></div>
+        <div class="stat-card"><div class="stat-label">Altas hoy</div><div class="stat-val" style="color:var(--blue)" id="stat-altas">0</div><div class="stat-meta">altas hoy</div></div>
       </div>
       <div class="grid-2">
         <div class="card">
@@ -358,6 +360,9 @@ textarea:focus{border-color:var(--blue);}
           <button class="btn-sm secondary" onclick="filterRooms('alta')">Altas</button>
           <button class="btn-sm secondary" onclick="filterRooms('pending')">Pendientes</button>
           <button class="btn-sm secondary" onclick="filterRooms('iso')">Con Aislamiento</button>
+          <button class="btn-sm secondary" onclick="filterRooms('premium')">⭐ Premium</button>
+          <button class="btn-sm secondary" onclick="filterRooms('pami')">PAMI</button>
+          <button class="btn-sm secondary" onclick="filterRooms('uti')">UTI</button>
         </div>
       </div>
       <div id="rooms-grid" class="rooms-grid"></div>
@@ -374,9 +379,9 @@ textarea:focus{border-color:var(--blue);}
     <div class="page" id="page-residuos">
       <div class="page-header"><div><div class="page-title">Residuos Patogénicos</div><div class="page-sub">Control de extracción y manifiestos</div></div><button class="btn-sm" onclick="openModal('modal-residuo')">+ Registrar Retiro</button></div>
       <div class="grid-3">
-        <div class="stat-card"><div class="stat-label">Último retiro</div><div class="stat-val" style="color:var(--teal);font-size:18px">16/05 · 18:30</div><div class="stat-meta">BioResiduos S.A.</div></div>
-        <div class="stat-card"><div class="stat-label">Peso registrado hoy</div><div class="stat-val" style="color:var(--blue)">12.4<span style="font-size:16px"> kg</span></div><div class="stat-meta">Manifiesto N° 00842</div></div>
-        <div class="stat-card"><div class="stat-label">Próximo retiro</div><div class="stat-val" style="color:var(--amber);font-size:18px">Hoy 18:00</div><div class="stat-meta">Confirmar con empresa</div></div>
+        <div class="stat-card"><div class="stat-label">Último retiro</div><div class="stat-val" style="color:var(--teal);font-size:18px">16/05 · 18:30</div><div class="stat-meta">Habitat Ecológico S.A.</div></div>
+        <div class="stat-card"><div class="stat-label">Peso registrado hoy</div><div class="stat-val" style="color:var(--blue)">—</div><div class="stat-meta">Sin retiros registrados hoy</div></div>
+        <div class="stat-card"><div class="stat-label">Próximo retiro</div><div class="stat-val" style="color:var(--amber);font-size:16px">Coordinar</div><div class="stat-meta">Habitat Ecológico S.A.</div></div>
       </div>
     </div>
 
@@ -384,9 +389,9 @@ textarea:focus{border-color:var(--blue);}
     <div class="page" id="page-roperia">
       <div class="page-header"><div><div class="page-title">Ropería</div><div class="page-sub">Control de entrega y recepción</div></div><button class="btn-sm" onclick="openModal('modal-roperia')">+ Registrar Movimiento</button></div>
       <div class="grid-3">
-        <div class="stat-card"><div class="stat-label">Entregado hoy</div><div class="stat-val" style="color:var(--red)">142</div><div class="stat-meta">prendas sucias</div></div>
-        <div class="stat-card"><div class="stat-label">Recibido hoy</div><div class="stat-val" style="color:var(--green)">138</div><div class="stat-meta">prendas limpias</div></div>
-        <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label">Diferencia</div><div class="stat-val" style="color:var(--amber)">-4</div><div class="stat-meta">⚠️ Informar a jefatura</div></div>
+        <div class="stat-card"><div class="stat-label">Entregado hoy</div><div class="stat-val" style="color:var(--red)">0</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
+        <div class="stat-card"><div class="stat-label">Recibido hoy</div><div class="stat-val" style="color:var(--green)">0</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
+        <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label">Diferencia</div><div class="stat-val" style="color:var(--green)">0</div><div class="stat-meta">Sin diferencias registradas</div></div>
       </div>
     </div>
 
@@ -429,6 +434,12 @@ textarea:focus{border-color:var(--blue);}
           <tr><td>📡 Imágenes</td><td style="font-family:var(--mono);font-weight:700">1007</td></tr>
           <tr><td>🧪 Laboratorio</td><td style="font-family:var(--mono);font-weight:700">1008</td></tr>
           <tr><td>🚨 Guardia Médica</td><td style="font-family:var(--mono);font-weight:700">1009</td></tr>
+          <tr><td>❤️ Hemodinamia</td><td style="font-family:var(--mono);font-weight:700">1010</td></tr>
+          <tr><td>👔 RR.HH.</td><td style="font-family:var(--mono);font-weight:700">1011</td></tr>
+          <tr><td>🏛️ Dirección</td><td style="font-family:var(--mono);font-weight:700">1012</td></tr>
+          <tr><td>⚖️ Legales</td><td style="font-family:var(--mono);font-weight:700">1013</td></tr>
+          <tr><td>⭐ Calidad del Paciente</td><td style="font-family:var(--mono);font-weight:700">1014</td></tr>
+          <tr><td>🩺 Consultorios Externos</td><td style="font-family:var(--mono);font-weight:700">1015</td></tr>
         </tbody></table>
       </div></div>
     </div>
@@ -506,8 +517,8 @@ textarea:focus{border-color:var(--blue);}
 
 <script>
 const SHEET_URL="https://script.google.com/macros/s/AKfycbwXsrZfGThoZ5JZcTJZmaDUGFUlt5Z7fniWpm5o354FzV-TMYaeUxxo9LiqyNpNiMkg-Q/exec";
-const SECTOR_PINS={'Enfermería Internación':'1001','Enfermería Áreas Críticas':'1002','Enfermería Quirófano':'1003','Admisión y Egreso':'1004','Seguridad':'1005','Mantenimiento':'1006','Imágenes':'1007','Laboratorio':'1008','Guardia Médica':'1009'};
-const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨'};
+const SECTOR_PINS={'Enfermería Internación':'1001','Enfermería Áreas Críticas':'1002','Enfermería Quirófano':'1003','Admisión y Egreso':'1004','Seguridad':'1005','Mantenimiento':'1006','Imágenes':'1007','Laboratorio':'1008','Guardia Médica':'1009','Hemodinamia':'1010','RR.HH.':'1011','Dirección':'1012','Legales':'1013','Calidad del Paciente':'1014','Consultorios Externos':'1015'};
+const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨','Hemodinamia':'❤️','RR.HH.':'👔','Dirección':'🏛️','Legales':'⚖️','Calidad del Paciente':'⭐','Consultorios Externos':'🩺'};
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
 
 function switchTab(t){document.querySelectorAll('.auth-tab').forEach((x,i)=>x.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='registro')));document.getElementById('form-login').style.display=t==='login'?'block':'none';document.getElementById('form-registro').style.display=t==='registro'?'block':'none';}
@@ -614,19 +625,21 @@ function resetSectorForm(){
 function launchApp(){
   showScreen(null);
   document.getElementById('app').style.display='flex';
-  const labels={jefe:'Jefe/a del Servicio',supervisor:'Supervisor/a',operario:'Operario/a',roperia:'Ropería'};
+  const labels={jefe:'Jefe/a del Servicio',supervisor:'Supervisor/a',operario:'Operario/a',roperia:'Ropería',direccion:'Dirección (Monitoreo)'};
   document.getElementById('sb-role-badge').textContent=labels[currentUser.perfil]||currentUser.perfil;
+  if(currentUser.perfil==='direccion'){document.getElementById('sb-role-badge').style.background='#2d1a4a';document.getElementById('sb-role-badge').style.color='#a855f7';}
   document.getElementById('sb-name').textContent=currentUser.nombre;
   const perms={'nav-solicitudes':['jefe','supervisor','operario'],'nav-novedades':['jefe','supervisor','operario'],'nav-residuos':['jefe','supervisor','operario'],'nav-roperia':['jefe','supervisor','roperia'],'nav-insumos':['jefe','supervisor'],'nav-reqs':['jefe','supervisor','operario','roperia'],'nav-personal':['jefe','supervisor'],'nav-monitor':['jefe']};
   Object.entries(perms).forEach(([id,roles])=>{const el=document.getElementById(id);if(el)el.style.display=roles.includes(currentUser.perfil)?'':'none';});
-  const isJefe=currentUser.perfil==='jefe';
+  const isJefe=['jefe','direccion'].includes(currentUser.perfil);
   document.getElementById('monitoreo-block').style.display=isJefe?'block':'none';
   document.getElementById('monitoreo-denied').style.display=isJefe?'none':'block';
   const now=new Date();
   document.getElementById('dash-date').textContent=now.toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const h=now.getHours();
-  document.getElementById('turno-badge').textContent=h<15?'Turno Mañana':h<23?'Turno Tarde':'Turno Noche';
+  document.getElementById('turno-badge').textContent=h>=7&&h<13?'Turno Mañana (7-15hs)':h>=13&&h<21?'Turno Tarde (13-21hs)':'Turno Noche (21-7hs)';
   renderRooms();
+  actualizarStatsHab();
   cargarSolicitudesDesdeSheets();
 }
 
@@ -692,14 +705,171 @@ function renderMonitoreo(){
 }
 
 // HABITACIONES
-const rooms=[{num:'101',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'102',status:'pending',iso:'contacto',pax:2,type:'estándar'},{num:'103',status:'ok',iso:'ninguno',pax:1,type:'prepaga'},{num:'104',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},{num:'105',status:'pending',iso:'respiratorio',pax:1,type:'estándar'},{num:'106',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'107',status:'busy',iso:'protector',pax:1,type:'prepaga'},{num:'108',status:'ok',iso:'ninguno',pax:2,type:'estándar'},{num:'201',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'202',status:'alta',iso:'ninguno',pax:0,type:'prepaga'},{num:'203',status:'pending',iso:'ninguno',pax:1,type:'estándar'},{num:'204',status:'ok',iso:'contacto',pax:1,type:'estándar'},{num:'205',status:'ok',iso:'ninguno',pax:2,type:'prepaga'},{num:'206',status:'ok',iso:'ninguno',pax:1,type:'estándar'},{num:'207',status:'alta',iso:'aire',pax:0,type:'estándar'},{num:'208',status:'ok',iso:'ninguno',pax:1,type:'estándar'}];
+const rooms=[
+  // PLANTA BAJA - GUARDIA
+  {num:'1',status:'ok',iso:'ninguno',pax:1,type:'guardia',sector:'Guardia',piso:'PB'},
+  {num:'2',status:'ok',iso:'ninguno',pax:1,type:'guardia',sector:'Guardia',piso:'PB'},
+  {num:'3',status:'ok',iso:'ninguno',pax:1,type:'guardia',sector:'Guardia',piso:'PB'},
+  {num:'4',status:'ok',iso:'ninguno',pax:1,type:'guardia',sector:'Guardia',piso:'PB'},
+  {num:'5',status:'ok',iso:'ninguno',pax:1,type:'guardia',sector:'Guardia',piso:'PB'},
+  {num:'6',status:'ok',iso:'ninguno',pax:1,type:'guardia',sector:'Guardia',piso:'PB'},
+  {num:'41',status:'ok',iso:'ninguno',pax:1,type:'shockroom',sector:'Shockroom',piso:'PB'},
+  {num:'42',status:'ok',iso:'ninguno',pax:1,type:'shockroom',sector:'Shockroom',piso:'PB'},
+  {num:'43',status:'ok',iso:'ninguno',pax:2,type:'internacion-dia',sector:'Internación de Día',piso:'PB'},
+  {num:'44',status:'ok',iso:'ninguno',pax:2,type:'internacion-dia',sector:'Internación de Día',piso:'PB'},
+  {num:'51',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'52',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'53',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'54',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'55',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'56',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'57',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'58',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'59',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI',piso:'PB'},
+  {num:'63',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'64',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'65',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'66',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'67',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'68',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'69',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'70',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'71',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'72',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'73',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'74',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'75',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'76',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'77',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  {num:'78',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'PB'},
+  // 1° PISO
+  {num:'101',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'102',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'103',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'104',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'105',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'106',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'107',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'108',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'109',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'110',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'111',status:'ok',iso:'ninguno',pax:1,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'121',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'122',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'123',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'124',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'125',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'126',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'127',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'128',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI / Obra Social',piso:'1°'},
+  {num:'131',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'132',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'133',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'134',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'135',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'136',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'137',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'138',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Psiquiatría Adulto Premium',piso:'1°'},
+  {num:'141',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'142',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'143',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'144',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'145',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'146',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'147',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'148',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  {num:'149',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Obra Social Premium',piso:'1°'},
+  // 2° PISO
+  {num:'201',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'202',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'203',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'204',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'205',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'206',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'207',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'208',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'209',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'210',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'211',status:'ok',iso:'ninguno',pax:2,type:'pami',sector:'PAMI',piso:'2°'},
+  {num:'231',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'232',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'233',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'234',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'235',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'236',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'237',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'238',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'239',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'240',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'241',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'242',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'243',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'244',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'245',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'246',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'247',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'248',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  {num:'249',status:'ok',iso:'ninguno',pax:1,type:'premium',sector:'Infanto Juvenil Premium',piso:'2°'},
+  // 3° PISO
+  {num:'301',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'302',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'303',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'304',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'305',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'306',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'307',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'308',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'309',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'310',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'311',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'312',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'341',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'342',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'343',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'344',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'345',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'346',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'347',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'348',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'331',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
+  {num:'332',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
+  {num:'333',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
+  {num:'334',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
+  {num:'335',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
+  {num:'336',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
+  {num:'390',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Endoscopía',piso:'3°'},
+  {num:'391',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Endoscopía',piso:'3°'},
+  {num:'392',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Endoscopía',piso:'3°'},
+  {num:'393',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Endoscopía',piso:'3°'},
+  // 4° PISO - UTI
+  {num:'431',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'432',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'433',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'434',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'435',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'436',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'437',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'438',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'439',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  {num:'440',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+];
 const sL={ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta'};
 const sC={ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta'};
 const iL={contacto:'Aislam. Contacto',respiratorio:'Aislam. Gotas',aire:'Aislam. Aire',protector:'Aislam. Protector',ninguno:'Sin aislamiento'};
 const iC={contacto:'iso-contacto',respiratorio:'iso-respiratorio',aire:'iso-aire',protector:'iso-protector',ninguno:'iso-ninguno'};
 const iE={contacto:'Guantes + camisolín + barbijo quirúrgico.',respiratorio:'Guantes + camisolín + barbijo quirúrgico. Puerta cerrada.',aire:'EPP completo + N95. Solo con autorización.',protector:'EPP completo. Limpieza profunda.',ninguno:'EPP estándar: guantes y delantal.'};
-function renderRooms(list){list=list||rooms;const g=document.getElementById('rooms-grid');if(g)g.innerHTML=list.map(r=>`<div class="room-card" onclick="openRoom('${r.num}')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="room-num">${r.num}</div><span class="badge badge-${r.type==='prepaga'?'teal':'blue'}" style="font-size:9px">${r.type}</span></div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span><div><span class="iso-tag ${iC[r.iso]}">${iL[r.iso]}</span></div>${r.pax>0?`<div style="font-size:11px;color:var(--text2);margin-top:3px">${r.pax} paciente${r.pax>1?'s':''}</div>`:''}</div>`).join('');}
-function filterRooms(f){renderRooms(f==='alta'?rooms.filter(r=>r.status==='alta'):f==='pending'?rooms.filter(r=>r.status==='pending'):f==='iso'?rooms.filter(r=>r.iso!=='ninguno'):rooms);}
+function actualizarStatsHab(){
+  const ok=rooms.filter(r=>r.status==='ok').length;
+  const pend=rooms.filter(r=>r.status==='pending'||r.status==='alta').length;
+  const el1=document.getElementById('stat-hab-ok');
+  const el2=document.getElementById('stat-hab-pend');
+  const el3=document.getElementById('stat-hab-total');
+  if(el1)el1.textContent=ok;
+  if(el2)el2.textContent=pend;
+  if(el3)el3.textContent='de '+rooms.length+' camas';
+}
+function renderRooms(list){list=list||rooms;const g=document.getElementById('rooms-grid');if(g)g.innerHTML=list.map(r=>`<div class="room-card" onclick="openRoom('${r.num}')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="room-num">${r.num}</div><span class="badge badge-${r.type==='premium'?'teal':r.type==='pami'?'amber':r.type==='uti'?'red':r.type==='obra-social'?'blue':'purple'}" style="font-size:9px">${r.type}</span></div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span><div><span class="iso-tag ${iC[r.iso]}">${iL[r.iso]}</span></div>${r.pax>0?`<div style="font-size:11px;color:var(--text2);margin-top:3px">${r.pax} paciente${r.pax>1?'s':''}</div>`:''}</div>`).join('');}
+function filterRooms(f){renderRooms(f==='alta'?rooms.filter(r=>r.status==='alta'):f==='pending'?rooms.filter(r=>r.status==='pending'):f==='iso'?rooms.filter(r=>r.iso!=='ninguno'):f==='premium'?rooms.filter(r=>r.type==='premium'):f==='pami'?rooms.filter(r=>r.type==='pami'):f==='uti'?rooms.filter(r=>r.type==='uti'):rooms);}
 function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;document.getElementById('modal-hab-title').textContent=`Habitación ${r.num}`;const ce=['jefe','supervisor'].includes(currentUser?.perfil);document.getElementById('modal-hab-body').innerHTML=`<div style="margin-bottom:14px"><div class="form-row" style="margin-bottom:8px"><div><div class="section-label">Estado</div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span></div><div><div class="section-label">Tipo</div><span class="badge badge-teal">${r.type}</span></div></div><div class="section-label" style="margin-top:10px">Aislamiento</div><span class="iso-tag ${iC[r.iso]}" style="font-size:12px;padding:3px 9px">${iL[r.iso]}</span><div style="background:var(--bg3);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">EPP requerido:</strong> ${iE[r.iso]}</div></div>${r.pax===2?'<div class="alert-box alert-amber">⚠️ 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.</div>':''}${r.status==='alta'?'<div class="alert-box alert-red">🔴 Alta: realizar limpieza terminal completa antes de nueva admisión.</div>':''}<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-sm" onclick="markOK(\'${r.num}\')">✅ Marcar servicio OK</button>${ce?`<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>`:''}</div>`;openModal('modal-hab');}
 function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';renderRooms();closeModal('modal-hab');sheetPost({action:'guardarHabitacion',habitacion:num,accion:'Limpieza OK',usuario:currentUser?.nombre||'—',turno:document.getElementById('turno-badge')?.textContent||'—'});showToast(`✅ Hab. ${num} — Servicio registrado`);}
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
