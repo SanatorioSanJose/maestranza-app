@@ -184,7 +184,7 @@ textarea:focus{border-color:var(--blue);}
       <div class="auth-msg" id="registro-msg"></div>
       <div class="field-group"><div class="field-label">Nombre completo</div><input type="text" id="reg-nombre" placeholder="Ej: Rodríguez Marcela" /></div>
       <div class="field-group"><div class="field-label">Turno / Sector</div>
-        <select id="reg-turno"><option value="">— Seleccioná tu turno —</option><option>Mañana</option><option>Tarde</option><option>Noche A</option><option>Noche B</option><option>Ropería</option></select>
+        <select id="reg-turno"><option value="">— Seleccioná tu turno —</option><option>Mañana</option><option>Tarde</option><option>Noche A</option><option>Noche B</option><option>SaDoFe</option><option>Ropería</option></select>
       </div>
       <div class="field-group"><div class="field-label">PIN de 4 dígitos</div><input type="password" id="reg-pin" placeholder="••••" maxlength="4" /></div>
       <div class="field-group"><div class="field-label">Confirmá tu PIN</div><input type="password" id="reg-pin2" placeholder="••••" maxlength="4" /></div>
@@ -372,7 +372,7 @@ textarea:focus{border-color:var(--blue);}
     <div class="page" id="page-novedades">
       <div class="page-header"><div><div class="page-title">Novedades del Turno</div><div class="page-sub">Partes, ausencias y comunicaciones</div></div><button class="btn-sm" onclick="openModal('modal-novedad')">+ Nueva Novedad</button></div>
       <div class="card"><table class="data-table"><thead><tr><th>Fecha/Hora</th><th>Personal</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
-      <tbody><tr><td style="font-family:var(--mono);font-size:12px">17/05 08:05</td><td>García, Marcela</td><td><span class="badge badge-red">Parte médico</span></td><td>Aviso por enfermedad — 2h antes turno tarde</td><td><span class="badge badge-green">Validado</span></td></tr></tbody></table></div>
+      <tbody id="novedades-tbody"><tr><td colspan="5" style="color:var(--text2);text-align:center;padding:20px">Sin novedades registradas.</td></tr></tbody></table></div>
     </div>
 
     <!-- RESIDUOS -->
@@ -381,7 +381,7 @@ textarea:focus{border-color:var(--blue);}
       <div class="grid-3">
         <div class="stat-card"><div class="stat-label">Último retiro</div><div class="stat-val" style="color:var(--teal);font-size:18px">16/05 · 18:30</div><div class="stat-meta">Habitat Ecológico S.A.</div></div>
         <div class="stat-card"><div class="stat-label">Peso registrado hoy</div><div class="stat-val" style="color:var(--blue)">—</div><div class="stat-meta">Sin retiros registrados hoy</div></div>
-        <div class="stat-card"><div class="stat-label">Próximo retiro</div><div class="stat-val" style="color:var(--amber);font-size:16px">Coordinar</div><div class="stat-meta">Habitat Ecológico S.A.</div></div>
+        <div class="stat-card"><div class="stat-label">Próximo retiro</div><div class="stat-val" style="color:var(--amber);font-size:16px">20:00 hs</div><div class="stat-meta">Habitat Ecológico S.A.</div></div>
       </div>
     </div>
 
@@ -389,22 +389,47 @@ textarea:focus{border-color:var(--blue);}
     <div class="page" id="page-roperia">
       <div class="page-header"><div><div class="page-title">Ropería</div><div class="page-sub">Control de entrega y recepción</div></div><button class="btn-sm" onclick="openModal('modal-roperia')">+ Registrar Movimiento</button></div>
       <div class="grid-3">
-        <div class="stat-card"><div class="stat-label">Entregado hoy</div><div class="stat-val" style="color:var(--red)">0</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
-        <div class="stat-card"><div class="stat-label">Recibido hoy</div><div class="stat-val" style="color:var(--green)">0</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
-        <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label">Diferencia</div><div class="stat-val" style="color:var(--green)">0</div><div class="stat-meta">Sin diferencias registradas</div></div>
+        <div class="stat-card"><div class="stat-label">Entregado hoy</div><div class="stat-val" style="color:var(--text2)" id="rop-entregado">—</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
+        <div class="stat-card"><div class="stat-label">Recibido hoy</div><div class="stat-val" style="color:var(--text2)" id="rop-recibido">—</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
+        <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label">Diferencia</div><div class="stat-val" style="color:var(--text2)" id="rop-diferencia">—</div><div class="stat-meta">Registrar movimiento para ver diferencia</div></div>
       </div>
     </div>
 
     <!-- INSUMOS -->
     <div class="page" id="page-insumos">
       <div class="page-header"><div><div class="page-title">Insumos y Amenities</div><div class="page-sub">Control semanal de stock</div></div><button class="btn-sm" onclick="openModal('modal-insumo')">+ Reportar Faltante</button></div>
-      <div class="card"><div class="card-header"><span>📦 Stock Actual</span></div>
-      <table class="data-table"><thead><tr><th>Ítem</th><th>Stock</th><th>Mínimo</th><th>Estado</th></tr></thead>
+      <div class="card"><div class="card-header"><span>🧴 Amenities — Sectores Premium</span></div>
+      <table class="data-table"><thead><tr><th>Ítem</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th></th></tr></thead>
       <tbody>
-        <tr><td>Shampoo en sobre</td><td>24 u.</td><td>20</td><td><span class="badge badge-green">OK</span></td></tr>
-        <tr><td>Crema de enjuague</td><td>18 u.</td><td>20</td><td><span class="badge badge-amber">Bajo</span></td></tr>
-        <tr><td>Jabón tocador</td><td>8 u.</td><td>20</td><td><span class="badge badge-red">Crítico</span></td></tr>
-        <tr><td>Guantes descartables</td><td>40 u.</td><td>100</td><td><span class="badge badge-red">Crítico</span></td></tr>
+        <tr><td>Shampoo en sobre</td><td id="st-shampoo">—</td><td>20</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Crema de enjuague</td><td id="st-crema">—</td><td>20</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Cepillo dental</td><td id="st-cepillo">—</td><td>20</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Jabón tocador</td><td id="st-jabon">—</td><td>30</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Bolsa bienvenida paciente</td><td id="st-bolsa-bien">—</td><td>15</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+      </tbody></table></div>
+      <div class="card" style="margin-top:4px"><div class="card-header"><span>🧹 Insumos de Limpieza</span></div>
+      <table class="data-table"><thead><tr><th>Ítem</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Detergente</td><td>—</td><td>10 L</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Lavandina</td><td>—</td><td>10 L</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Desinfectante</td><td>—</td><td>10 L</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Papel higiénico</td><td>—</td><td>50 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Servilletas de papel</td><td>—</td><td>20 paq.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Bolsas rojas (patogénicas)</td><td>—</td><td>100 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Bolsas negras (residuos comunes)</td><td>—</td><td>100 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Guantes descartables</td><td>—</td><td>200 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+      </tbody></table></div>
+      <div class="card" style="margin-top:4px"><div class="card-header"><span>🪣 Equipamiento de Limpieza</span></div>
+      <table class="data-table"><thead><tr><th>Ítem</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Rejilla verde (superficies generales)</td><td>—</td><td>20 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Rejilla amarilla (baños)</td><td>—</td><td>20 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Rejilla azul (áreas críticas)</td><td>—</td><td>20 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Rejilla roja (fluidos / aislamiento)</td><td>—</td><td>20 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Trapos de piso</td><td>—</td><td>10 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Mopa / mopas</td><td>—</td><td>5 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Carro de limpieza</td><td>—</td><td>3 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
+        <tr><td>Balde / cubeta</td><td>—</td><td>10 u.</td><td><span class="badge badge-blue">Sin datos</span></td><td><button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="openModal('modal-insumo')">Actualizar</button></td></tr>
       </tbody></table></div>
     </div>
 
@@ -412,34 +437,84 @@ textarea:focus{border-color:var(--blue);}
     <div class="page" id="page-requerimientos">
       <div class="page-header"><div><div class="page-title">Requerimientos</div><div class="page-sub">Solicitudes internas del personal</div></div><button class="btn-sm" onclick="openModal('modal-req')">+ Nuevo Requerimiento</button></div>
       <div class="card"><table class="data-table"><thead><tr><th>Fecha</th><th>Solicitante</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr></thead>
-      <tbody><tr><td>17/05</td><td>Torres, Raúl</td><td><span class="badge badge-blue">Vacaciones</span></td><td>Solicitud vacaciones 10-20 junio</td><td><span class="badge badge-amber">Pendiente supervisor</span></td></tr></tbody></table></div>
+      <tbody id="reqs-tbody"><tr><td colspan="5" style="color:var(--text2);text-align:center;padding:20px">Sin requerimientos registrados.</td></tr></tbody></table></div>
     </div>
 
     <!-- PERSONAL -->
     <div class="page" id="page-personal">
       <div class="page-header"><div><div class="page-title">Personal y Turnos</div></div></div>
       <div class="card"><div class="card-header"><span>👥 Gestión de Usuarios</span><a href="https://docs.google.com/spreadsheets/d/13o6o3yeYEPuSY8pecZqLoiwanymrdkUh63QbNtWXQ5Q" target="_blank" class="btn-sm secondary">Abrir planilla</a></div>
-      <div class="card-body"><div class="supervisor-note">Para aprobar usuarios: abrí la planilla y cambiá <strong>Estado</strong> de "Pendiente" a "Aprobado" y escribí el <strong>Perfil</strong> en minúscula:<br><strong>jefe / supervisor / operario / roperia</strong></div></div></div>
+      <div class="card-body"><div class="supervisor-note">Para aprobar usuarios: abrí la planilla y cambiá <strong>Estado</strong> de "Pendiente" a "Aprobado" y escribí el <strong>Perfil</strong> en minúscula:<br><strong>jefe / supervisor / operario / roperia / direccion</strong></div></div></div>
+      <div class="card"><div class="card-header"><span>📋 Nómina del Servicio</span></div>
+      <table class="data-table"><thead><tr><th>Legajo</th><th>Apellido y Nombre</th><th>Turno</th><th>Horario</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:var(--mono)">5955</td><td><strong>López Cintia Valeria</strong> <span class="badge badge-purple">Supervisora</span></td><td>TM</td><td>Lun-Vie 7-15</td><td></td></tr>
+        <tr><td style="font-family:var(--mono)">3457</td><td>Sanchez Liliana Beatriz</td><td>TM</td><td>Lun-Vie 7-14</td><td style="color:var(--amber);font-size:11px">Tareas livianas (3 meses)</td></tr>
+        <tr><td style="font-family:var(--mono)">3818</td><td>Barzola Lidia Matilde</td><td>TM</td><td>Lun-Vie 7-14</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr><td style="font-family:var(--mono)">4080</td><td>Ruiz Diaz Maria Eugenia</td><td>TM</td><td>Lun-Vie 7-14</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr><td style="font-family:var(--mono)">4899</td><td>Balsamo Bibiana</td><td>TM</td><td>Lun-Vie 6-14</td><td style="color:var(--amber);font-size:11px">14 días vacac. 2025</td></tr>
+        <tr><td style="font-family:var(--mono)">5256</td><td>Ferreyra Jonathan</td><td>TM</td><td>Lun-Vie 6-14</td><td style="color:var(--amber);font-size:11px">21 días vacac. 2025</td></tr>
+        <tr><td style="font-family:var(--mono)">5395</td><td>Garcia Valeria Paola</td><td>TM</td><td>Lun-Vie 6-14</td><td style="color:var(--text2);font-size:11px">Congresal</td></tr>
+        <tr><td style="font-family:var(--mono)">5400</td><td>Gonzalez Adriana Veronica</td><td>TM</td><td>Lun-Vie 7-15</td><td></td></tr>
+        <tr><td style="font-family:var(--mono)">5413</td><td>Rubiolo Florencia Solange</td><td>TM</td><td>Lun-Vie 7-14</td><td style="color:var(--amber);font-size:11px">Período prueba hasta junio</td></tr>
+        <tr><td style="font-family:var(--mono)">5026</td><td>Jerez Jose Alejandro</td><td>TM</td><td>Lun-Vie 7-15</td><td></td></tr>
+        <tr><td style="font-family:var(--mono)">6000</td><td>Montroni Solange Elizabeth</td><td>TM</td><td>Noche B 6-14</td><td></td></tr>
+        <tr><td style="font-family:var(--mono)">6026</td><td>Ferreira Sergio Mariano</td><td>TM</td><td>Lun-Vie 6-14</td><td></td></tr>
+        <tr><td style="font-family:var(--mono)">6093</td><td>Perez Emilia Angel</td><td>TM</td><td>Lun-Vie 6-14</td><td></td></tr>
+        <tr><td style="font-family:var(--mono)">6195</td><td>Escalada Debora Estela</td><td>TM</td><td>Lun-Vie 7-15</td><td style="color:var(--amber);font-size:11px">7 días vacac. 2025</td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">4887</td><td>Baez Noelia Soledad</td><td>TT</td><td>Noche A 14-21</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">5118</td><td>Cabrera Blanca Betina</td><td>TT</td><td>Lun-Vie 13-20</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">5872</td><td>Fuentes Donoso Patricia</td><td>TT</td><td>Lun-Vie 14-21</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">6133</td><td>Trabes Gustavo Rodolfo</td><td>TT</td><td>Lun-Vie 13-21</td><td></td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">6134</td><td>Cano Emanuel David</td><td>TT</td><td>Lun-Vie 13-21</td><td></td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">6172</td><td>Mosiso Martinez Ailyn</td><td>TT</td><td>Lun-Vie 14-21</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">6175</td><td>Gorosito Martin Fabian</td><td>TT</td><td>Lun-Vie 13-21</td><td style="color:var(--amber);font-size:11px">7 días vacac. 2025</td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">6202</td><td>Avalos Norma Cristina</td><td>TT</td><td>Lun-Vie 13-21</td><td></td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">6205</td><td>Aybar Lorena Paola</td><td>TT</td><td>Lun-Vie 13-20</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--amber-dim)"><td style="font-family:var(--mono)">6313</td><td>Leguzamon Vanesa Romina</td><td>TT</td><td>Lun-Vie 13-21</td><td></td></tr>
+        <tr style="background:var(--blue-dim)"><td style="font-family:var(--mono)">4894</td><td>Insfran Margarita</td><td>TN</td><td>Noche B 21-7</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--blue-dim)"><td style="font-family:var(--mono)">4911</td><td>Aguirre Jonatan Eduardo</td><td>TN</td><td>Noche A 21-7</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--blue-dim)"><td style="font-family:var(--mono)">5867</td><td>Flea Gabriela Betsabe</td><td>TN</td><td>Noche A 21-7</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--blue-dim)"><td style="font-family:var(--mono)">6008</td><td>Sigel Valeria Luciana</td><td>TN</td><td>Noche B 20-6</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">3510</td><td>Moreno Silvia Raquel</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--amber);font-size:11px">35 días vacac. 2025</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">4163</td><td>Gomez Zulma</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">4884</td><td>Ruiz Fabiana Andrea</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--red);font-size:11px">Licencia embarazo</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">4890</td><td>Rios Andrea Lorena</td><td>SaDoFe</td><td>7-21 / Dom 21-7</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">4897</td><td>Jimenez Mariel Ofelia</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">5231</td><td>Penida Malvina Dora</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--amber);font-size:11px">14 días vacac. 2025</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">5267</td><td>Aguero Cristian Raul</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--amber);font-size:11px">14 días vacac. 2025</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">5396</td><td>Fernandez Maria de los Angel</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--text2);font-size:11px">Áreas cerradas</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">5532</td><td>Fara Santiago Ezequiel</td><td>SaDoFe</td><td>7-21</td><td style="color:var(--text2);font-size:11px">Actualmente en camareros</td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">5948</td><td>Vignoles Stella Maris</td><td>SaDoFe</td><td>7-21</td><td></td></tr>
+        <tr style="background:var(--teal-dim)"><td style="font-family:var(--mono)">6313</td><td>Lopez Julian Ramon</td><td>SaDoFe</td><td>7-21</td><td></td></tr>
+      </tbody></table>
+      <div style="display:flex;gap:16px;padding:12px 18px;font-size:11px;flex-wrap:wrap;border-top:1px solid var(--border)">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--bg3);display:inline-block"></span>Turno Mañana</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--amber-dim);display:inline-block"></span>Turno Tarde</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--blue-dim);display:inline-block"></span>Turno Noche</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--teal-dim);display:inline-block"></span>SaDoFe</span>
+      </div>
+      </div>
       <div class="card"><div class="card-header"><span>🔐 PINes de Sectores Externos</span></div>
       <div class="card-body">
         <div class="supervisor-note">Entregá estos PINes a cada sector. Solo usarlos para solicitar intervenciones a maestranza.</div>
         <table class="data-table"><thead><tr><th>Sector</th><th>PIN</th></tr></thead>
         <tbody>
-          <tr><td>🏥 Enfermería Internación</td><td style="font-family:var(--mono);font-weight:700">1001</td></tr>
-          <tr><td>🫀 Enfermería Áreas Críticas</td><td style="font-family:var(--mono);font-weight:700">1002</td></tr>
-          <tr><td>🔪 Enfermería Quirófano</td><td style="font-family:var(--mono);font-weight:700">1003</td></tr>
-          <tr><td>🚪 Admisión y Egreso</td><td style="font-family:var(--mono);font-weight:700">1004</td></tr>
-          <tr><td>🛡️ Seguridad</td><td style="font-family:var(--mono);font-weight:700">1005</td></tr>
-          <tr><td>🔧 Mantenimiento</td><td style="font-family:var(--mono);font-weight:700">1006</td></tr>
-          <tr><td>📡 Imágenes</td><td style="font-family:var(--mono);font-weight:700">1007</td></tr>
-          <tr><td>🧪 Laboratorio</td><td style="font-family:var(--mono);font-weight:700">1008</td></tr>
-          <tr><td>🚨 Guardia Médica</td><td style="font-family:var(--mono);font-weight:700">1009</td></tr>
-          <tr><td>❤️ Hemodinamia</td><td style="font-family:var(--mono);font-weight:700">1010</td></tr>
-          <tr><td>👔 RR.HH.</td><td style="font-family:var(--mono);font-weight:700">1011</td></tr>
-          <tr><td>🏛️ Dirección</td><td style="font-family:var(--mono);font-weight:700">1012</td></tr>
-          <tr><td>⚖️ Legales</td><td style="font-family:var(--mono);font-weight:700">1013</td></tr>
-          <tr><td>⭐ Calidad del Paciente</td><td style="font-family:var(--mono);font-weight:700">1014</td></tr>
-          <tr><td>🩺 Consultorios Externos</td><td style="font-family:var(--mono);font-weight:700">1015</td></tr>
+          <tr><td>🏥 Enfermería Internación</td><td style="font-family:var(--mono);font-weight:700">2839</td></tr>
+          <tr><td>🫀 Enfermería Áreas Críticas</td><td style="font-family:var(--mono);font-weight:700">3828</td></tr>
+          <tr><td>🔪 Enfermería Quirófano</td><td style="font-family:var(--mono);font-weight:700">4253</td></tr>
+          <tr><td>🚪 Admisión y Egreso</td><td style="font-family:var(--mono);font-weight:700">6467</td></tr>
+          <tr><td>🛡️ Seguridad</td><td style="font-family:var(--mono);font-weight:700">8074</td></tr>
+          <tr><td>🔧 Mantenimiento</td><td style="font-family:var(--mono);font-weight:700">7543</td></tr>
+          <tr><td>📡 Imágenes</td><td style="font-family:var(--mono);font-weight:700">3143</td></tr>
+          <tr><td>🧪 Laboratorio</td><td style="font-family:var(--mono);font-weight:700">8033</td></tr>
+          <tr><td>🚨 Guardia Médica</td><td style="font-family:var(--mono);font-weight:700">9308</td></tr>
+          <tr><td>❤️ Hemodinamia</td><td style="font-family:var(--mono);font-weight:700">2912</td></tr>
+          <tr><td>👔 RR.HH.</td><td style="font-family:var(--mono);font-weight:700">2712</td></tr>
+          <tr><td>🏛️ Dirección</td><td style="font-family:var(--mono);font-weight:700">8067</td></tr>
+          <tr><td>⚖️ Legales</td><td style="font-family:var(--mono);font-weight:700">2204</td></tr>
+          <tr><td>⭐ Calidad del Paciente</td><td style="font-family:var(--mono);font-weight:700">4006</td></tr>
+          <tr><td>🩺 Consultorios Externos</td><td style="font-family:var(--mono);font-weight:700">7238</td></tr>
         </tbody></table>
       </div></div>
     </div>
@@ -449,7 +524,7 @@ textarea:focus{border-color:var(--blue);}
       <div class="page-header"><div><div class="page-title">🔒 Monitoreo — Jefatura</div><div class="page-sub">Vista privada en tiempo real</div></div><span class="badge badge-red">Solo Jefatura</span></div>
       <div id="monitoreo-block">
         <div class="grid-3">
-          <div class="stat-card" style="border-color:var(--purple)"><div class="stat-label">Supervisora activa</div><div class="stat-val" style="color:var(--purple);font-size:16px">González, A.</div><div class="stat-meta">Turno mañana</div></div>
+          <div class="stat-card" style="border-color:var(--purple)"><div class="stat-label">Supervisora activa</div><div class="stat-val" style="color:var(--purple);font-size:16px">López, Cintia</div><div class="stat-meta">Supervisora — Turno Mañana</div></div>
           <div class="stat-card"><div class="stat-label">Sol. resueltas hoy</div><div class="stat-val" id="mon-res" style="color:var(--green)">0</div></div>
           <div class="stat-card"><div class="stat-label">Sol. pendientes</div><div class="stat-val" id="mon-pend" style="color:var(--amber)">0</div></div>
         </div>
@@ -494,7 +569,36 @@ textarea:focus{border-color:var(--blue);}
 <div class="modal-overlay" id="modal-insumo"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-insumo')">✕</button>
   <div class="modal-title">Reportar Faltante</div>
-  <div class="form-field"><label>Ítem</label><select><option>Shampoo en sobre</option><option>Crema de enjuague</option><option>Jabón tocador</option><option>Guantes descartables</option><option>Hipoclorito de sodio</option><option>Otro</option></select></div>
+  <div class="form-field"><label>Ítem</label><select>
+    <optgroup label="Amenities Premium">
+      <option>Shampoo en sobre</option>
+      <option>Crema de enjuague</option>
+      <option>Cepillo dental</option>
+      <option>Jabón tocador</option>
+      <option>Bolsa bienvenida paciente</option>
+    </optgroup>
+    <optgroup label="Insumos de Limpieza">
+      <option>Detergente</option>
+      <option>Lavandina</option>
+      <option>Desinfectante</option>
+      <option>Papel higiénico</option>
+      <option>Servilletas de papel</option>
+      <option>Bolsas rojas (patogénicas)</option>
+      <option>Bolsas negras (residuos comunes)</option>
+      <option>Guantes descartables</option>
+    </optgroup>
+    <optgroup label="Equipamiento">
+      <option>Rejilla verde</option>
+      <option>Rejilla amarilla</option>
+      <option>Rejilla azul</option>
+      <option>Rejilla roja</option>
+      <option>Trapos de piso</option>
+      <option>Mopa</option>
+      <option>Carro de limpieza</option>
+      <option>Balde / cubeta</option>
+      <option>Otro</option>
+    </optgroup>
+  </select></div>
   <div class="form-row"><div class="form-field"><label>Stock actual</label><input type="text" /></div><div class="form-field"><label>Urgencia</label><select><option>Normal</option><option>Bajo stock</option><option>🚨 Crítico</option></select></div></div>
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-insumo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-insumo','Faltante reportado')">Reportar</button></div>
 </div></div>
@@ -517,7 +621,7 @@ textarea:focus{border-color:var(--blue);}
 
 <script>
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzkAeTuoGY74Cb5Kve3HM4GgR9Y-SIkcZYDQINDFsQGO9iG_qsCW8yyx9PQefKOqhi8rg/exec";
-const SECTOR_PINS={'Enfermería Internación':'1001','Enfermería Áreas Críticas':'1002','Enfermería Quirófano':'1003','Admisión y Egreso':'1004','Seguridad':'1005','Mantenimiento':'1006','Imágenes':'1007','Laboratorio':'1008','Guardia Médica':'1009','Hemodinamia':'1010','RR.HH.':'1011','Dirección':'1012','Legales':'1013','Calidad del Paciente':'1014','Consultorios Externos':'1015'};
+const SECTOR_PINS={'Enfermería Internación':'2839','Enfermería Áreas Críticas':'3828','Enfermería Quirófano':'4253','Admisión y Egreso':'6467','Seguridad':'8074','Mantenimiento':'7543','Imágenes':'3143','Laboratorio':'8033','Guardia Médica':'9308','Hemodinamia':'2912','RR.HH.':'2712','Dirección':'8067','Legales':'2204','Calidad del Paciente':'4006','Consultorios Externos':'7238'};
 const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨','Hemodinamia':'❤️','RR.HH.':'👔','Dirección':'🏛️','Legales':'⚖️','Calidad del Paciente':'⭐','Consultorios Externos':'🩺'};
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
 
