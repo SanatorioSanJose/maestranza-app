@@ -330,8 +330,27 @@ textarea:focus{border-color:var(--blue);}
           <div class="card-header"><span>📊 Progreso del Turno</span></div>
           <div class="card-body">
             <div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Limpiezas completadas</span><span style="color:var(--green)">18/28</span></div><div class="progress-bar"><div class="progress-fill" style="width:64%;background:var(--green)"></div></div></div>
-            <div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Limpiezas terminales</span><span style="color:var(--blue)">3/4</span></div><div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--blue)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Solicitudes resueltas</span><span id="prog-sol-txt" style="color:var(--teal)">0/0</span></div><div class="progress-bar"><div class="progress-fill" id="prog-sol-bar" style="width:0%;background:var(--teal)"></div></div></div>
+            <div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Solicitudes resueltas</span><span id="prog-sol-txt" style="color:var(--teal)">0/0</span></div><div class="progress-bar"><div class="progress-fill" id="prog-sol-bar" style="width:0%;background:var(--teal)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Pedidos de ropería</span><span id="prog-rop-txt" style="color:var(--purple)">—</span></div><div class="progress-bar"><div class="progress-fill" id="prog-rop-bar" style="width:0%;background:var(--purple)"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span>👕 Novedades Ropería</span><button class="btn-sm secondary" onclick="navToPage('roperia')">Ver ropería</button></div>
+          <div class="card-body" id="dash-rop-preview"><div style="color:var(--text2);font-size:13px">Sin novedades de ropería hoy.</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span>📋 Resumen de Pedidos</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="navToPage('solicitudes')">
+              <span style="font-size:13px">🔔 Pedidos a Maestranza</span>
+              <span class="badge badge-orange" id="dash-count-maestranza">0</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;cursor:pointer" onclick="navToPage('roperia');setTimeout(()=>switchRoperiaTab('pedidos'),300)">
+              <span style="font-size:13px">👕 Pedidos a Ropería</span>
+              <span class="badge badge-purple" id="dash-count-roperia">0</span>
+            </div>
           </div>
         </div>
       </div>
@@ -567,6 +586,7 @@ textarea:focus{border-color:var(--blue);}
           <div class="stat-card"><div class="stat-label">Sol. pendientes</div><div class="stat-val" id="mon-pend" style="color:var(--amber)">0</div></div>
         </div>
         <div class="card"><div class="card-header"><span>📋 Todas las Solicitudes del Día</span></div><div class="card-body" id="mon-sol-list"><div style="color:var(--text2);font-size:13px">Sin solicitudes aún.</div></div></div>
+        <div class="card"><div class="card-header"><span>👕 Novedades de Ropería del Día</span><button class="btn-sm secondary" onclick="navToPage('roperia')">Ver ropería</button></div><div class="card-body" id="mon-rop-list"><div style="color:var(--text2);font-size:13px">Sin novedades de ropería.</div></div></div>
       </div>
       <div id="monitoreo-denied" style="display:none;text-align:center;padding:60px 20px">
         <div style="font-size:48px;margin-bottom:16px">🔒</div>
@@ -804,13 +824,23 @@ function resetSectorForm(){
 function launchApp(){
   showScreen(null);
   document.getElementById('app').style.display='flex';
-  const labels={jefe:'Jefe/a del Servicio',supervisor:'Supervisor/a',operario:'Operario/a',roperia:'Ropería',direccion:'Dirección (Monitoreo)'};
+  const labels={jefe:'Jefe/a del Servicio',supervisor:'Supervisor/a',operario:'Operario/a',roperia:'Ropería',direccion:'Dirección'};
   document.getElementById('sb-role-badge').textContent=labels[currentUser.perfil]||currentUser.perfil;
-  if(currentUser.perfil==='direccion'){document.getElementById('sb-role-badge').style.background='#2d1a4a';document.getElementById('sb-role-badge').style.color='#a855f7';}
+  if(currentUser.perfil==='direccion'){
+    document.getElementById('sb-role-badge').style.background='#2d1a4a';
+    document.getElementById('sb-role-badge').style.color='#a855f7';
+    // Ocultar todos los botones de acción para perfil dirección
+    setTimeout(()=>{
+      document.querySelectorAll('.btn-sm:not(.secondary)').forEach(b=>{
+        if(!b.classList.contains('nav-item')) b.style.display='none';
+      });
+      document.querySelectorAll('button.btn-primary').forEach(b=>b.style.display='none');
+    },500);
+  }
   document.getElementById('sb-name').textContent=currentUser.nombre;
-  const perms={'nav-solicitudes':['jefe','supervisor','operario'],'nav-novedades':['jefe','supervisor','operario'],'nav-residuos':['jefe','supervisor','operario'],'nav-roperia':['jefe','supervisor','roperia'],'nav-insumos':['jefe','supervisor'],'nav-reqs':['jefe','supervisor','operario','roperia'],'nav-personal':['jefe','supervisor'],'nav-monitor':['jefe']};
+  const perms={'nav-solicitudes':['jefe','supervisor','operario','direccion'],'nav-novedades':['jefe','supervisor','operario','direccion'],'nav-residuos':['jefe','supervisor','operario','direccion'],'nav-roperia':['jefe','supervisor','roperia','direccion'],'nav-insumos':['jefe','supervisor','direccion'],'nav-reqs':['jefe','supervisor','operario','roperia','direccion'],'nav-personal':['jefe','supervisor','direccion'],'nav-monitor':['jefe']};
   Object.entries(perms).forEach(([id,roles])=>{const el=document.getElementById(id);if(el)el.style.display=roles.includes(currentUser.perfil)?'':'none';});
-  const isJefe=['jefe','direccion'].includes(currentUser.perfil);
+  const isJefe=currentUser.perfil==='jefe';
   document.getElementById('monitoreo-block').style.display=isJefe?'block':'none';
   document.getElementById('monitoreo-denied').style.display=isJefe?'none':'block';
   const now=new Date();
@@ -837,7 +867,50 @@ function actualizarBadges(){
   const pt=document.getElementById('prog-sol-txt');if(pt)pt.textContent=`${resueltas}/${total}`;
   const pb=document.getElementById('prog-sol-bar');if(pb)pb.style.width=total>0?`${Math.round(resueltas/total*100)}%`:'0%';
   renderSolPreview();
+  actualizarDashRoperia();
   if(currentUser?.perfil==='jefe')renderMonitoreo();
+}
+
+async function actualizarDashRoperia() {
+  // Pedidos de roperia
+  const d = await sheetPost({action:'obtenerPedidosRoperia'});
+  const pedRop = d.ok && d.pedidos ? d.pedidos.length : 0;
+  const el = document.getElementById('dash-count-roperia');
+  if(el) el.textContent = pedRop;
+  const prog = document.getElementById('prog-rop-txt');
+  if(prog) prog.textContent = pedRop + ' pendientes';
+  
+  // Pedidos maestranza (solicitudes activas)
+  const elM = document.getElementById('dash-count-maestranza');
+  if(elM) elM.textContent = solicitudes.filter(s=>s.estado!=='resuelta').length;
+  
+  // Preview roperia movimientos del dia
+  const preview = document.getElementById('dash-rop-preview');
+  if(preview && pedRop > 0) {
+    preview.innerHTML = d.pedidos.slice(0,3).map(p=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="navToPage('roperia');setTimeout(()=>switchRoperiaTab('pedidos'),300)">
+        <span style="font-size:16px">👕</span>
+        <div style="flex:1"><div style="font-size:12px;font-weight:700">${p.prenda} × ${p.cantidad}</div>
+        <div style="font-size:11px;color:var(--text2)">${p.sector} — ${p.solicitante}</div></div>
+        <span class="badge badge-amber">${p.estado}</span>
+      </div>`).join('');
+  }
+  
+  // Monitoreo jefatura - novedades roperia
+  const monRop = document.getElementById('mon-rop-list');
+  if(monRop && currentUser?.perfil==='jefe') {
+    if(!d.ok || !d.pedidos || !d.pedidos.length) {
+      monRop.innerHTML = '<div style="color:var(--text2);font-size:13px">Sin pedidos de ropería pendientes.</div>';
+    } else {
+      monRop.innerHTML = d.pedidos.map(p=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:16px">👕</span>
+          <div style="flex:1"><div style="font-size:12px;font-weight:700">${p.prenda} × ${p.cantidad} — ${p.sector}</div>
+          <div style="font-size:11px;color:var(--text2)">Pedido por: ${p.solicitante} · ${p.motivo}</div></div>
+          <span class="badge badge-${p.estado==='Entregado'?'green':'amber'}">${p.estado}</span>
+        </div>`).join('');
+    }
+  }
 }
 
 function renderSolPreview(){
@@ -1054,7 +1127,17 @@ function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';rende
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){switchRoperiaTab('inventario');}}
+function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
+    const h=new Date().getHours();
+    const esNoche=(h>=21||h<7);
+    if(currentUser.perfil==='operario'&&!esNoche){
+      showToast('El módulo de ropería está disponible para operarios solo en turno noche (21-7hs).',true);
+      navToPage('dashboard');
+      return;
+    }
+    switchRoperiaTab('inventario');
+  }
+}
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function submitForm(id,msg){closeModal(id);showToast(msg);}
