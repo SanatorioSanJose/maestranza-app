@@ -387,11 +387,87 @@ textarea:focus{border-color:var(--blue);}
 
     <!-- ROPERÍA -->
     <div class="page" id="page-roperia">
-      <div class="page-header"><div><div class="page-title">Ropería</div><div class="page-sub">Control de entrega y recepción</div></div><button class="btn-sm" onclick="openModal('modal-roperia')">+ Registrar Movimiento</button></div>
-      <div class="grid-3">
-        <div class="stat-card"><div class="stat-label">Entregado hoy</div><div class="stat-val" style="color:var(--text2)" id="rop-entregado">—</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
-        <div class="stat-card"><div class="stat-label">Recibido hoy</div><div class="stat-val" style="color:var(--text2)" id="rop-recibido">—</div><div class="stat-meta">prendas — Empresa Tercerizada</div></div>
-        <div class="stat-card" style="border-color:var(--amber)"><div class="stat-label">Diferencia</div><div class="stat-val" style="color:var(--text2)" id="rop-diferencia">—</div><div class="stat-meta">Registrar movimiento para ver diferencia</div></div>
+      <div class="page-header">
+        <div><div class="page-title">👕 Ropería</div><div class="page-sub">SANIRAP — Control de entrega y recepción</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm secondary" onclick="switchRoperiaTab('inventario')">📦 Inventario</button>
+          <button class="btn-sm secondary" onclick="switchRoperiaTab('pedidos')">📋 Pedidos</button>
+          <button class="btn-sm" onclick="switchRoperiaTab('movimiento')">+ Registrar Movimiento</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="grid-3" id="rop-stats">
+        <div class="stat-card"><div class="stat-label">Entregado hoy (07:30)</div><div class="stat-val" style="color:var(--red)" id="rop-entregado">—</div><div class="stat-meta">prendas a SANIRAP</div></div>
+        <div class="stat-card"><div class="stat-label">Recibido hoy (11:30)</div><div class="stat-val" style="color:var(--green)" id="rop-recibido">—</div><div class="stat-meta">prendas limpias</div></div>
+        <div class="stat-card" id="rop-diff-card"><div class="stat-label">Diferencia</div><div class="stat-val" id="rop-diferencia" style="color:var(--text2)">—</div><div class="stat-meta" id="rop-diff-meta">Sin movimientos hoy</div></div>
+      </div>
+
+      <!-- TAB: INVENTARIO -->
+      <div id="rop-tab-inventario">
+        <div class="card">
+          <div class="card-header"><span>📦 Inventario de Prendas</span><span style="font-size:11px;color:var(--text2);font-weight:400">Stock mínimo editable en Google Sheets</span></div>
+          <div id="rop-inv-alert" style="display:none" class="alert-box alert-red" style="margin:12px 18px">🚨 Hay prendas por debajo del stock mínimo.</div>
+          <table class="data-table">
+            <thead><tr><th>Código</th><th>Prenda</th><th>Stock Total</th><th>Premium</th><th>Con Novedad</th><th>Mínimo</th><th>Estado</th></tr></thead>
+            <tbody id="rop-inv-tbody"><tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Cargando inventario...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: PEDIDOS -->
+      <div id="rop-tab-pedidos" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <span>📋 Pedidos de Ropa Pendientes</span>
+            <button class="btn-sm" onclick="openModal('modal-pedido-roperia')">+ Nuevo Pedido</button>
+          </div>
+          <div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px 16px;margin:12px 18px;font-size:12px;color:var(--amber)">
+            ⚠️ <strong>Recordatorio:</strong> La ropa como sábanas no debe ser usada para tirar al piso ni para usos que no correspondan al material. No se pueden pedir almohadas ortopédicas u otros elementos técnicos — esos pedidos deben gestionarse por el servicio correspondiente (ej: Kinesiología).
+          </div>
+          <div id="rop-pedidos-list" style="padding:0 18px 18px"><div style="color:var(--text2);font-size:13px">Cargando pedidos...</div></div>
+        </div>
+      </div>
+
+      <!-- TAB: MOVIMIENTO -->
+      <div id="rop-tab-movimiento" style="display:none">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span>📤 Entrega a SANIRAP (07:30 hs)</span></div>
+            <div class="card-body">
+              <div class="form-field"><label>Prenda</label><select id="rop-mov-prenda-entrega"><option value="">— Seleccioná —</option></select></div>
+              <div class="form-field"><label>Cantidad entregada</label><input type="text" id="rop-mov-cant-entrega" placeholder="Cantidad" /></div>
+              <button class="btn-sm danger" onclick="registrarMovimiento('Entrega')">Registrar Entrega a SANIRAP</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span>📥 Recepción de SANIRAP (11:30 hs)</span></div>
+            <div class="card-body">
+              <div class="form-field"><label>Prenda</label><select id="rop-mov-prenda-recep"><option value="">— Seleccioná —</option></select></div>
+              <div class="form-field"><label>Cantidad recibida</label><input type="text" id="rop-mov-cant-recep" placeholder="Cantidad" /></div>
+              <div class="form-field"><label>Cantidad según remito SANIRAP</label><input type="text" id="rop-mov-cant-remito" placeholder="Cantidad en remito" /></div>
+              <div class="form-field"><label>Novedad (opcional)</label>
+                <select id="rop-mov-novedad">
+                  <option value="">Sin novedad</option>
+                  <option>Manchada</option><option>Rota</option><option>Desteñida</option>
+                  <option>Con agujeros</option><option>Deteriorada</option><option>Otra</option>
+                </select>
+              </div>
+              <button class="btn-sm success" onclick="registrarMovimiento('Recepcion')">Registrar Recepción</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="rop-reclamo-card" style="display:none;border-color:var(--red)">
+          <div class="card-header" style="color:var(--red)"><span>⚠️ Faltante detectado — Reclamo a SANIRAP</span></div>
+          <div class="card-body">
+            <div id="rop-reclamo-detalle" style="font-size:13px;margin-bottom:16px"></div>
+            <div class="form-field"><label>Observación adicional (opcional)</label><textarea id="rop-reclamo-obs" placeholder="Podés agregar un comentario al reclamo..."></textarea></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm danger" onclick="enviarReclamo()">📧 Enviar reclamo por email a SANIRAP</button>
+              <button class="btn-sm secondary" onclick="document.getElementById('rop-reclamo-card').style.display='none'">Descartar</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -520,12 +596,24 @@ textarea:focus{border-color:var(--blue);}
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-residuo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-residuo','Manifiesto registrado')">Guardar</button></div>
 </div></div>
 
-<div class="modal-overlay" id="modal-roperia"><div class="modal">
-  <button class="modal-close" onclick="closeModal('modal-roperia')">✕</button>
-  <div class="modal-title">Movimiento de Ropería</div>
-  <div class="form-row"><div class="form-field"><label>Entregado (sucio)</label><input type="text" /></div><div class="form-field"><label>Recibido (limpio)</label><input type="text" /></div></div>
-  <div class="form-field"><label>Observaciones</label><textarea></textarea></div>
-  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-roperia')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-roperia','Movimiento registrado')">Guardar</button></div>
+<div class="modal-overlay" id="modal-pedido-roperia"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-pedido-roperia')">✕</button>
+  <div class="modal-title">Nuevo Pedido de Ropa</div>
+  <div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px;font-size:12px;color:var(--amber);margin-bottom:16px">
+    ⚠️ La ropa no debe usarse para tirar al piso ni para fines que no correspondan. No solicitar almohadas ortopédicas u otros elementos técnicos.
+  </div>
+  <div class="form-row">
+    <div class="form-field"><label>Tu nombre completo</label><input type="text" id="ped-nombre" placeholder="Nombre y apellido" /></div>
+    <div class="form-field"><label>Prenda solicitada</label><select id="ped-prenda"><option value="">— Seleccioná —</option></select></div>
+  </div>
+  <div class="form-row">
+    <div class="form-field"><label>Cantidad</label><input type="text" id="ped-cantidad" placeholder="Cantidad" /></div>
+    <div class="form-field"><label>Motivo / Destino</label><input type="text" id="ped-motivo" placeholder="Para qué se necesita" /></div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+    <button class="btn-sm secondary" onclick="closeModal('modal-pedido-roperia')">Cancelar</button>
+    <button class="btn-sm" onclick="guardarPedidoRoperia()">Enviar Pedido</button>
+  </div>
 </div></div>
 
 <div class="modal-overlay" id="modal-insumo"><div class="modal">
@@ -582,7 +670,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbyEGy2sw8lfaLJQv6-MvPlZf1fMCEiddt2_4fyQSqzqEz1VKE-IZMcHtx55hcYb6AtVRQ/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzvJZsWD_vduHAl-37O40Devyogbq1PGd_K7hTRR1iGcaYQlnARkzcBMZ96Pt0uuF1w8A/exec";
 const SECTOR_PINS={'Enfermería Internación':'2839','Enfermería Áreas Críticas':'3828','Enfermería Quirófano':'4253','Admisión y Egreso':'6467','Seguridad':'8074','Mantenimiento':'7543','Imágenes':'3143','Laboratorio':'8033','Guardia Médica':'9308','Hemodinamia':'2912','RR.HH.':'2712','Dirección':'8067','Legales':'2204','Calidad del Paciente':'4006','Consultorios Externos':'7238'};
 const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨','Hemodinamia':'❤️','RR.HH.':'👔','Dirección':'🏛️','Legales':'⚖️','Calidad del Paciente':'⭐','Consultorios Externos':'🩺'};
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -966,13 +1054,192 @@ function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';rende
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();}
+function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){switchRoperiaTab('inventario');}}
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function submitForm(id,msg){closeModal(id);showToast(msg);}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
+
+// ---- ROPERÍA ----
+let roperiaInventario = [];
+let roperiaEmailReclamo = 'nestor@sanirap.com';
+let ropMovActual = null; // guarda el último movimiento para reclamo
+
+function switchRoperiaTab(tab) {
+  ['inventario','pedidos','movimiento'].forEach(t => {
+    const el = document.getElementById('rop-tab-'+t);
+    if(el) el.style.display = t===tab ? 'block' : 'none';
+  });
+  if(tab==='inventario') cargarInventarioRoperia();
+  if(tab==='pedidos') cargarPedidosRoperia();
+  if(tab==='movimiento') poblarSelectsPrendas();
+}
+
+async function cargarInventarioRoperia() {
+  const tbody = document.getElementById('rop-inv-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Cargando...</td></tr>';
+  const d = await sheetPost({action:'obtenerPrendas'});
+  if(!d.ok || !d.prendas) { tbody.innerHTML='<tr><td colspan="7" style="color:var(--red);text-align:center;padding:20px">Error al cargar inventario.</td></tr>'; return; }
+  roperiaInventario = d.prendas;
+  roperiaEmailReclamo = d.emailReclamo || 'nestor@sanirap.com';
+  let hayBajoMinimo = false;
+  tbody.innerHTML = d.prendas.map(p => {
+    const stockUtil = p.stockTotal - p.stockNovedad;
+    const bajo = stockUtil < p.stockMinimo;
+    if(bajo) hayBajoMinimo = true;
+    const estado = bajo
+      ? '<span class="badge badge-red">⚠️ Bajo mínimo</span>'
+      : '<span class="badge badge-green">OK</span>';
+    return `<tr style="${bajo?'background:var(--red-dim)':''}">
+      <td style="font-family:var(--mono);font-size:11px">${p.codigo}</td>
+      <td style="font-weight:600">${p.descripcion}</td>
+      <td style="text-align:center">${p.stockTotal}</td>
+      <td style="text-align:center;color:var(--teal)">${p.stockPremium}</td>
+      <td style="text-align:center;color:var(--amber)">${p.stockNovedad}</td>
+      <td style="text-align:center;color:var(--text2)">${p.stockMinimo}</td>
+      <td>${estado}</td>
+    </tr>`;
+  }).join('');
+  const alertEl = document.getElementById('rop-inv-alert');
+  if(alertEl) alertEl.style.display = hayBajoMinimo ? 'block' : 'none';
+}
+
+function poblarSelectsPrendas() {
+  if(!roperiaInventario.length) {
+    sheetPost({action:'obtenerPrendas'}).then(d => {
+      if(d.ok && d.prendas) { roperiaInventario=d.prendas; roperiaEmailReclamo=d.emailReclamo||'nestor@sanirap.com'; _fillSelects(); }
+    });
+  } else { _fillSelects(); }
+}
+
+function _fillSelects() {
+  const opts = roperiaInventario.map(p=>`<option value="${p.codigo}">${p.descripcion}</option>`).join('');
+  ['rop-mov-prenda-entrega','rop-mov-prenda-recep','ped-prenda'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = '<option value="">— Seleccioná —</option>' + opts;
+  });
+}
+
+async function registrarMovimiento(tipo) {
+  const esEntrega = tipo === 'Entrega';
+  const codigoEl = document.getElementById(esEntrega ? 'rop-mov-prenda-entrega' : 'rop-mov-prenda-recep');
+  const cantEl = document.getElementById(esEntrega ? 'rop-mov-cant-entrega' : 'rop-mov-cant-recep');
+  const codigo = codigoEl?.value;
+  const cant = parseInt(cantEl?.value) || 0;
+  if(!codigo || !cant) { showToast('Completá prenda y cantidad.', true); return; }
+  const prenda = roperiaInventario.find(p=>p.codigo===codigo);
+  const turno = document.getElementById('turno-badge')?.textContent || '—';
+  
+  let cantRemito = 0, novedad = '', diferencia = 0;
+  if(!esEntrega) {
+    cantRemito = parseInt(document.getElementById('rop-mov-cant-remito')?.value) || cant;
+    novedad = document.getElementById('rop-mov-novedad')?.value || '';
+    diferencia = cant - cantRemito; // negativo = faltante
+  }
+  
+  await sheetPost({
+    action:'guardarMovimiento', tipo, codigo, descripcion: prenda?.descripcion||codigo,
+    cantEntregada: esEntrega ? cant : 0, cantRecibida: esEntrega ? 0 : cant,
+    diferencia, novedad, turno, usuario: currentUser?.nombre||'—'
+  });
+
+  // Actualizar stats
+  if(esEntrega) {
+    const prev = parseInt(document.getElementById('rop-entregado')?.textContent) || 0;
+    document.getElementById('rop-entregado').textContent = prev + cant;
+    document.getElementById('rop-entregado').style.color = 'var(--red)';
+  } else {
+    const prev = parseInt(document.getElementById('rop-recibido')?.textContent) || 0;
+    document.getElementById('rop-recibido').textContent = prev + cant;
+    document.getElementById('rop-recibido').style.color = 'var(--green)';
+    
+    // Detectar faltante
+    if(diferencia < 0) {
+      ropMovActual = { codigo, descripcion: prenda?.descripcion||codigo, cantRemito, cant, diferencia: Math.abs(diferencia) };
+      const card = document.getElementById('rop-reclamo-card');
+      const detalle = document.getElementById('rop-reclamo-detalle');
+      if(card && detalle) {
+        detalle.innerHTML = `<div class="alert-box alert-red">
+          <strong>${prenda?.descripcion||codigo}</strong><br>
+          Según remito SANIRAP: <strong>${cantRemito}</strong> — Recibido real: <strong>${cant}</strong><br>
+          <strong>Faltante: ${Math.abs(diferencia)} prendas</strong>
+        </div>`;
+        card.style.display = 'block';
+        document.getElementById('rop-diff-card').style.borderColor = 'var(--red)';
+        document.getElementById('rop-diferencia').textContent = '-' + Math.abs(diferencia);
+        document.getElementById('rop-diferencia').style.color = 'var(--red)';
+        document.getElementById('rop-diff-meta').textContent = '⚠️ Faltante detectado';
+      }
+    }
+    if(novedad) showToast(`⚠️ Prenda con novedad "${novedad}" registrada`, true);
+  }
+  
+  cantEl.value = '';
+  if(!esEntrega) { document.getElementById('rop-mov-cant-remito').value=''; document.getElementById('rop-mov-novedad').value=''; }
+  showToast(`${tipo} registrada: ${cant} x ${prenda?.descripcion||codigo}`);
+  cargarInventarioRoperia();
+}
+
+async function enviarReclamo() {
+  if(!ropMovActual) return;
+  const obs = document.getElementById('rop-reclamo-obs')?.value || '';
+  const fecha = new Date().toLocaleDateString('es-AR');
+  const detalle = `${ropMovActual.descripcion} — Remito: ${ropMovActual.cantRemito} — Recibido: ${ropMovActual.cant} — Faltante: ${ropMovActual.diferencia}${obs ? '\nObservación: '+obs : ''}`;
+  showLoading('Enviando reclamo por email...');
+  const d = await sheetPost({action:'enviarReclamoSanirap', fecha, detalle, totalFaltante: ropMovActual.diferencia, turno: document.getElementById('turno-badge')?.textContent||'—', usuario: currentUser?.nombre||'—'});
+  hideLoading();
+  if(d.ok) {
+    document.getElementById('rop-reclamo-card').style.display='none';
+    showToast(`✅ Reclamo enviado a ${d.emailEnviado}`);
+    ropMovActual = null;
+  } else { showToast('Error al enviar el reclamo. Intentá de nuevo.', true); }
+}
+
+async function cargarPedidosRoperia() {
+  const el = document.getElementById('rop-pedidos-list');
+  if(!el) return;
+  el.innerHTML = '<div style="color:var(--text2);font-size:13px">Cargando...</div>';
+  const d = await sheetPost({action:'obtenerPedidosRoperia'});
+  if(!d.ok || !d.pedidos) { el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pedidos pendientes.</div>'; return; }
+  if(!d.pedidos.length) { el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pedidos pendientes.</div>'; return; }
+  const canManage = ['jefe','supervisor','roperia'].includes(currentUser?.perfil);
+  el.innerHTML = d.pedidos.map(p => `
+    <div class="sol-card normal" style="margin-bottom:10px">
+      <div class="sol-header">
+        <div><div class="sol-sector">👕 ${p.prenda} × ${p.cantidad}</div><div style="font-size:11px;color:var(--text2)">${p.sector} — ${p.solicitante}</div></div>
+        <div style="text-align:right"><div class="sol-time">${p.fecha}</div><span class="badge badge-amber">${p.estado}</span></div>
+      </div>
+      <div class="sol-body">Motivo: ${p.motivo}</div>
+      <div class="sol-footer">
+        ${canManage ? `<button class="btn-sm success" onclick="entregarPedidoRoperia(${p.fila},'${p.prenda}')">✅ Marcar entregado</button>` : ''}
+      </div>
+    </div>`).join('');
+  poblarSelectsPrendas();
+}
+
+async function guardarPedidoRoperia() {
+  const nombre = document.getElementById('ped-nombre')?.value.trim();
+  const prenda = document.getElementById('ped-prenda');
+  const cantidad = document.getElementById('ped-cantidad')?.value.trim();
+  const motivo = document.getElementById('ped-motivo')?.value.trim();
+  if(!nombre||!prenda?.value||!cantidad||!motivo) { showToast('Completá todos los campos.', true); return; }
+  const prendaDesc = prenda.options[prenda.selectedIndex]?.text || prenda.value;
+  await sheetPost({action:'guardarPedidoRoperia', sector: currentUser?.nombre||'—', solicitante: nombre, prenda: prendaDesc, cantidad, motivo});
+  closeModal('modal-pedido-roperia');
+  showToast('Pedido enviado a ropería');
+  document.getElementById('ped-nombre').value='';
+  document.getElementById('ped-cantidad').value='';
+  document.getElementById('ped-motivo').value='';
+}
+
+async function entregarPedidoRoperia(fila, prenda) {
+  await sheetPost({action:'entregarPedidoRoperia', fila, entregadoPor: currentUser?.nombre||'—'});
+  showToast(`✅ ${prenda} marcado como entregado`);
+  cargarPedidosRoperia();
+}
 function openSidebar(){document.querySelector('.sidebar').classList.add('open');document.getElementById('mobile-overlay').classList.add('open');}
 function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.getElementById('mobile-overlay').classList.remove('open');}
 </script>
