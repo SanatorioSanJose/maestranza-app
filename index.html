@@ -411,6 +411,8 @@ textarea:focus{border-color:var(--blue);}
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn-sm secondary" onclick="switchRoperiaTab('inventario')">📦 Inventario</button>
           <button class="btn-sm secondary" onclick="switchRoperiaTab('pedidos')">📋 Pedidos</button>
+          <button class="btn-sm secondary" onclick="switchRoperiaTab('perdidas')">⚠️ Pérdidas</button>
+          <button class="btn-sm secondary" onclick="generarParteManual()">📧 Generar Parte</button>
           <button class="btn-sm" onclick="switchRoperiaTab('movimiento')">+ Registrar Movimiento</button>
         </div>
       </div>
@@ -445,6 +447,17 @@ textarea:focus{border-color:var(--blue);}
             ⚠️ <strong>Recordatorio:</strong> La ropa como sábanas no debe ser usada para tirar al piso ni para usos que no correspondan al material. No se pueden pedir almohadas ortopédicas u otros elementos técnicos — esos pedidos deben gestionarse por el servicio correspondiente (ej: Kinesiología).
           </div>
           <div id="rop-pedidos-list" style="padding:0 18px 18px"><div style="color:var(--text2);font-size:13px">Cargando pedidos...</div></div>
+        </div>
+      </div>
+
+      <!-- TAB: PÉRDIDAS -->
+      <div id="rop-tab-perdidas" style="display:none">
+        <div class="card">
+          <div class="card-header"><span>⚠️ Registro de Pérdidas de Ropa</span><button class="btn-sm danger" onclick="openModal('modal-perdida-ropa')">+ Registrar Pérdida</button></div>
+          <div class="supervisor-note" style="margin:12px 18px 0">
+            Registrá aquí toda pérdida de ropa: pacientes que se van en ambulancia con frazadas, toallones no encontrados, etc. El sistema notificará automáticamente a <strong>Experiencia del Paciente</strong> para que gestionen la situación.
+          </div>
+          <div id="rop-perdidas-list" style="padding:16px 18px"><div style="color:var(--text2);font-size:13px">Cargando registros...</div></div>
         </div>
       </div>
 
@@ -616,6 +629,34 @@ textarea:focus{border-color:var(--blue);}
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn-sm secondary" onclick="closeModal('modal-residuo')">Cancelar</button><button class="btn-sm" onclick="submitForm('modal-residuo','Manifiesto registrado')">Guardar</button></div>
 </div></div>
 
+<div class="modal-overlay" id="modal-perdida-ropa"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-perdida-ropa')">✕</button>
+  <div class="modal-title">⚠️ Registrar Pérdida de Ropa</div>
+  <div class="alert-box alert-amber" style="margin-bottom:16px">Este registro se enviará automáticamente a <strong>Experiencia del Paciente</strong> para su gestión.</div>
+  <div class="form-row">
+    <div class="form-field"><label>Prenda perdida</label><select id="per-prenda"><option value="">— Seleccioná —</option></select></div>
+    <div class="form-field"><label>Cantidad</label><input type="text" id="per-cantidad" placeholder="Cantidad" /></div>
+  </div>
+  <div class="form-row">
+    <div class="form-field"><label>Habitación / Sector</label><input type="text" id="per-habitacion" placeholder="Ej: Hab. 205, Ambulancia..." /></div>
+    <div class="form-field"><label>Causa</label>
+      <select id="per-causa">
+        <option value="">— Seleccioná —</option>
+        <option>Alta en ambulancia — paciente llevó ropa</option>
+        <option>Ropa no encontrada en habitación</option>
+        <option>Paciente desconoce el faltante</option>
+        <option>Ropa retenida por familiar</option>
+        <option>Otra causa</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-field"><label>Observación adicional</label><textarea id="per-obs" placeholder="Detallá la situación..."></textarea></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+    <button class="btn-sm secondary" onclick="closeModal('modal-perdida-ropa')">Cancelar</button>
+    <button class="btn-sm danger" onclick="registrarPerdida()">📧 Registrar y notificar a Experiencia del Paciente</button>
+  </div>
+</div></div>
+
 <div class="modal-overlay" id="modal-pedido-roperia"><div class="modal">
   <button class="modal-close" onclick="closeModal('modal-pedido-roperia')">✕</button>
   <div class="modal-title">Nuevo Pedido de Ropa</div>
@@ -690,7 +731,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbzvJZsWD_vduHAl-37O40Devyogbq1PGd_K7hTRR1iGcaYQlnARkzcBMZ96Pt0uuF1w8A/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbyGlV3Sa5TtfHdeZPqrHvZYuyvE03NytDw0p_peWPtw4kCWCS9J7Etk6PKTXVAk6j0/exec";
 const SECTOR_PINS={'Enfermería Internación':'2839','Enfermería Áreas Críticas':'3828','Enfermería Quirófano':'4253','Admisión y Egreso':'6467','Seguridad':'8074','Mantenimiento':'7543','Imágenes':'3143','Laboratorio':'8033','Guardia Médica':'9308','Hemodinamia':'2912','RR.HH.':'2712','Dirección':'8067','Legales':'2204','Calidad del Paciente':'4006','Consultorios Externos':'7238'};
 const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨','Hemodinamia':'❤️','RR.HH.':'👔','Dirección':'🏛️','Legales':'⚖️','Calidad del Paciente':'⭐','Consultorios Externos':'🩺'};
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -1145,18 +1186,186 @@ document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
 
+// ---- PÉRDIDAS DE ROPA ----
+async function registrarPerdida() {
+  const prenda = document.getElementById('per-prenda');
+  const cantidad = document.getElementById('per-cantidad')?.value.trim();
+  const habitacion = document.getElementById('per-habitacion')?.value.trim();
+  const causa = document.getElementById('per-causa')?.value;
+  const obs = document.getElementById('per-obs')?.value.trim();
+  if(!prenda?.value || !cantidad || !habitacion || !causa) {
+    showToast('Completá todos los campos requeridos.', true); return;
+  }
+  const prendaDesc = prenda.options[prenda.selectedIndex]?.text || prenda.value;
+  showLoading('Registrando pérdida y notificando...');
+  const d = await sheetPost({
+    action: 'registrarPerdida',
+    prenda: prendaDesc, cantidad, habitacion, causa, obs: obs||'',
+    usuario: currentUser?.nombre||'—',
+    turno: document.getElementById('turno-badge')?.textContent||'—',
+    emailExp: 'calidad@sanatoriosanjose.org.ar'
+  });
+  hideLoading();
+  closeModal('modal-perdida-ropa');
+  if(d.ok) {
+    showToast('✅ Pérdida registrada. Experiencia del Paciente fue notificada.');
+    document.getElementById('per-cantidad').value='';
+    document.getElementById('per-habitacion').value='';
+    document.getElementById('per-obs').value='';
+    cargarPerdidasRoperia();
+  } else showToast('Error al registrar. Intentá de nuevo.', true);
+}
+
+async function cargarPerdidasRoperia() {
+  const el = document.getElementById('rop-perdidas-list');
+  if(!el) return;
+  el.innerHTML = '<div style="color:var(--text2);font-size:13px">Cargando...</div>';
+  const d = await sheetPost({action:'obtenerPerdidas'});
+  if(!d.ok || !d.perdidas || !d.perdidas.length) {
+    el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pérdidas registradas.</div>'; return;
+  }
+  el.innerHTML = d.perdidas.map(p=>`
+    <div class="sol-card urgente" style="margin-bottom:10px">
+      <div class="sol-header">
+        <div><div class="sol-sector">⚠️ ${p.prenda} × ${p.cantidad}</div>
+        <div style="font-size:11px;color:var(--text2)">📍 ${p.habitacion} — ${p.causa}</div></div>
+        <div style="text-align:right"><div class="sol-time">${p.fecha}</div>
+        <span class="badge badge-${p.notificado==='Si'?'green':'amber'}">${p.notificado==='Si'?'Notificado':'Pendiente'}</span></div>
+      </div>
+      ${p.obs?`<div class="sol-body">${p.obs}</div>`:''}
+      <div class="sol-footer"><span style="font-size:11px;color:var(--text2)">Registrado por: ${p.usuario}</span></div>
+    </div>`).join('');
+  // Populate prenda select if empty
+  if(document.getElementById('per-prenda')?.options.length <= 1) poblarSelectsPrendas();
+}
+
+// ---- PARTE DIARIO ----
+async function generarParteDiario(automatico) {
+  const h = new Date().getHours();
+  const turno = h >= 7 && h < 13 ? 'Mañana' : h >= 13 && h < 21 ? 'Tarde' : 'Noche';
+  const fecha = new Date().toLocaleDateString('es-AR', {day:'2-digit',month:'2-digit',year:'numeric'});
+  
+  // Obtener datos del día
+  const [movRes, pedRes] = await Promise.all([
+    sheetPost({action:'obtenerMovimientosHoy', turno}),
+    sheetPost({action:'obtenerPedidosRoperia'})
+  ]);
+  
+  const movimientos = movRes.ok ? movRes.movimientos || [] : [];
+  const pedidos = pedRes.ok ? pedRes.pedidos || [] : [];
+  const pedidosEntregados = pedidos.filter(p=>p.estado==='Entregado');
+  const pedidosPendientes = pedidos.filter(p=>p.estado!=='Entregado');
+  
+  // Construir cuerpo del email
+  let cuerpo = `PARTE DIARIO DE ROPERÍA — TURNO ${turno.toUpperCase()}
+`;
+  cuerpo += `Fecha: ${fecha}
+`;
+  cuerpo += `Generado por: ${currentUser?.nombre||'Sistema'}
+`;
+  cuerpo += `${'='.repeat(50)}
+
+`;
+  
+  cuerpo += `MOVIMIENTOS CON SANIRAP:
+`;
+  const entregas = movimientos.filter(m=>m.tipo==='Entrega');
+  const recepciones = movimientos.filter(m=>m.tipo==='Recepcion');
+  const reclamos = movimientos.filter(m=>m.tipo==='Reclamo enviado');
+  
+  if(entregas.length) {
+    cuerpo += `
+Entregas a SANIRAP (07:30 hs):
+`;
+    entregas.forEach(m=>{ cuerpo += `  • ${m.descripcion}: ${m.cantEntregada} u.
+`; });
+  }
+  if(recepciones.length) {
+    cuerpo += `
+Recepciones de SANIRAP (11:30 hs):
+`;
+    recepciones.forEach(m=>{
+      cuerpo += `  • ${m.descripcion}: ${m.cantRecibida} u.`;
+      if(m.diferencia < 0) cuerpo += ` ⚠️ FALTANTE: ${Math.abs(m.diferencia)} u.`;
+      if(m.novedad) cuerpo += ` — Novedad: ${m.novedad}`;
+      cuerpo += '
+';
+    });
+  }
+  if(reclamos.length) {
+    cuerpo += `
+Reclamos enviados a SANIRAP: ${reclamos.length}
+`;
+  }
+  
+  cuerpo += `
+${'='.repeat(50)}
+`;
+  cuerpo += `PEDIDOS DE ROPA DEL TURNO:
+`;
+  cuerpo += `  Entregados: ${pedidosEntregados.length}
+`;
+  cuerpo += `  Pendientes: ${pedidosPendientes.length}
+`;
+  if(pedidosPendientes.length) {
+    cuerpo += `
+Pedidos pendientes:
+`;
+    pedidosPendientes.forEach(p=>{ cuerpo += `  • ${p.prenda} × ${p.cantidad} — ${p.sector} (${p.solicitante})
+`; });
+  }
+  
+  cuerpo += `
+${'='.repeat(50)}
+`;
+  cuerpo += `Sanatorio San José — Servicio de Ropería
+`;
+  cuerpo += `jefaturamantenimiento.ssanjose@gmail.com`;
+  
+  showLoading('Enviando parte diario...');
+  const d = await sheetPost({
+    action: 'enviarParteDiario',
+    turno, fecha, cuerpo,
+    emailDestino: 'calidad.sanirap@gmail.com',
+    usuario: currentUser?.nombre||'—'
+  });
+  hideLoading();
+  if(d.ok) showToast(`✅ Parte del turno ${turno} enviado a calidad.sanirap@gmail.com`);
+  else showToast('Error al enviar el parte. Intentá de nuevo.', true);
+}
+
+function generarParteManual() {
+  if(confirm('¿Generar y enviar el parte diario del turno actual a calidad.sanirap@gmail.com?')) {
+    generarParteDiario(false);
+  }
+}
+
+// Auto-parte al cambio de turno
+function verificarCambioDeTurno() {
+  const h = new Date().getHours();
+  const min = new Date().getMinutes();
+  // Enviar parte automático a las 21:00 (fin turno tarde) y a las 13:00 (fin turno mañana)
+  if((h === 21 || h === 13) && min === 0) {
+    if(currentUser && ['jefe','supervisor','roperia'].includes(currentUser.perfil)) {
+      generarParteDiario(true);
+    }
+  }
+}
+setInterval(verificarCambioDeTurno, 60000); // verificar cada minuto
+
 // ---- ROPERÍA ----
 let roperiaInventario = [];
 let roperiaEmailReclamo = 'nestor@sanirap.com';
 let ropMovActual = null; // guarda el último movimiento para reclamo
 
 function switchRoperiaTab(tab) {
-  ['inventario','pedidos','movimiento'].forEach(t => {
+  ['inventario','pedidos','perdidas','movimiento'].forEach(t => {
     const el = document.getElementById('rop-tab-'+t);
     if(el) el.style.display = t===tab ? 'block' : 'none';
   });
   if(tab==='inventario') cargarInventarioRoperia();
   if(tab==='pedidos') cargarPedidosRoperia();
+  if(tab==='perdidas') { cargarPerdidasRoperia(); poblarSelectsPrendas(); }
   if(tab==='movimiento') poblarSelectsPrendas();
 }
 
