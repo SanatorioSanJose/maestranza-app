@@ -633,7 +633,7 @@ textarea:focus{border-color:var(--blue);}
       <div class="card" style="margin-top:20px">
         <div class="card-header">
           <span>🔧 Habitaciones Fuera de Servicio / En Reparación</span>
-          <button class="btn-sm" onclick="openModal('modal-hab-estado')" id="btn-hab-estado">+ Marcar habitación</button>
+          <button class="btn-sm" onclick="openModal('modal-hab-estado')" id="btn-hab-estado" style="display:none">+ Marcar habitación</button>
         </div>
         <table class="data-table">
           <thead><tr><th>Habitación</th><th>Estado</th><th>Motivo</th><th>Desde</th><th>Retorno estimado</th><th>Sector</th><th></th></tr></thead>
@@ -1339,13 +1339,16 @@ async function cargarInfectologia() {
   if(estRes.ok) {
     infectEstados = estRes.estados || [];
     // Actualizar rooms con estados
+    // Reset rooms first
+    rooms.forEach(function(r){ if(['reparacion','fuera','reservada'].indexOf(r.status)>=0){ r.status='ok'; delete r.estadoInfo; } });
     infectEstados.forEach(e => {
       const r = rooms.find(r => String(r.num) === String(e.habitacion));
       if(r) {
-        if(e.estado === 'En Reparación') r.status = 'reparacion';
-        else if(e.estado === 'Fuera de Servicio') r.status = 'fuera';
-        else if(e.estado === 'Reservada') r.status = 'reservada';
-        else if(e.estado === 'Operativa') r.status = 'ok';
+        const est = String(e.estado||'').trim();
+        if(est==='En Reparacion'||est==='En Reparación') r.status = 'reparacion';
+        else if(est==='Fuera de Servicio') r.status = 'fuera';
+        else if(est==='Reservada') r.status = 'reservada';
+        else if(est==='Operativa'){ r.status='ok'; delete r.estadoInfo; return; }
         r.estadoInfo = e;
       }
     });
