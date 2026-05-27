@@ -1029,7 +1029,7 @@ function actualizarBadges(){
   const sc=document.getElementById('stat-sol');if(sc)sc.style.borderColor=criticas.length>0?'var(--red)':activas.length>0?'var(--orange)':'var(--border)';
   const ca=document.getElementById('sol-alert-critico');if(ca)ca.style.display=criticas.length>0?'block':'none';
   const da=document.getElementById('dash-alerts');
-  if(da)da.innerHTML=criticas.length>0?`<div class="alert-box alert-red" style="margin-bottom:20px">🚨 <strong>${criticas.length} solicitud${criticas.length>1?'es críticas':'crítica'}</strong> — <a onclick="navToPage('solicitudes')" style="color:var(--red);cursor:pointer;font-weight:700">Ver ahora →</a></div>`:'';
+  if(da){if(criticas.length>0){da.innerHTML='<div class="alert-box alert-red" style="margin-bottom:20px">🚨 <strong>' + criticas.length + ' solicitud' + (criticas.length>1?'es críticas':'crítica') + '</strong> — <a onclick="navToPage(\'solicitudes\')" style="color:var(--red);cursor:pointer;font-weight:700">Ver ahora →</a></div>';}else{da.innerHTML='';}};
   const pt=document.getElementById('prog-sol-txt');if(pt)pt.textContent=`${resueltas}/${total}`;
   const pb=document.getElementById('prog-sol-bar');if(pb)pb.style.width=total>0?`${Math.round(resueltas/total*100)}%`:'0%';
   renderSolPreview();
@@ -1053,13 +1053,15 @@ async function actualizarDashRoperia() {
   // Preview roperia movimientos del dia
   const preview = document.getElementById('dash-rop-preview');
   if(preview && pedRop > 0) {
-    preview.innerHTML = d.pedidos.slice(0,3).map(function(p){
-      return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="navToPage(\'roperia\');setTimeout(function(){switchRoperiaTab(\'pedidos\')},300)">'
-        + '<span style="font-size:16px">👕</span>'
-        + '<div style="flex:1"><div style="font-size:12px;font-weight:700">' + p.prenda + ' x ' + p.cantidad + '</div>'
-        + '<div style="font-size:11px;color:var(--text2)">' + p.sector + ' - ' + p.solicitante + '</div></div>'
-        + '<span class="badge badge-amber">' + p.estado + '</span></div>';
-    }).join('');
+    var html = '';
+    d.pedidos.slice(0,3).forEach(function(p){
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">';
+      html += '<span style="font-size:16px">👕</span>';
+      html += '<div style="flex:1"><div style="font-size:12px;font-weight:700">' + p.prenda + ' x ' + p.cantidad + '</div>';
+      html += '<div style="font-size:11px;color:var(--text2)">' + p.sector + ' - ' + p.solicitante + '</div></div>';
+      html += '<span class="badge badge-amber">' + p.estado + '</span></div>';
+    });
+    preview.innerHTML = html;
   }
   
   // Monitoreo jefatura - novedades roperia
@@ -1068,13 +1070,15 @@ async function actualizarDashRoperia() {
     if(!d.ok || !d.pedidos || !d.pedidos.length) {
       monRop.innerHTML = '<div style="color:var(--text2);font-size:13px">Sin pedidos de ropería pendientes.</div>';
     } else {
-      monRop.innerHTML = d.pedidos.map(function(p){
-        return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">'
-          + '<span style="font-size:16px">👕</span>'
-          + '<div style="flex:1"><div style="font-size:12px;font-weight:700">' + p.prenda + ' x ' + p.cantidad + ' - ' + p.sector + '</div>'
-          + '<div style="font-size:11px;color:var(--text2)">Pedido por: ' + p.solicitante + ' - ' + p.motivo + '</div></div>'
-          + '<span class="badge badge-' + (p.estado==='Entregado'?'green':'amber') + '">' + p.estado + '</span></div>';
-      }).join('');
+      var monHtml = '';
+      d.pedidos.forEach(function(p){
+        monHtml += '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">';
+        monHtml += '<span style="font-size:16px">👕</span>';
+        monHtml += '<div style="flex:1"><div style="font-size:12px;font-weight:700">' + p.prenda + ' x ' + p.cantidad + ' - ' + p.sector + '</div>';
+        monHtml += '<div style="font-size:11px;color:var(--text2)">Pedido por: ' + p.solicitante + ' - ' + p.motivo + '</div></div>';
+        monHtml += '<span class="badge badge-' + (p.estado==='Entregado'?'green':'amber') + '">' + p.estado + '</span></div>';
+      });
+      monRop.innerHTML = monHtml;
     }
   }
 }
