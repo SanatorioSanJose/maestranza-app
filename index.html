@@ -861,7 +861,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbw_OmTxR1n8NhPaVKGALMwtBgct8NrTnvxdDEmv8cBF6yMUdBKJERwbmkKuIteztbqa_w/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbwaNxvaAnbHy3vDE_RJJNqlsg1cBpqfem-l3A7nh0tQTGDm6m4XWZFCWkB16hqTPdlu0w/exec";
 const SECTOR_PINS={'Enfermería Internación':'2839','Enfermería Áreas Críticas':'3828','Enfermería Quirófano':'4253','Admisión y Egreso':'6467','Seguridad':'8074','Mantenimiento':'7543','Imágenes':'3143','Laboratorio':'8033','Guardia Médica':'9308','Hemodinamia':'2912','RR.HH.':'2712','Dirección':'8067','Legales':'2204','Calidad del Paciente':'4006','Consultorios Externos':'7238'};
 const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨','Hemodinamia':'❤️','RR.HH.':'👔','Dirección':'🏛️','Legales':'⚖️','Calidad del Paciente':'⭐','Consultorios Externos':'🩺'};
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -1097,7 +1097,24 @@ function renderSolicitudes(filtro){
   else if(filtro==='critico')lista=lista.filter(s=>s.urgency==='critico'&&s.estado!=='resuelta');
   if(!lista.length){el.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px 0">No hay solicitudes en esta categoría.</div>';return;}
   const canManage=['jefe','supervisor'].includes(currentUser?.perfil);
-  el.innerHTML=lista.map(s=>'\n    <div class="sol-card ' + (s.estado==='resuelta'?'resuelta':s.urgency) + '">\n      <div class="sol-header">\n        <div style="display:flex;align-items:center;gap:8px">\n          <span style="font-size:22px">' + (SECTOR_ICONS[s.sector]||'🏥') + '</span>\n          <div><div class="sol-sector">' + (s.sector) + '</div><div style="font-size:11px;color:var(--text2)">Por: ' + (s.persona) + '</div></div>\n        </div>\n        <div style="text-align:right"><div class="sol-time">' + (s.fecha) + ' · ' + (s.hora) + '</div><span class="badge badge-' + (s.urgency==='critico'?'red':s.urgency==='urgente'?'amber':'green') + '" style="margin-top:4px">' + (s.urgency.toUpperCase()) + '</span></div>\n      </div>\n      <div class="sol-body"><strong>📍 ' + (s.lugar) + '</strong><br><strong>Tipo:</strong> ' + (s.tipo) + '<br>' + (s.desc) + '</div>\n      <div class="sol-footer">\n        ${s.estado==='resuelta'?'<span class="badge badge-green">✅ Resuelta a las ${s.resueltaA}</span>':s.estado==='en-curso'?'<span class="badge badge-blue">⚙️ En curso — ${s.asignadoA}</span>${canManage?'<button class="btn-sm success" onclick="resolverSol(' + (s.id) + ')">✅ Marcar resuelta</button>':''}':'<span class="badge badge-amber">⏳ Pendiente</span>${canManage?'<button class="btn-sm" onclick="tomarSol(' + (s.id) + ')">Tomar / Asignar</button>':''}'}\n      </div>\n    </div>').join('');
+  var html='';
+  lista.forEach(function(s){
+    var canManage=['jefe','supervisor'].indexOf(CU?CU.perfil:'')>=0;
+    html+='<div class="sol-card '+(s.estado==='resuelta'?'resuelta':s.urgency)+'">';
+    html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">';
+    html+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">'+(SECTOR_ICONS[s.sector]||'🏥')+'</span>';
+    html+='<div><div style="font-weight:700;font-size:13px">'+s.sector+'</div>';
+    html+='<div style="font-size:11px;color:var(--text2)">Por: '+s.persona+'</div></div></div>';
+    html+='<div style="text-align:right"><div style="font-size:11px;color:var(--text2);font-family:monospace">'+s.fecha+' '+s.hora+'</div>';
+    html+='<span class="badge badge-'+(s.urgency==='critico'?'red':s.urgency==='urgente'?'amber':'green')+'" style="margin-top:4px">'+s.urgency.toUpperCase()+'</span></div></div>';
+    html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px"><strong>'+s.lugar+'</strong><br>'+s.tipo+'<br>'+s.desc+'</div>';
+    html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    if(s.estado==='resuelta'){html+='<span class="badge badge-green">Resuelta '+s.resueltaA+'</span>';}
+    else if(s.estado==='en-curso'){html+='<span class="badge badge-blue">En curso - '+s.asignadoA+'</span>';if(canManage)html+='<button class="btn-sm success" onclick="resolverSol('+s.id+')">Marcar resuelta</button>';}
+    else{if(canManage)html+='<button class="btn-sm" onclick="tomarSol('+s.id+')">Tomar / Asignar</button>';else html+='<span class="badge badge-amber">Pendiente</span>';}
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
 }
 
 function filtrarSol(f){renderSolicitudes(f||undefined);}
@@ -1349,32 +1366,60 @@ function filtrarIndicaciones() {
 }
 
 function renderInfectTabla() {
-  const buscar = document.getElementById('infect-buscar')?.value.toLowerCase() || '';
-  const canEdit = ['jefe','infectologia'].includes(currentUser?.perfil);
-
-  // Habitaciones
-  const habList = infectIndicaciones.filter(i => i.ambito === 'habitacion' && (!buscar || i.identificador.includes(buscar)));
-  const habTbody = document.getElementById('infect-hab-tbody');
-  if(habTbody) {
-    habTbody.innerHTML = habList.length ? habList.map(i => '\n      <tr>\n        <td style="font-weight:700">' + (i.identificador) + '</td>\n        <td><span class="iso-tag iso-' + (i.aislamiento) + '">' + (iL[i.aislamiento]||i.aislamiento) + '</span></td>\n        <td style="font-size:12px;max-width:300px">' + (i.indicaciones||'—') + '</td>\n        <td style="font-size:11px;color:var(--text2)">' + (i.fecha||'—') + '</td>\n        <td style="font-size:11px;color:var(--text2)">' + (i.actualizadoPor||'—') + '</td>\n        <td>${canEdit ? '<button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="editarIndicacion(${i.fila},'${i.ambito}','${i.identificador}','${i.aislamiento}')">Editar</button>
-        <button class="btn-sm danger" style="font-size:11px;padding:4px 8px;margin-left:4px" onclick="eliminarIndicacion(${i.fila})">✕</button>' : ''}</td>\n      </tr>').join('') : '<tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Sin indicaciones por habitación.</td></tr>';
+  var buscar = (document.getElementById('infect-buscar') ? document.getElementById('infect-buscar').value : '').toLowerCase();
+  var canEdit = ['jefe','infectologia'].indexOf(CU ? CU.perfil : '') >= 0;
+  var habList = infectIndicaciones.filter(function(i){ return i.ambito==='habitacion' && (!buscar || i.identificador.toLowerCase().indexOf(buscar)>=0); });
+  var secList = infectIndicaciones.filter(function(i){ return i.ambito==='sector'; });
+  var habTbody = document.getElementById('infect-hab-tbody');
+  var secTbody = document.getElementById('infect-sec-tbody');
+  function makeRow(i) {
+    var html = '<tr><td style="font-weight:700">'+i.identificador+'</td>';
+    html += '<td><span class="iso-tag iso-'+i.aislamiento+'">'+(iL[i.aislamiento]||i.aislamiento)+'</span></td>';
+    html += '<td style="font-size:12px;max-width:300px">'+(i.indicaciones||'-')+'</td>';
+    html += '<td style="font-size:11px;color:var(--text2)">'+(i.fecha||'-')+'</td>';
+    html += '<td style="font-size:11px;color:var(--text2)">'+(i.actualizadoPor||'-')+'</td>';
+    html += '<td>';
+    if(canEdit) {
+      html += '<button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" data-fila="'+i.fila+'" data-ambito="'+i.ambito+'" data-id="'+i.identificador+'" data-ais="'+i.aislamiento+'" onclick="editarIndicacionBtn(this)">Editar</button> ';
+      html += '<button class="btn-sm danger" style="font-size:11px;padding:4px 8px;margin-left:4px" onclick="eliminarIndicacion('+i.fila+')">X</button>';
+    }
+    html += '</td></tr>';
+    return html;
   }
-
-  // Sectores
-  const secList = infectIndicaciones.filter(i => i.ambito === 'sector');
-  const secTbody = document.getElementById('infect-sec-tbody');
-  if(secTbody) {
-    secTbody.innerHTML = secList.length ? secList.map(i => '\n      <tr>\n        <td style="font-weight:700">' + (i.identificador) + '</td>\n        <td><span class="iso-tag iso-' + (i.aislamiento) + '">' + (iL[i.aislamiento]||i.aislamiento) + '</span></td>\n        <td style="font-size:12px;max-width:300px">' + (i.indicaciones||'—') + '</td>\n        <td style="font-size:11px;color:var(--text2)">' + (i.fecha||'—') + '</td>\n        <td style="font-size:11px;color:var(--text2)">' + (i.actualizadoPor||'—') + '</td>\n        <td>${canEdit ? '<button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="editarIndicacion(${i.fila},'${i.ambito}','${i.identificador}','${i.aislamiento}')">Editar</button>
-        <button class="btn-sm danger" style="font-size:11px;padding:4px 8px;margin-left:4px" onclick="eliminarIndicacion(${i.fila})">✕</button>' : ''}</td>\n      </tr>').join('') : '<tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Sin indicaciones por sector.</td></tr>';
-  }
+  if(habTbody) habTbody.innerHTML = habList.length ? habList.map(makeRow).join('') : '<tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Sin indicaciones por habitacion.</td></tr>';
+  if(secTbody) secTbody.innerHTML = secList.length ? secList.map(makeRow).join('') : '<tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Sin indicaciones por sector.</td></tr>';
 }
 
+function editarIndicacionBtn(btn) {
+  var fila = parseInt(btn.getAttribute('data-fila'));
+  var ambito = btn.getAttribute('data-ambito');
+  var id = btn.getAttribute('data-id');
+  var ais = btn.getAttribute('data-ais');
+  editarIndicacion(fila, ambito, id, ais);
+}
+function eliminarIndicacionBtn(btn) {
+  var fila = parseInt(btn.getAttribute('data-fila'));
+  eliminarIndicacion(fila);
+}
 function renderEstadoTabla() {
   const tbody = document.getElementById('infect-estado-tbody');
   if(!tbody) return;
   const canEdit = ['jefe','infectologia','supervisor'].includes(currentUser?.perfil);
   const noOperativas = infectEstados.filter(e => e.estado !== 'Operativa');
-  tbody.innerHTML = noOperativas.length ? noOperativas.map(e => '\n    <tr style="' + (e.estado==='En Reparación'?'background:var(--amber-dim)':e.estado==='Fuera de Servicio'?'background:var(--red-dim)':'') + '">\n      <td style="font-weight:700">' + (e.habitacion) + '</td>\n      <td><span class="badge badge-' + (e.estado==='En Reparación'?'amber':e.estado==='Fuera de Servicio'?'red':'purple') + '">' + (e.estado) + '</span></td>\n      <td style="font-size:12px">' + (e.motivo||'—') + '</td>\n      <td style="font-size:12px">' + (e.fechaDesde||'—') + '</td>\n      <td style="font-size:12px;color:var(--teal)">' + (e.fechaRetorno||'Sin fecha') + '</td>\n      <td style="font-size:12px">' + (e.sector||'—') + '</td>\n      <td>${canEdit ? '<button class="btn-sm success" style="font-size:11px;padding:4px 8px" onclick="marcarOperativa('${e.habitacion}')">✅ Operativa</button>' : ''}</td>\n    </tr>').join('') : '<tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Todas las habitaciones están operativas.</td></tr>';
+  if(!noOperativas.length){tbody.innerHTML='<tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Todas las habitaciones estan operativas.</td></tr>';return;}
+  var html='';
+  noOperativas.forEach(function(e){
+    var bg=e.estado==='En Reparacion'?'background:var(--amber-dim)':e.estado==='Fuera de Servicio'?'background:var(--red-dim)':'';
+    html+='<tr style="'+bg+'">';
+    html+='<td style="font-weight:700">'+e.habitacion+'</td>';
+    html+='<td><span class="badge badge-'+(e.estado==='En Reparacion'?'amber':e.estado==='Fuera de Servicio'?'red':'purple')+'">'+e.estado+'</span></td>';
+    html+='<td style="font-size:12px">'+(e.motivo||'-')+'</td>';
+    html+='<td style="font-size:12px">'+(e.fechaDesde||'-')+'</td>';
+    html+='<td style="font-size:12px;color:var(--teal)">'+(e.fechaRetorno||'Sin fecha')+'</td>';
+    html+='<td style="font-size:12px">'+(e.sector||'-')+'</td>';
+    html+='<td>'+(canEdit?'<button class="btn-sm suc" style="font-size:11px;padding:3px 8px" data-num="'+e.habitacion+'" onclick="marcarOpBtn(this)">Operativa</button>':'')+'</td></tr>';
+  });
+  tbody.innerHTML=html;
 }
 
 function toggleInfectAmbito() {
@@ -1442,6 +1487,7 @@ async function guardarEstadoHabitacion() {
   cargarInfectologia();
 }
 
+function marcarOpBtn(btn){var num=btn.getAttribute('data-num');marcarOperativa(num);}
 async function marcarOperativa(num) {
   await sheetPost({action:'actualizarHabitacionEstado', habitacion:num, estado:'Operativa', motivo:'', fechaRetorno:'', sector:''});
   const r = rooms.find(x=>String(x.num)===String(num));
@@ -1489,7 +1535,18 @@ async function cargarPerdidasRoperia() {
   if(!d.ok || !d.perdidas || !d.perdidas.length) {
     el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pérdidas registradas.</div>'; return;
   }
-  el.innerHTML = d.perdidas.map(p=>'\n    <div class="sol-card urgente" style="margin-bottom:10px">\n      <div class="sol-header">\n        <div><div class="sol-sector">⚠️ ' + (p.prenda) + ' × ' + (p.cantidad) + '</div>\n        <div style="font-size:11px;color:var(--text2)">📍 ' + (p.habitacion) + ' — ' + (p.causa) + '</div></div>\n        <div style="text-align:right"><div class="sol-time">' + (p.fecha) + '</div>\n        <span class="badge badge-' + (p.notificado==='Si'?'green':'amber') + '">' + (p.notificado==='Si'?'Notificado':'Pendiente') + '</span></div>\n      </div>\n      ${p.obs?'<div class="sol-body">${p.obs}</div>':''}\n      <div class="sol-footer"><span style="font-size:11px;color:var(--text2)">Registrado por: ' + (p.usuario) + '</span></div>\n    </div>').join('');
+  var html='';
+  d.perdidas.forEach(function(p){
+    html+='<div class="sol-card urgente" style="margin-bottom:10px">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html+='<div><div style="font-weight:700;font-size:13px">'+p.prenda+' x '+p.cantidad+'</div>';
+    html+='<div style="font-size:11px;color:var(--text2)">'+p.habitacion+' - '+p.causa+'</div></div>';
+    html+='<div><div style="font-size:11px;color:var(--text2)">'+p.fecha+'</div>';
+    html+='<span class="badge badge-'+(p.notificado==='Si'?'green':'amber')+'">'+(p.notificado==='Si'?'Notificado':'Pendiente')+'</span></div></div>';
+    if(p.obs)html+='<div style="font-size:12px;color:var(--text2);margin-bottom:8px">'+p.obs+'</div>';
+    html+='<div style="font-size:11px;color:var(--text2)">Registrado por: '+p.usuario+'</div></div>';
+  });
+  el.innerHTML=html;
   // Populate prenda select if empty
   if(document.getElementById('per-prenda')?.options.length <= 1) poblarSelectsPrendas();
 }
@@ -1532,8 +1589,7 @@ async function generarParteDiario(automatico) {
       cuerpo += '  - ' + m.descripcion + ': ' + m.cantRecibida + ' u.';
       if(m.diferencia < 0) cuerpo += ' FALTANTE: ' + Math.abs(m.diferencia) + ' u.';
       if(m.novedad) cuerpo += ' - Novedad: ' + m.novedad;
-      cuerpo += '
-';
+      cuerpo += '\n';
     });
   }
   if(reclamos.length) {
@@ -1717,7 +1773,21 @@ async function cargarPedidosRoperia() {
   if(!d.ok || !d.pedidos) { el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pedidos pendientes.</div>'; return; }
   if(!d.pedidos.length) { el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pedidos pendientes.</div>'; return; }
   const canManage = ['jefe','supervisor','roperia'].includes(currentUser?.perfil);
-  el.innerHTML = d.pedidos.map(p => '\n    <div class="sol-card normal" style="margin-bottom:10px">\n      <div class="sol-header">\n        <div><div class="sol-sector">👕 ' + (p.prenda) + ' × ' + (p.cantidad) + '</div><div style="font-size:11px;color:var(--text2)">' + (p.sector) + ' — ' + (p.solicitante) + '</div></div>\n        <div style="text-align:right"><div class="sol-time">' + (p.fecha) + '</div><span class="badge badge-amber">' + (p.estado) + '</span></div>\n      </div>\n      <div class="sol-body">Motivo: ' + (p.motivo) + '</div>\n      <div class="sol-footer">\n        ${canManage ? '<button class="btn-sm success" onclick="entregarPedidoRoperia(${p.fila},'${p.prenda}')">✅ Marcar entregado</button>' : ''}\n      </div>\n    </div>').join('');
+  var canMgRope=['jefe','supervisor','roperia'].indexOf(CU?CU.perfil:'')>=0;
+  var html='';
+  d.pedidos.forEach(function(p){
+    html+='<div class="sol-card normal" style="margin-bottom:10px">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html+='<div><div style="font-weight:700;font-size:13px">'+p.prenda+' x '+p.cantidad+'</div>';
+    html+='<div style="font-size:11px;color:var(--text2)">'+p.sector+' - '+p.solicitante+'</div></div>';
+    html+='<div style="text-align:right"><div style="font-size:11px;color:var(--text2)">'+p.fecha+'</div>';
+    html+='<span class="badge badge-amber">'+p.estado+'</span></div></div>';
+    html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Motivo: '+p.motivo+'</div>';
+    html+='<div>';
+    if(canMgRope){html+='<button class="btn suc" data-fila="'+p.fila+'" data-prenda="'+p.prenda+'" onclick="entregarPedBtn(this)">Marcar entregado</button>';}
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
   poblarSelectsPrendas();
 }
 
@@ -1736,6 +1806,7 @@ async function guardarPedidoRoperia() {
   document.getElementById('ped-motivo').value='';
 }
 
+function entregarPedBtn(btn){var fila=parseInt(btn.getAttribute('data-fila'));var prenda=btn.getAttribute('data-prenda');entregarPedidoRoperia(fila,prenda);}
 async function entregarPedidoRoperia(fila, prenda) {
   await sheetPost({action:'entregarPedidoRoperia', fila, entregadoPor: currentUser?.nombre||'—'});
   showToast(`✅ ${prenda} marcado como entregado`);
