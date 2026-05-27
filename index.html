@@ -1367,7 +1367,7 @@ function filtrarIndicaciones() {
 
 function renderInfectTabla() {
   var buscar = (document.getElementById('infect-buscar') ? document.getElementById('infect-buscar').value : '').toLowerCase();
-  var canEdit = ['jefe','infectologia'].indexOf(CU ? CU.perfil : '') >= 0;
+  var canEdit = CU && ['jefe','infectologia'].indexOf(CU.perfil) >= 0;
   var habList = infectIndicaciones.filter(function(i){ return i.ambito==='habitacion' && (!buscar || i.identificador.toLowerCase().indexOf(buscar)>=0); });
   var secList = infectIndicaciones.filter(function(i){ return i.ambito==='sector'; });
   var habTbody = document.getElementById('infect-hab-tbody');
