@@ -72,7 +72,7 @@ select:focus,input:focus{border-color:var(--blue);}
 .s-ok{background:var(--green-dim);color:var(--green);}
 .s-pending{background:var(--amber-dim);color:var(--amber);}
 .s-busy{background:var(--blue-dim);color:var(--blue);}
-.s-alta{background:var(--red-dim);color:var(--red);}
+.s-alta{background:var(--red-dim);color:var(--red);}.s-reparacion{background:var(--amber-dim);color:var(--amber);}.s-fuera{background:#2d1a1a;color:#f87171;}.s-reservada{background:#2d1a4a;color:var(--purple);}
 .iso-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;margin-top:3px;}
 .iso-contacto{background:#1a3d4a;color:#38bdf8;}
 .iso-respiratorio{background:#3d2a0a;color:#fbbf24;}
@@ -292,6 +292,7 @@ textarea:focus{border-color:var(--blue);}
       <div class="nav-section">Administración</div>
       <div class="nav-item" data-page="requerimientos" onclick="navTo(this)" id="nav-reqs"><span class="icon">📝</span> Requerimientos</div>
       <div class="nav-item" data-page="personal" onclick="navTo(this)" id="nav-personal"><span class="icon">👥</span> Personal</div>
+      <div class="nav-item" data-page="infectologia" onclick="navTo(this)" id="nav-infectologia" style="display:none"><span class="icon">🦠</span> Infectología</div>
       <div class="nav-item" data-page="monitoreo" onclick="navTo(this)" id="nav-monitor"><span class="icon">👁️</span> Monitoreo Jefatura</div>
     </nav>
     <div class="sidebar-logout"><button class="btn-logout" onclick="doLogout()">⬅ Cerrar sesión</button></div>
@@ -589,6 +590,58 @@ textarea:focus{border-color:var(--blue);}
       </div></div>
     </div>
 
+    <!-- INFECTOLOGÍA -->
+    <div class="page" id="page-infectologia">
+      <div class="page-header">
+        <div><div class="page-title">🦠 Infectología</div><div class="page-sub">Gestión de aislamientos y cuidados por habitación y sector</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm secondary" onclick="switchInfectTab('habitaciones')">🛏️ Por habitación</button>
+          <button class="btn-sm secondary" onclick="switchInfectTab('sectores')">🏥 Por sector</button>
+          <button class="btn-sm" onclick="openModal('modal-infect-nueva')" id="btn-infect-nueva">+ Nueva indicación</button>
+        </div>
+      </div>
+
+      <!-- TAB HABITACIONES -->
+      <div id="infect-tab-habitaciones">
+        <div class="card">
+          <div class="card-header"><span>🛏️ Indicaciones por Habitación</span></div>
+          <div class="card-body">
+            <div class="form-field" style="max-width:300px">
+              <label>Buscar habitación</label>
+              <input type="text" id="infect-buscar" placeholder="Ej: 205, 307..." oninput="filtrarIndicaciones()" />
+            </div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Habitación</th><th>Aislamiento</th><th>Indicaciones especiales</th><th>Actualizado</th><th>Por</th><th></th></tr></thead>
+            <tbody id="infect-hab-tbody"><tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB SECTORES -->
+      <div id="infect-tab-sectores" style="display:none">
+        <div class="card">
+          <div class="card-header"><span>🏥 Indicaciones por Sector</span><span style="font-size:11px;color:var(--text2);font-weight:400">Aplica a todas las habitaciones del sector</span></div>
+          <table class="data-table">
+            <thead><tr><th>Sector</th><th>Aislamiento</th><th>Indicaciones especiales</th><th>Actualizado</th><th>Por</th><th></th></tr></thead>
+            <tbody id="infect-sec-tbody"><tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB ESTADO HABITACIONES -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-header">
+          <span>🔧 Habitaciones Fuera de Servicio / En Reparación</span>
+          <button class="btn-sm" onclick="openModal('modal-hab-estado')" id="btn-hab-estado">+ Marcar habitación</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Habitación</th><th>Estado</th><th>Motivo</th><th>Desde</th><th>Retorno estimado</th><th>Sector</th><th></th></tr></thead>
+          <tbody id="infect-estado-tbody"><tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- MONITOREO -->
     <div class="page" id="page-monitoreo">
       <div class="page-header"><div><div class="page-title">🔒 Monitoreo — Jefatura</div><div class="page-sub">Vista privada en tiempo real</div></div><span class="badge badge-red">Solo Jefatura</span></div>
@@ -728,10 +781,87 @@ textarea:focus{border-color:var(--blue);}
   <div id="modal-hab-body"></div>
 </div></div>
 
+<!-- MODAL NUEVA INDICACIÓN INFECTOLOGÍA -->
+<div class="modal-overlay" id="modal-infect-nueva"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-infect-nueva')">✕</button>
+  <div class="modal-title">🦠 Nueva Indicación de Infectología</div>
+  <div class="form-row">
+    <div class="form-field"><label>Ámbito</label>
+      <select id="infect-ambito" onchange="toggleInfectAmbito()">
+        <option value="habitacion">Habitación individual</option>
+        <option value="sector">Sector completo</option>
+      </select>
+    </div>
+    <div class="form-field" id="infect-id-field"><label>Número de habitación</label>
+      <input type="text" id="infect-identificador" placeholder="Ej: 205" />
+    </div>
+  </div>
+  <div class="form-field" id="infect-sector-field" style="display:none"><label>Sector</label>
+    <select id="infect-sector-sel">
+      <option value="">— Seleccioná sector —</option>
+      <option>Guardia</option><option>PAMI</option><option>Obra Social</option>
+      <option>Premium</option><option>UTI</option><option>Unidad Coronaria</option>
+      <option>Psiquiatría Adulto</option><option>Infanto Juvenil</option>
+      <option>Cirugías Programadas</option><option>Endoscopía</option>
+      <option>Hemodinamia</option><option>Zona 50</option><option>Otro</option>
+    </select>
+  </div>
+  <div class="form-field"><label>Tipo de aislamiento</label>
+    <select id="infect-aislamiento">
+      <option value="ninguno">Sin aislamiento</option>
+      <option value="contacto">Contacto</option>
+      <option value="respiratorio">Gotas / Respiratorio</option>
+      <option value="aire">Aéreo (N95)</option>
+      <option value="protector">Protector (inmunodeprimido)</option>
+    </select>
+  </div>
+  <div class="form-field"><label>Indicaciones especiales (texto libre)</label>
+    <textarea id="infect-indicaciones" placeholder="Ej: Usar barbijo N95 azul del armario 3. No ingresar sin consultar a enfermería. Ropa con tratamiento especial..."></textarea>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+    <button class="btn-sm secondary" onclick="closeModal('modal-infect-nueva')">Cancelar</button>
+    <button class="btn-sm" onclick="guardarIndicacion()">Guardar indicación</button>
+  </div>
+</div></div>
+
+<!-- MODAL ESTADO HABITACIÓN -->
+<div class="modal-overlay" id="modal-hab-estado"><div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-hab-estado')">✕</button>
+  <div class="modal-title">🔧 Marcar Estado de Habitación</div>
+  <div class="form-row">
+    <div class="form-field"><label>Habitación / Rango</label>
+      <input type="text" id="estado-hab-num" placeholder="Ej: 205 — o — 51,52,53" />
+    </div>
+    <div class="form-field"><label>Estado</label>
+      <select id="estado-hab-sel">
+        <option value="En Reparación">🔧 En Reparación</option>
+        <option value="Fuera de Servicio">🚫 Fuera de Servicio</option>
+        <option value="Reservada">🔒 Reservada</option>
+        <option value="Operativa">✅ Operativa</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-field"><label>Motivo</label>
+      <input type="text" id="estado-hab-motivo" placeholder="Ej: Refacción eléctrica, pintura..." />
+    </div>
+    <div class="form-field"><label>Retorno estimado (opcional)</label>
+      <input type="text" id="estado-hab-retorno" placeholder="Ej: 15/06/2026" />
+    </div>
+  </div>
+  <div class="form-field"><label>Sector (opcional)</label>
+    <input type="text" id="estado-hab-sector" placeholder="Ej: Zona 50, Piso 2..." />
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+    <button class="btn-sm secondary" onclick="closeModal('modal-hab-estado')">Cancelar</button>
+    <button class="btn-sm" onclick="guardarEstadoHabitacion()">Guardar</button>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbyGlV3Sa5TtfHdeZPqrHvZYuyvE03NytDw0p_peWPtw4kCWCS9J7Etk6PKTXVAk6j0/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbxOfUXYrCTIed7FbDZ2A-HkenD5riCt-Ivtwcrw24d4TOwzdu5FC-JiccHjugxi7THlLA/exec";
 const SECTOR_PINS={'Enfermería Internación':'2839','Enfermería Áreas Críticas':'3828','Enfermería Quirófano':'4253','Admisión y Egreso':'6467','Seguridad':'8074','Mantenimiento':'7543','Imágenes':'3143','Laboratorio':'8033','Guardia Médica':'9308','Hemodinamia':'2912','RR.HH.':'2712','Dirección':'8067','Legales':'2204','Calidad del Paciente':'4006','Consultorios Externos':'7238'};
 const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨','Hemodinamia':'❤️','RR.HH.':'👔','Dirección':'🏛️','Legales':'⚖️','Calidad del Paciente':'⭐','Consultorios Externos':'🩺'};
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -865,8 +995,9 @@ function resetSectorForm(){
 function launchApp(){
   showScreen(null);
   document.getElementById('app').style.display='flex';
-  const labels={jefe:'Jefe/a del Servicio',supervisor:'Supervisor/a',operario:'Operario/a',roperia:'Ropería',direccion:'Dirección'};
+  const labels={jefe:'Jefe/a del Servicio',supervisor:'Supervisor/a',operario:'Operario/a',roperia:'Ropería',direccion:'Dirección',infectologia:'Infectología'};
   document.getElementById('sb-role-badge').textContent=labels[currentUser.perfil]||currentUser.perfil;
+  if(currentUser.perfil==='infectologia'){document.getElementById('sb-role-badge').style.background='#0d3d38';document.getElementById('sb-role-badge').style.color='#14b8a6';}
   if(currentUser.perfil==='direccion'){
     document.getElementById('sb-role-badge').style.background='#2d1a4a';
     document.getElementById('sb-role-badge').style.color='#a855f7';
@@ -879,7 +1010,7 @@ function launchApp(){
     },500);
   }
   document.getElementById('sb-name').textContent=currentUser.nombre;
-  const perms={'nav-solicitudes':['jefe','supervisor','operario','direccion'],'nav-novedades':['jefe','supervisor','operario','direccion'],'nav-residuos':['jefe','supervisor','operario','direccion'],'nav-roperia':['jefe','supervisor','roperia','direccion'],'nav-insumos':['jefe','supervisor','direccion'],'nav-reqs':['jefe','supervisor','operario','roperia','direccion'],'nav-personal':['jefe','supervisor','direccion'],'nav-monitor':['jefe']};
+  const perms={'nav-solicitudes':['jefe','supervisor','operario','direccion'],'nav-novedades':['jefe','supervisor','operario','direccion'],'nav-residuos':['jefe','supervisor','operario','direccion'],'nav-roperia':['jefe','supervisor','roperia','direccion'],'nav-insumos':['jefe','supervisor','direccion'],'nav-reqs':['jefe','supervisor','operario','roperia','direccion'],'nav-personal':['jefe','supervisor','direccion'],'nav-monitor':['jefe'],'nav-infectologia':['jefe','infectologia']};
   Object.entries(perms).forEach(([id,roles])=>{const el=document.getElementById(id);if(el)el.style.display=roles.includes(currentUser.perfil)?'':'none';});
   const isJefe=currentUser.perfil==='jefe';
   document.getElementById('monitoreo-block').style.display=isJefe?'block':'none';
@@ -891,6 +1022,7 @@ function launchApp(){
   renderRooms();
   actualizarStatsHab();
   cargarSolicitudesDesdeSheets();
+  cargarInfectologia();
 }
 
 function actualizarBadges(){
@@ -1146,8 +1278,8 @@ const rooms=[
   {num:'439',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
   {num:'440',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
 ];
-const sL={ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta'};
-const sC={ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta'};
+const sL={ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta',reparacion:'En Reparación',fuera:'Fuera de Servicio',reservada:'Reservada'};
+const sC={ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta',reparacion:'s-reparacion',fuera:'s-fuera',reservada:'s-reservada'};
 const iL={contacto:'Aislam. Contacto',respiratorio:'Aislam. Gotas',aire:'Aislam. Aire',protector:'Aislam. Protector',ninguno:'Sin aislamiento'};
 const iC={contacto:'iso-contacto',respiratorio:'iso-respiratorio',aire:'iso-aire',protector:'iso-protector',ninguno:'iso-ninguno'};
 const iE={contacto:'Guantes + camisolín + barbijo quirúrgico.',respiratorio:'Guantes + camisolín + barbijo quirúrgico. Puerta cerrada.',aire:'EPP completo + N95. Solo con autorización.',protector:'EPP completo. Limpieza profunda.',ninguno:'EPP estándar: guantes y delantal.'};
@@ -1163,7 +1295,14 @@ function actualizarStatsHab(){
 }
 function renderRooms(list){list=list||rooms;const g=document.getElementById('rooms-grid');if(g)g.innerHTML=list.map(r=>`<div class="room-card" onclick="openRoom('${r.num}')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="room-num">${r.num}</div><span class="badge badge-${r.type==='premium'?'teal':r.type==='pami'?'amber':r.type==='uti'?'red':r.type==='obra-social'?'blue':'purple'}" style="font-size:9px">${r.type}</span></div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span><div><span class="iso-tag ${iC[r.iso]}">${iL[r.iso]}</span></div>${r.pax>0?`<div style="font-size:11px;color:var(--text2);margin-top:3px">${r.pax} paciente${r.pax>1?'s':''}</div>`:''}</div>`).join('');}
 function filterRooms(f){renderRooms(f==='alta'?rooms.filter(r=>r.status==='alta'):f==='pending'?rooms.filter(r=>r.status==='pending'):f==='iso'?rooms.filter(r=>r.iso!=='ninguno'):f==='premium'?rooms.filter(r=>r.type==='premium'):f==='pami'?rooms.filter(r=>r.type==='pami'):f==='uti'?rooms.filter(r=>r.type==='uti'):rooms);}
-function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;document.getElementById('modal-hab-title').textContent=`Habitación ${r.num}`;const ce=['jefe','supervisor'].includes(currentUser?.perfil);document.getElementById('modal-hab-body').innerHTML=`<div style="margin-bottom:14px"><div class="form-row" style="margin-bottom:8px"><div><div class="section-label">Estado</div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span></div><div><div class="section-label">Tipo</div><span class="badge badge-teal">${r.type}</span></div></div><div class="section-label" style="margin-top:10px">Aislamiento</div><span class="iso-tag ${iC[r.iso]}" style="font-size:12px;padding:3px 9px">${iL[r.iso]}</span><div style="background:var(--bg3);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">EPP requerido:</strong> ${iE[r.iso]}</div></div>${r.pax===2?'<div class="alert-box alert-amber">⚠️ 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.</div>':''}${r.status==='alta'?'<div class="alert-box alert-red">🔴 Alta: realizar limpieza terminal completa antes de nueva admisión.</div>':''}<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-sm" onclick="markOK(\'${r.num}\')">✅ Marcar servicio OK</button>${ce?`<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>`:''}</div>`;openModal('modal-hab');}
+function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;
+  // Buscar indicaciones de infectología para esta habitación y su sector
+  const indHab = infectIndicaciones.find(i=>i.ambito==='habitacion'&&String(i.identificador)===String(r.num));
+  const indSec = infectIndicaciones.find(i=>i.ambito==='sector'&&r.sector&&r.sector.includes(i.identificador));
+  const indActiva = indHab || indSec;
+  // Si hay indicación de infectología, sobreescribir el aislamiento visual
+  const isoEfectivo = indActiva ? indActiva.aislamiento : r.iso;
+  document.getElementById('modal-hab-title').textContent=`Habitación ${r.num}`;const ce=['jefe','supervisor'].includes(currentUser?.perfil);document.getElementById('modal-hab-body').innerHTML=`<div style="margin-bottom:14px"><div class="form-row" style="margin-bottom:8px"><div><div class="section-label">Estado</div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span></div><div><div class="section-label">Tipo</div><span class="badge badge-teal">${r.type}</span></div></div><div class="section-label" style="margin-top:10px">Aislamiento</div><span class="iso-tag ${iC[r.iso]}" style="font-size:12px;padding:3px 9px">${iL[r.iso]}</span><div style="background:var(--bg3);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">EPP requerido:</strong> ${iE[r.iso]}</div></div>${r.pax===2?'<div class="alert-box alert-amber">⚠️ 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.</div>':''}${r.status==='alta'?'<div class="alert-box alert-red">🔴 Alta: realizar limpieza terminal completa antes de nueva admisión.</div>':''}<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-sm" onclick="markOK(\'${r.num}\')">✅ Marcar servicio OK</button>${ce?`<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>`:''}</div>`;openModal('modal-hab');}
 function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';renderRooms();closeModal('modal-hab');sheetPost({action:'guardarHabitacion',habitacion:num,accion:'Limpieza OK',usuario:currentUser?.nombre||'—',turno:document.getElementById('turno-badge')?.textContent||'—'});showToast(`✅ Hab. ${num} — Servicio registrado`);}
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
 
@@ -1185,6 +1324,173 @@ function submitForm(id,msg){closeModal(id);showToast(msg);}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
+
+// ---- INFECTOLOGÍA ----
+let infectIndicaciones = [];
+let infectEstados = [];
+
+async function cargarInfectologia() {
+  const [indRes, estRes] = await Promise.all([
+    sheetPost({action:'obtenerIndicaciones'}),
+    sheetPost({action:'obtenerHabitacionesEstado'})
+  ]);
+  if(indRes.ok) infectIndicaciones = indRes.indicaciones || [];
+  if(estRes.ok) {
+    infectEstados = estRes.estados || [];
+    // Actualizar rooms con estados
+    infectEstados.forEach(e => {
+      const r = rooms.find(r => String(r.num) === String(e.habitacion));
+      if(r) {
+        if(e.estado === 'En Reparación') r.status = 'reparacion';
+        else if(e.estado === 'Fuera de Servicio') r.status = 'fuera';
+        else if(e.estado === 'Reservada') r.status = 'reservada';
+        else if(e.estado === 'Operativa') r.status = 'ok';
+        r.estadoInfo = e;
+      }
+    });
+    renderRooms();
+  }
+  renderInfectTabla();
+  renderEstadoTabla();
+}
+
+function switchInfectTab(tab) {
+  document.getElementById('infect-tab-habitaciones').style.display = tab==='habitaciones' ? 'block' : 'none';
+  document.getElementById('infect-tab-sectores').style.display = tab==='sectores' ? 'block' : 'none';
+  renderInfectTabla();
+}
+
+function filtrarIndicaciones() {
+  renderInfectTabla();
+}
+
+function renderInfectTabla() {
+  const buscar = document.getElementById('infect-buscar')?.value.toLowerCase() || '';
+  const canEdit = ['jefe','infectologia'].includes(currentUser?.perfil);
+
+  // Habitaciones
+  const habList = infectIndicaciones.filter(i => i.ambito === 'habitacion' && (!buscar || i.identificador.includes(buscar)));
+  const habTbody = document.getElementById('infect-hab-tbody');
+  if(habTbody) {
+    habTbody.innerHTML = habList.length ? habList.map(i => `
+      <tr>
+        <td style="font-weight:700">${i.identificador}</td>
+        <td><span class="iso-tag iso-${i.aislamiento}">${iL[i.aislamiento]||i.aislamiento}</span></td>
+        <td style="font-size:12px;max-width:300px">${i.indicaciones||'—'}</td>
+        <td style="font-size:11px;color:var(--text2)">${i.fecha||'—'}</td>
+        <td style="font-size:11px;color:var(--text2)">${i.actualizadoPor||'—'}</td>
+        <td>${canEdit ? `<button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="editarIndicacion(${i.fila},'${i.ambito}','${i.identificador}','${i.aislamiento}')">Editar</button>
+        <button class="btn-sm danger" style="font-size:11px;padding:4px 8px;margin-left:4px" onclick="eliminarIndicacion(${i.fila})">✕</button>` : ''}</td>
+      </tr>`).join('') : '<tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Sin indicaciones por habitación.</td></tr>';
+  }
+
+  // Sectores
+  const secList = infectIndicaciones.filter(i => i.ambito === 'sector');
+  const secTbody = document.getElementById('infect-sec-tbody');
+  if(secTbody) {
+    secTbody.innerHTML = secList.length ? secList.map(i => `
+      <tr>
+        <td style="font-weight:700">${i.identificador}</td>
+        <td><span class="iso-tag iso-${i.aislamiento}">${iL[i.aislamiento]||i.aislamiento}</span></td>
+        <td style="font-size:12px;max-width:300px">${i.indicaciones||'—'}</td>
+        <td style="font-size:11px;color:var(--text2)">${i.fecha||'—'}</td>
+        <td style="font-size:11px;color:var(--text2)">${i.actualizadoPor||'—'}</td>
+        <td>${canEdit ? `<button class="btn-sm secondary" style="font-size:11px;padding:4px 8px" onclick="editarIndicacion(${i.fila},'${i.ambito}','${i.identificador}','${i.aislamiento}')">Editar</button>
+        <button class="btn-sm danger" style="font-size:11px;padding:4px 8px;margin-left:4px" onclick="eliminarIndicacion(${i.fila})">✕</button>` : ''}</td>
+      </tr>`).join('') : '<tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Sin indicaciones por sector.</td></tr>';
+  }
+}
+
+function renderEstadoTabla() {
+  const tbody = document.getElementById('infect-estado-tbody');
+  if(!tbody) return;
+  const canEdit = ['jefe','infectologia','supervisor'].includes(currentUser?.perfil);
+  const noOperativas = infectEstados.filter(e => e.estado !== 'Operativa');
+  tbody.innerHTML = noOperativas.length ? noOperativas.map(e => `
+    <tr style="${e.estado==='En Reparación'?'background:var(--amber-dim)':e.estado==='Fuera de Servicio'?'background:var(--red-dim)':''}">
+      <td style="font-weight:700">${e.habitacion}</td>
+      <td><span class="badge badge-${e.estado==='En Reparación'?'amber':e.estado==='Fuera de Servicio'?'red':'purple'}">${e.estado}</span></td>
+      <td style="font-size:12px">${e.motivo||'—'}</td>
+      <td style="font-size:12px">${e.fechaDesde||'—'}</td>
+      <td style="font-size:12px;color:var(--teal)">${e.fechaRetorno||'Sin fecha'}</td>
+      <td style="font-size:12px">${e.sector||'—'}</td>
+      <td>${canEdit ? `<button class="btn-sm success" style="font-size:11px;padding:4px 8px" onclick="marcarOperativa('${e.habitacion}')">✅ Operativa</button>` : ''}</td>
+    </tr>`).join('') : '<tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Todas las habitaciones están operativas.</td></tr>';
+}
+
+function toggleInfectAmbito() {
+  const ambito = document.getElementById('infect-ambito')?.value;
+  document.getElementById('infect-id-field').style.display = ambito==='habitacion' ? 'flex' : 'none';
+  document.getElementById('infect-sector-field').style.display = ambito==='sector' ? 'flex' : 'none';
+}
+
+function editarIndicacion(fila, ambito, id, aislamiento) {
+  document.getElementById('infect-ambito').value = ambito;
+  toggleInfectAmbito();
+  if(ambito==='habitacion') document.getElementById('infect-identificador').value = id;
+  else document.getElementById('infect-sector-sel').value = id;
+  document.getElementById('infect-aislamiento').value = aislamiento;
+  const ind = infectIndicaciones.find(i=>i.fila===fila);
+  if(ind) document.getElementById('infect-indicaciones').value = ind.indicaciones || '';
+  openModal('modal-infect-nueva');
+}
+
+async function guardarIndicacion() {
+  const ambito = document.getElementById('infect-ambito')?.value;
+  const id = ambito==='habitacion'
+    ? document.getElementById('infect-identificador')?.value.trim()
+    : document.getElementById('infect-sector-sel')?.value;
+  const aislamiento = document.getElementById('infect-aislamiento')?.value;
+  const indicaciones = document.getElementById('infect-indicaciones')?.value.trim();
+  if(!id || !aislamiento) { showToast('Completá todos los campos.', true); return; }
+  showLoading('Guardando indicación...');
+  const d = await sheetPost({action:'guardarIndicacion', ambito, identificador:id, aislamiento, indicaciones, actualizadoPor: currentUser?.nombre||'—'});
+  hideLoading();
+  closeModal('modal-infect-nueva');
+  if(d.ok) {
+    showToast('✅ Indicación guardada correctamente');
+    document.getElementById('infect-indicaciones').value='';
+    cargarInfectologia();
+  } else showToast('Error al guardar.', true);
+}
+
+async function eliminarIndicacion(fila) {
+  if(!confirm('¿Eliminar esta indicación?')) return;
+  await sheetPost({action:'eliminarIndicacion', fila});
+  showToast('Indicación eliminada');
+  cargarInfectologia();
+}
+
+async function guardarEstadoHabitacion() {
+  const habitaciones = document.getElementById('estado-hab-num')?.value.trim();
+  const estado = document.getElementById('estado-hab-sel')?.value;
+  const motivo = document.getElementById('estado-hab-motivo')?.value.trim();
+  const retorno = document.getElementById('estado-hab-retorno')?.value.trim();
+  const sector = document.getElementById('estado-hab-sector')?.value.trim();
+  if(!habitaciones || !estado) { showToast('Indicá la habitación y el estado.', true); return; }
+  // Soporta múltiples habitaciones separadas por coma
+  const lista = habitaciones.split(',').map(h=>h.trim()).filter(Boolean);
+  showLoading('Guardando...');
+  for(const hab of lista) {
+    await sheetPost({action:'actualizarHabitacionEstado', habitacion:hab, estado, motivo, fechaRetorno:retorno, sector});
+  }
+  hideLoading();
+  closeModal('modal-hab-estado');
+  showToast(`✅ ${lista.length} habitación/es marcadas como ${estado}`);
+  document.getElementById('estado-hab-num').value='';
+  document.getElementById('estado-hab-motivo').value='';
+  document.getElementById('estado-hab-retorno').value='';
+  cargarInfectologia();
+}
+
+async function marcarOperativa(num) {
+  await sheetPost({action:'actualizarHabitacionEstado', habitacion:num, estado:'Operativa', motivo:'', fechaRetorno:'', sector:''});
+  const r = rooms.find(x=>String(x.num)===String(num));
+  if(r) { r.status='ok'; delete r.estadoInfo; }
+  renderRooms();
+  showToast(`✅ Habitación ${num} marcada como operativa`);
+  cargarInfectologia();
+}
 
 // ---- PÉRDIDAS DE ROPA ----
 async function registrarPerdida() {
