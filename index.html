@@ -886,7 +886,8 @@ function doLogout(){currentUser=null;document.getElementById('app').style.displa
 
 function showSectorScreen(){
   showScr('scr-sector');
-  if(!sectoresData.length) cargarSectores();
+  // Always reload to get latest from Sheets
+  cargarSectores();
 }
 
 function doSectorLogin(){
