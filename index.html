@@ -630,16 +630,7 @@ textarea:focus{border-color:var(--blue);}
       </div>
 
       <!-- TAB ESTADO HABITACIONES -->
-      <div class="card" style="margin-top:20px">
-        <div class="card-header">
-          <span>🔧 Habitaciones Fuera de Servicio / En Reparación</span>
-          <button class="btn-sm" onclick="openModal('modal-hab-estado')" id="btn-hab-estado" style="display:none">+ Marcar habitación</button>
-        </div>
-        <table class="data-table">
-          <thead><tr><th>Habitación</th><th>Estado</th><th>Motivo</th><th>Desde</th><th>Retorno estimado</th><th>Sector</th><th></th></tr></thead>
-          <tbody id="infect-estado-tbody"><tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Cargando...</td></tr></tbody>
-        </table>
-      </div>
+      
     </div>
 
     <!-- MONITOREO -->
@@ -652,7 +643,7 @@ textarea:focus{border-color:var(--blue);}
           <div class="stat-card"><div class="stat-label">Sol. pendientes</div><div class="stat-val" id="mon-pend" style="color:var(--amber)">0</div></div>
         </div>
         <div class="card"><div class="card-header"><span>📋 Todas las Solicitudes del Día</span></div><div class="card-body" id="mon-sol-list"><div style="color:var(--text2);font-size:13px">Sin solicitudes aún.</div></div></div>
-        <div class="card"><div class="card-header"><span>👕 Novedades de Ropería del Día</span><button class="btn-sm secondary" onclick="navToPage('roperia')">Ver ropería</button></div><div class="card-body" id="mon-rop-list"><div style="color:var(--text2);font-size:13px">Sin novedades de ropería.</div></div></div>
+        
       </div>
       <div id="monitoreo-denied" style="display:none;text-align:center;padding:60px 20px">
         <div style="font-size:48px;margin-bottom:16px">🔒</div>
@@ -1407,7 +1398,7 @@ function eliminarIndicacionBtn(btn) {
 function renderEstadoTabla() {
   const tbody = document.getElementById('infect-estado-tbody');
   if(!tbody) return;
-  const canEdit = ['jefe','infectologia','supervisor'].includes(currentUser?.perfil);
+  const canEdit = ['jefe','supervisor'].includes(currentUser?.perfil);
   const noOperativas = infectEstados.filter(e => e.estado !== 'Operativa');
   if(!noOperativas.length){tbody.innerHTML='<tr><td colspan="7" style="color:var(--text2);text-align:center;padding:20px">Todas las habitaciones estan operativas.</td></tr>';return;}
   var html='';
@@ -1616,16 +1607,16 @@ async function generarParteDiario(automatico) {
   const d = await sheetPost({
     action: 'enviarParteDiario',
     turno, fecha, cuerpo,
-    emailDestino: 'calidad.sanirap@gmail.com',
+    emailDestino: 'maestranza@sanatoriosanjose.org.ar',
     usuario: currentUser?.nombre||'—'
   });
   hideLoading();
-  if(d.ok) showToast(`✅ Parte del turno ${turno} enviado a calidad.sanirap@gmail.com`);
+  if(d.ok) showToast('Parte del turno '+turno+' enviado a maestranza@sanatoriosanjose.org.ar');
   else showToast('Error al enviar el parte. Intentá de nuevo.', true);
 }
 
 function generarParteManual() {
-  if(confirm('¿Generar y enviar el parte diario del turno actual a calidad.sanirap@gmail.com?')) {
+  if(confirm('¿Generar y enviar el parte diario del turno actual a maestranza@sanatoriosanjose.org.ar?')) {
     generarParteDiario(false);
   }
 }
