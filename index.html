@@ -201,15 +201,7 @@ textarea:focus{border-color:var(--blue);}
     <div class="auth-msg" id="sector-msg"></div>
     <div id="sector-selector">
       <div class="field-group"><div class="field-label">Tu servicio</div>
-        <select id="sector-nombre">
-          <option value="">— Seleccioná —</option>
-          <option>Enfermería Internación</option><option>Enfermería Áreas Críticas</option>
-          <option>Enfermería Quirófano</option><option>Admisión y Egreso</option>
-          <option>Seguridad</option><option>Mantenimiento</option>
-          <option>Imágenes</option><option>Laboratorio</option><option>Guardia Médica</option>
-          <option>Hemodinamia</option><option>RR.HH.</option><option>Dirección</option>
-          <option>Legales</option><option>Calidad del Paciente</option><option>Consultorios Externos</option>
-        </select>
+        <select id="sector-nombre"><option value="">Cargando servicios...</option></select>
       </div>
       <div class="field-group"><div class="field-label">PIN del servicio</div><input type="password" id="sector-pin" placeholder="••••" maxlength="4" /></div>
       <button class="btn-primary" onclick="doSectorLogin()">Continuar</button>
@@ -571,21 +563,14 @@ textarea:focus{border-color:var(--blue);}
         <div class="supervisor-note">Entregá estos PINes a cada sector. Solo usarlos para solicitar intervenciones a maestranza.</div>
         <table class="data-table"><thead><tr><th>Sector</th><th>PIN</th></tr></thead>
         <tbody>
-          <tr><td>🏥 Enfermería Internación</td><td style="font-family:var(--mono);font-weight:700">2839</td></tr>
-          <tr><td>🫀 Enfermería Áreas Críticas</td><td style="font-family:var(--mono);font-weight:700">3828</td></tr>
           <tr><td>🔪 Enfermería Quirófano</td><td style="font-family:var(--mono);font-weight:700">4253</td></tr>
-          <tr><td>🚪 Admisión y Egreso</td><td style="font-family:var(--mono);font-weight:700">6467</td></tr>
           <tr><td>🛡️ Seguridad</td><td style="font-family:var(--mono);font-weight:700">8074</td></tr>
           <tr><td>🔧 Mantenimiento</td><td style="font-family:var(--mono);font-weight:700">7543</td></tr>
           <tr><td>📡 Imágenes</td><td style="font-family:var(--mono);font-weight:700">3143</td></tr>
           <tr><td>🧪 Laboratorio</td><td style="font-family:var(--mono);font-weight:700">8033</td></tr>
-          <tr><td>🚨 Guardia Médica</td><td style="font-family:var(--mono);font-weight:700">9308</td></tr>
           <tr><td>❤️ Hemodinamia</td><td style="font-family:var(--mono);font-weight:700">2912</td></tr>
           <tr><td>👔 RR.HH.</td><td style="font-family:var(--mono);font-weight:700">2712</td></tr>
-          <tr><td>🏛️ Dirección</td><td style="font-family:var(--mono);font-weight:700">8067</td></tr>
           <tr><td>⚖️ Legales</td><td style="font-family:var(--mono);font-weight:700">2204</td></tr>
-          <tr><td>⭐ Calidad del Paciente</td><td style="font-family:var(--mono);font-weight:700">4006</td></tr>
-          <tr><td>🩺 Consultorios Externos</td><td style="font-family:var(--mono);font-weight:700">7238</td></tr>
         </tbody></table>
       </div></div>
     </div>
@@ -852,7 +837,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbxO6s46cBMdrxivACit49p1KQQY0ytGK5u_HF66v_WVA6StbJsk4xvHoEvD6BoC4AJw2A/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbwzg10Px049YUZ02adLIH0Lv-1fBB6q2mQelPPuv5mf9Sc9qcXSZUph904XvoXP8Rt5EA/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
