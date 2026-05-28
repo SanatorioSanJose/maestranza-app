@@ -852,9 +852,9 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbwaNxvaAnbHy3vDE_RJJNqlsg1cBpqfem-l3A7nh0tQTGDm6m4XWZFCWkB16hqTPdlu0w/exec";
-const SECTOR_PINS={'Enfermería Internación':'2839','Enfermería Áreas Críticas':'3828','Enfermería Quirófano':'4253','Admisión y Egreso':'6467','Seguridad':'8074','Mantenimiento':'7543','Imágenes':'3143','Laboratorio':'8033','Guardia Médica':'9308','Hemodinamia':'2912','RR.HH.':'2712','Dirección':'8067','Legales':'2204','Calidad del Paciente':'4006','Consultorios Externos':'7238'};
-const SECTOR_ICONS={'Enfermería Internación':'🏥','Enfermería Áreas Críticas':'🫀','Enfermería Quirófano':'🔪','Admisión y Egreso':'🚪','Seguridad':'🛡️','Mantenimiento':'🔧','Imágenes':'📡','Laboratorio':'🧪','Guardia Médica':'🚨','Hemodinamia':'❤️','RR.HH.':'👔','Dirección':'🏛️','Legales':'⚖️','Calidad del Paciente':'⭐','Consultorios Externos':'🩺'};
+const SHEET_URL="https://script.google.com/macros/s/AKfycbxO6s46cBMdrxivACit49p1KQQY0ytGK5u_HF66v_WVA6StbJsk4xvHoEvD6BoC4AJw2A/exec";
+let SECTOR_PINS={}; // cargado desde Sheets
+let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
 
 function switchTab(t){document.querySelectorAll('.auth-tab').forEach((x,i)=>x.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='registro')));document.getElementById('form-login').style.display=t==='login'?'block':'none';document.getElementById('form-registro').style.display=t==='registro'?'block':'none';}
@@ -883,6 +883,11 @@ async function doRegistro(){
 }
 
 function doLogout(){currentUser=null;document.getElementById('app').style.display='none';showScreen('screen-login');document.getElementById('login-nombre').value='';document.getElementById('login-pin').value='';}
+
+function showSectorScreen(){
+  showScr('scr-sector');
+  if(!sectoresData.length) cargarSectores();
+}
 
 function doSectorLogin(){
   const s=document.getElementById('sector-nombre').value,p=document.getElementById('sector-pin').value;
