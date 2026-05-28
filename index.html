@@ -1112,10 +1112,10 @@ function renderSolicitudes(filtro){
   if(filtro==='activas')lista=lista.filter(s=>s.estado!=='resuelta');
   else if(filtro==='critico')lista=lista.filter(s=>s.urgency==='critico'&&s.estado!=='resuelta');
   if(!lista.length){el.innerHTML='<div style="color:var(--text2);font-size:13px;padding:20px 0">No hay solicitudes en esta categoría.</div>';return;}
-  const canManage=['jefe','supervisor'].includes(currentUser?.perfil);
+  const canManage=['jefe','supervisor','operario'].includes(currentUser?.perfil);
   var html='';
   lista.forEach(function(s){
-    var canManage=['jefe','supervisor'].indexOf(CU?CU.perfil:'')>=0;
+    var canManage=['jefe','supervisor','operario'].indexOf(CU?CU.perfil:'')>=0;
     html+='<div class="sol-card '+(s.estado==='resuelta'?'resuelta':s.urgency)+'">';
     html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">';
     html+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">'+(SECTOR_ICONS[s.sector]||'🏥')+'</span>';
