@@ -1341,6 +1341,7 @@ function submitForm(id,msg){closeModal(id);showToast(msg);}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
+document.addEventListener('DOMContentLoaded',function(){cargarSectores();});
 
 // ---- INFECTOLOGÍA ----
 let infectIndicaciones = [];
