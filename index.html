@@ -872,7 +872,7 @@ function doLogout(){currentUser=null;document.getElementById('app').style.displa
 async function cargarSectores() {
   const sel = document.getElementById('sector-nombre');
   if(sel) sel.innerHTML = '<option value="">Cargando...</option>';
-  const d = await api({action:'obtenerSectores'});
+  const d = await sheetPost({action:'obtenerSectores'});
   if(d.ok && d.sectores && d.sectores.length) {
     sectoresData = d.sectores;
     SECTOR_PINS = {};
