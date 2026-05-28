@@ -869,6 +869,36 @@ async function doRegistro(){
 
 function doLogout(){currentUser=null;document.getElementById('app').style.display='none';showScreen('screen-login');document.getElementById('login-nombre').value='';document.getElementById('login-pin').value='';}
 
+async function cargarSectores() {
+  const sel = document.getElementById('sector-nombre');
+  if(sel) sel.innerHTML = '<option value="">Cargando...</option>';
+  const d = await api({action:'obtenerSectores'});
+  if(d.ok && d.sectores && d.sectores.length) {
+    sectoresData = d.sectores;
+    SECTOR_PINS = {};
+    SECTOR_ICONS = {};
+    d.sectores.forEach(function(s){
+      SECTOR_PINS[s.sector] = String(s.pin);
+      SECTOR_ICONS[s.sector] = s.icono || '🏥';
+    });
+    if(sel) {
+      sel.innerHTML = '<option value="">— Selecciona tu servicio —</option>';
+      d.sectores.forEach(function(s){
+        sel.innerHTML += '<option value="'+s.sector+'">'+s.icono+' '+s.sector+'</option>';
+      });
+    }
+    // Actualizar tabla PINes en Personal
+    var tbody = document.getElementById('pines-tbody');
+    if(tbody) {
+      tbody.innerHTML = d.sectores.map(function(s,i){
+        return '<tr style="'+(i%2===0?'':'background:var(--bg3)')+'"><td>'+s.icono+' '+s.sector+'</td><td style="font-family:monospace;font-weight:700;color:var(--blue)">'+s.pin+'</td></tr>';
+      }).join('');
+    }
+  } else {
+    if(sel) sel.innerHTML = '<option value="">Error - recarga la pagina</option>';
+  }
+}
+
 function showSectorScreen(){
   showScr('scr-sector');
   // Always reload to get latest from Sheets
@@ -878,7 +908,7 @@ function showSectorScreen(){
 function doSectorLogin(){
   const s=document.getElementById('sector-nombre').value,p=document.getElementById('sector-pin').value;
   if(!s||!p){showMsg('sector-msg','Seleccioná tu servicio e ingresá el PIN.','error');return;}
-  if(SECTOR_PINS[s]!==p){showMsg('sector-msg','PIN incorrecto para ese servicio.','error');return;}
+  if(!SECTOR_PINS[s]||String(SECTOR_PINS[s])!==String(p)){showMsg('sector-msg','PIN incorrecto para ese servicio.','error');return;}
   currentSector=s;
   document.getElementById('sf-nombre').textContent=s;
   document.getElementById('sf-icon').textContent=SECTOR_ICONS[s]||'🏥';
