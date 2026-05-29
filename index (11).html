@@ -837,7 +837,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbwzg10Px049YUZ02adLIH0Lv-1fBB6q2mQelPPuv5mf9Sc9qcXSZUph904XvoXP8Rt5EA/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycby-lAm4kojywFMcyDXtpwiMcds63-qflNP1wSOJdf9ovpvox0zT3qENMzrllI8MHBgqeg/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -1115,7 +1115,7 @@ function renderSolicitudes(filtro){
   const canManage=['jefe','supervisor','operario'].includes(currentUser?.perfil);
   var html='';
   lista.forEach(function(s){
-    var canManage=['jefe','supervisor','operario'].indexOf(CU?CU.perfil:'')>=0;
+    var canManage=['jefe','supervisor','operario'].indexOf(currentUser?currentUser.perfil:'')>=0;
     html+='<div class="sol-card '+(s.estado==='resuelta'?'resuelta':s.urgency)+'">';
     html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">';
     html+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">'+(SECTOR_ICONS[s.sector]||'🏥')+'</span>';
@@ -1324,7 +1324,7 @@ function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';rende
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
+function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
     const h=new Date().getHours();
     const esNoche=(h>=21||h<7);
     if(currentUser.perfil==='operario'&&!esNoche){
@@ -1340,6 +1340,13 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 function submitForm(id,msg){closeModal(id);showToast(msg);}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+function recargarDatos() {
+  cargarSolicitudesDesdeSheets();
+  cargarInfectologia();
+  cargarDashRoperia();
+  showToast('🔄 Datos actualizados');
+}
+
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
 document.addEventListener('DOMContentLoaded',function(){cargarSectores();});
 
@@ -1387,7 +1394,7 @@ function filtrarIndicaciones() {
 
 function renderInfectTabla() {
   var buscar = (document.getElementById('infect-buscar') ? document.getElementById('infect-buscar').value : '').toLowerCase();
-  var canEdit = CU && ['jefe','infectologia'].indexOf(CU.perfil) >= 0;
+  var canEdit = currentUser && ['jefe','infectologia'].indexOf(currentUser.perfil) >= 0;
   var habList = infectIndicaciones.filter(function(i){ return i.ambito==='habitacion' && (!buscar || i.identificador.toLowerCase().indexOf(buscar)>=0); });
   var secList = infectIndicaciones.filter(function(i){ return i.ambito==='sector'; });
   var habTbody = document.getElementById('infect-hab-tbody');
@@ -1793,7 +1800,7 @@ async function cargarPedidosRoperia() {
   if(!d.ok || !d.pedidos) { el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pedidos pendientes.</div>'; return; }
   if(!d.pedidos.length) { el.innerHTML='<div style="color:var(--text2);font-size:13px">Sin pedidos pendientes.</div>'; return; }
   const canManage = ['jefe','supervisor','roperia'].includes(currentUser?.perfil);
-  var canMgRope=['jefe','supervisor','roperia'].indexOf(CU?CU.perfil:'')>=0;
+  var canMgRope=['jefe','supervisor','roperia'].indexOf(currentUser?currentUser.perfil:'')>=0;
   var html='';
   d.pedidos.forEach(function(p){
     html+='<div class="sol-card normal" style="margin-bottom:10px">';
