@@ -1324,7 +1324,7 @@ function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';rende
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast(`Estado hab. ${num}: ${sL[r.status]}`);}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes')renderSolicitudes();if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
+function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
     const h=new Date().getHours();
     const esNoche=(h>=21||h<7);
     if(currentUser.perfil==='operario'&&!esNoche){
@@ -1340,6 +1340,13 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 function submitForm(id,msg){closeModal(id);showToast(msg);}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red-dim)':'var(--green-dim)';t.style.borderColor=err?'var(--red)':'var(--green)';t.style.color=err?'var(--red)':'var(--green)';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+function recargarDatos() {
+  cargarSolicitudesDesdeSheets();
+  cargarInfectologia();
+  cargarDashRoperia();
+  showToast('🔄 Datos actualizados');
+}
+
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
 document.addEventListener('DOMContentLoaded',function(){cargarSectores();});
 
