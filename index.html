@@ -208,6 +208,11 @@ textarea:focus{border-color:var(--blue);}
       <div style="text-align:center;margin-top:14px"><a onclick="showScreen('screen-login')" style="color:var(--text2);font-size:13px;cursor:pointer">← Volver al login de maestranza</a></div>
     </div>
     <div id="sector-form" style="display:none">
+      <!-- TABS -->
+      <div style="display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:20px">
+        <div class="auth-tab active" id="tab-maestranza" onclick="switchSectorTab('maestranza')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff">🔧 Maestranza</div>
+        <div class="auth-tab" id="tab-roperia" onclick="switchSectorTab('roperia')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2)" id="tab-roperia-btn">👕 Ropería</div>
+      </div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
         <span style="font-size:28px" id="sf-icon">🏥</span>
         <div><div style="font-size:16px;font-weight:800" id="sf-nombre">—</div><div style="font-size:11px;color:var(--text2)">Solicitud a Maestranza</div></div>
@@ -837,7 +842,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycby-lAm4kojywFMcyDXtpwiMcds63-qflNP1wSOJdf9ovpvox0zT3qENMzrllI8MHBgqeg/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbyCv8_0G0Kese_ifsvzEl-fJgHW5t2qFRtm32whuleD0IJGj1WTNI5AZ75vA8mICFIlCQ/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -1468,6 +1473,88 @@ function iniciarMonitoreoSolicitudes() {
     // Luego cada 2 minutos
     setInterval(verificarSolicitudesNuevas, 120000);
   }, 5000);
+}
+
+// ---- SECTOR ROPERIA TAB ----
+let roperiaSectorActivo = false;
+
+async function switchSectorTab(tab) {
+  // Update tab styles
+  const tabM = document.getElementById('tab-maestranza');
+  const tabR = document.getElementById('tab-roperia');
+  const formM = document.getElementById('sector-form-maestranza');
+  const formR = document.getElementById('form-roperia-sector');
+  const msgHorario = document.getElementById('roperia-horario-msg');
+
+  if(tab === 'maestranza') {
+    tabM.style.background = 'var(--blue)'; tabM.style.color = '#fff';
+    tabR.style.background = 'transparent'; tabR.style.color = 'var(--text2)';
+    if(formM) formM.style.display = 'block';
+    if(formR) formR.style.display = 'none';
+  } else {
+    // Verificar horario y config de roperia
+    const ahora = new Date();
+    const h = ahora.getHours();
+    const esDiaLaboral = ahora.getDay() >= 1 && ahora.getDay() <= 5;
+    const esFinSemana = ahora.getDay() === 0 || ahora.getDay() === 6;
+    const enHorario = (h >= 7 && h < 21);
+
+    // Verificar config desde Sheets
+    const config = await sheetPost({action:'obtenerConfigRoperia'});
+    const estadoGeneral = config.ok ? config.estado_general : 'Activo';
+    const estadoSadofe = config.ok ? config.estado_sadofe : 'Activo';
+
+    tabM.style.background = 'transparent'; tabM.style.color = 'var(--text2)';
+    tabR.style.background = 'var(--teal)'; tabR.style.color = '#fff';
+    if(formM) formM.style.display = 'none';
+    if(formR) formR.style.display = 'block';
+
+    if(estadoGeneral !== 'Activo') {
+      msgHorario.style.display = 'block';
+      msgHorario.textContent = 'El servicio de ropería no está disponible en este momento. Contactar a maestranza de turno.';
+      roperiaSectorActivo = false;
+    } else if(!enHorario) {
+      msgHorario.style.display = 'block';
+      msgHorario.textContent = 'Ropería no tiene personal de noche (21-7hs). Para urgencias contactar al personal de maestranza de turno.';
+      roperiaSectorActivo = false;
+    } else if(esFinSemana && estadoSadofe !== 'Activo') {
+      msgHorario.style.display = 'block';
+      msgHorario.textContent = 'El personal de ropería de SaDoFe no está disponible hoy. El pedido será atendido por maestranza.';
+      roperiaSectorActivo = false;
+    } else {
+      msgHorario.style.display = 'none';
+      roperiaSectorActivo = true;
+      // Cargar prendas en select
+      poblarSelectRopSector();
+    }
+  }
+}
+
+async function poblarSelectRopSector() {
+  const sel = document.getElementById('rop-sec-prenda');
+  if(!sel) return;
+  if(ropInv && ropInv.length) {
+    sel.innerHTML = '<option value="">Seleccioná</option>' + ropInv.map(function(p){ return '<option value="'+p.descripcion+'">'+p.descripcion+'</option>'; }).join('');
+    return;
+  }
+  const d = await sheetPost({action:'obtenerPrendas'});
+  if(d.ok && d.prendas) {
+    ropInv = d.prendas;
+    sel.innerHTML = '<option value="">Seleccioná</option>' + d.prendas.map(function(p){ return '<option value="'+p.descripcion+'">'+p.descripcion+'</option>'; }).join('');
+  }
+}
+
+async function enviarPedidoRopSector() {
+  const nombre = document.getElementById('rop-sec-nombre')?.value.trim();
+  const prenda = document.getElementById('rop-sec-prenda')?.value;
+  const cantidad = document.getElementById('rop-sec-cantidad')?.value.trim();
+  const motivo = document.getElementById('rop-sec-motivo')?.value.trim();
+  const sector = document.getElementById('sf-nombre')?.textContent || '-';
+  if(!nombre||!prenda||!cantidad||!motivo){showMsg('sector-msg','Completá todos los campos.','error');return;}
+  await sheetPost({action:'guardarPedidoRoperia', sector:sector, solicitante:nombre, prenda:prenda, cantidad:cantidad, motivo:motivo});
+  document.getElementById('sector-ok').style.display = 'block';
+  document.getElementById('sector-form').style.display = 'none';
+  document.getElementById('sector-ok-msg').textContent = 'Pedido de ropería enviado. El personal lo atenderá a la brevedad.';
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
