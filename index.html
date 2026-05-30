@@ -210,8 +210,8 @@ textarea:focus{border-color:var(--blue);}
     <div id="sector-form" style="display:none">
       <!-- TABS -->
       <div style="display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:20px">
-        <div class="auth-tab active" id="tab-maestranza" onclick="switchSectorTab('maestranza')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff">🔧 Maestranza</div>
-        <div class="auth-tab" id="tab-roperia" onclick="switchSectorTab('roperia')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2)" id="tab-roperia-btn">👕 Ropería</div>
+        <button type="button" id="tab-maestranza" onclick="switchSectorTab('maestranza')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff;border:none;font-family:var(--font)">🔧 Maestranza</button>
+        <button type="button" id="tab-roperia" onclick="switchSectorTab('roperia')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;border:none;font-family:var(--font)">👕 Ropería</button>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
         <span style="font-size:28px" id="sf-icon">🏥</span>
@@ -1546,15 +1546,34 @@ async function poblarSelectRopSector() {
 
 async function enviarPedidoRopSector() {
   const nombre = document.getElementById('rop-sec-nombre')?.value.trim();
-  const prenda = document.getElementById('rop-sec-prenda')?.value;
+  const tipo = document.getElementById('rop-sec-tipo')?.value;
+  const habitacion = document.getElementById('rop-sec-habitacion')?.value.trim();
   const cantidad = document.getElementById('rop-sec-cantidad')?.value.trim();
-  const motivo = document.getElementById('rop-sec-motivo')?.value.trim();
+  const obs = document.getElementById('rop-sec-obs')?.value.trim();
   const sector = document.getElementById('sf-nombre')?.textContent || '-';
-  if(!nombre||!prenda||!cantidad||!motivo){showMsg('sector-msg','Completá todos los campos.','error');return;}
-  await sheetPost({action:'guardarPedidoRoperia', sector:sector, solicitante:nombre, prenda:prenda, cantidad:cantidad, motivo:motivo});
-  document.getElementById('sector-ok').style.display = 'block';
-  document.getElementById('sector-form').style.display = 'none';
-  document.getElementById('sector-ok-msg').textContent = 'Pedido de ropería enviado. El personal lo atenderá a la brevedad.';
+  if(!nombre||!tipo||!habitacion){
+    showMsg('sector-msg','Completa nombre, tipo de pedido y habitacion.','error');
+    return;
+  }
+  const motivo = habitacion + (obs ? ' - ' + obs : '');
+  const btn = document.getElementById('btn-enviar-rop-sector');
+  if(btn) btn.disabled = true;
+  const d = await sheetPost({
+    action:'guardarPedidoRoperia',
+    sector: sector,
+    solicitante: nombre,
+    prenda: tipo,
+    cantidad: cantidad || '1',
+    motivo: motivo
+  });
+  if(btn) btn.disabled = false;
+  if(d.ok) {
+    document.getElementById('sector-ok').style.display = 'block';
+    document.getElementById('sector-form').style.display = 'none';
+    document.getElementById('sector-ok-msg').textContent = 'Pedido de roperia enviado. El personal lo atendera a la brevedad.';
+  } else {
+    showMsg('sector-msg','Error al enviar. Intenta de nuevo.','error');
+  }
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
