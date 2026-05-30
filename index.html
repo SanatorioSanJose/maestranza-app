@@ -907,6 +907,7 @@ function showSectorScreen(){
   showScr('scr-sector');
   // Always reload to get latest from Sheets
   cargarSectores();
+  iniciarMonitoreoSolicitudes();
 }
 
 function doSectorLogin(){
@@ -1345,6 +1346,128 @@ function recargarDatos() {
   cargarInfectologia();
   cargarDashRoperia();
   showToast('🔄 Datos actualizados');
+}
+
+// ---- SISTEMA DE NOTIFICACIONES Y SONIDOS ----
+let solicitudesKnownIds = new Set();
+let notifPermiso = false;
+
+// Solicitar permiso de notificaciones
+async function pedirPermisoNotificaciones() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') { notifPermiso = true; return; }
+  if (Notification.permission !== 'denied') {
+    const p = await Notification.requestPermission();
+    notifPermiso = p === 'granted';
+  }
+}
+
+// Generar sonido con Web Audio API
+function reproducirSonido(tipo) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const secuencias = {
+      normal: [{f:520,d:0.15,g:0.3},{f:660,d:0.2,g:0.4}],
+      urgente: [{f:880,d:0.15,g:0.5},{f:0,d:0.05},{f:880,d:0.15,g:0.5},{f:1100,d:0.25,g:0.6}],
+      critico: [{f:1200,d:0.1,g:0.7},{f:0,d:0.05},{f:1200,d:0.1,g:0.7},{f:0,d:0.05},{f:1200,d:0.1,g:0.7},{f:800,d:0.3,g:0.8},{f:0,d:0.05},{f:1200,d:0.2,g:0.9}]
+    };
+    const seq = secuencias[tipo] || secuencias.normal;
+    let t = ctx.currentTime;
+    seq.forEach(function(n) {
+      if (!n.f) { t += n.d; return; }
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = n.f;
+      osc.type = tipo === 'critico' ? 'sawtooth' : tipo === 'urgente' ? 'square' : 'sine';
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(n.g, t + 0.02);
+      gain.gain.linearRampToValueAtTime(0, t + n.d);
+      osc.start(t);
+      osc.stop(t + n.d + 0.05);
+      t += n.d + 0.02;
+    });
+  } catch(e) { console.log('Audio no disponible'); }
+}
+
+// Mostrar notificacion del navegador
+function mostrarNotificacion(sol) {
+  if (!notifPermiso) return;
+  const iconos = {normal:'[Normal]', urgente:'[Urgente]', critico:'[CRITICO]'};
+  const n = new Notification(iconos[sol.urgency] + ' ' + sol.sector, {
+    body: sol.lugar + ' - ' + sol.tipo,
+    icon: 'https://sanatoriosanjose.github.io/maestranza-app/icon.png',
+    badge: 'https://sanatoriosanjose.github.io/maestranza-app/icon.png',
+    tag: 'sol-' + sol.id,
+    requireInteraction: sol.urgency === 'critico'
+  });
+  n.onclick = function() { window.focus(); navToPage('solicitudes'); n.close(); };
+}
+
+// Verificar solicitudes nuevas
+async function verificarSolicitudesNuevas() {
+  if (!currentUser) return;
+  const d = await sheetPost({action:'obtenerSolicitudes'});
+  if (!d.ok || !d.solicitudes) return;
+  
+  // Primera carga - solo registrar IDs sin notificar
+  if (solicitudesKnownIds.size === 0) {
+    d.solicitudes.forEach(function(s){ solicitudesKnownIds.add(String(s.id)); });
+    return;
+  }
+  
+  // Detectar nuevas
+  const nuevas = d.solicitudes.filter(function(s){ return !solicitudesKnownIds.has(String(s.id)); });
+  
+  if (nuevas.length > 0) {
+    // Actualizar IDs conocidos
+    d.solicitudes.forEach(function(s){ solicitudesKnownIds.add(String(s.id)); });
+    // Actualizar array de solicitudes
+    solicitudes = d.solicitudes.map(function(s){
+      return {
+        id:s.id, sector:s.sector, persona:s.persona, lugar:s.lugar,
+        tipo:s.tipo, desc:s.desc, urgency:s.urgency, estado:s.estado,
+        asignadoA:s.asignadoA||'', resueltaA:s.resueltaA||'',
+        hora:s.fecha?new Date(s.fecha).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'--',
+        fecha:s.fecha?new Date(s.fecha).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}):'--'
+      };
+    });
+    actuBadges();
+    
+    // Notificar por prioridad - critico primero
+    const criticas = nuevas.filter(function(s){ return s.urgency==='critico'; });
+    const urgentes = nuevas.filter(function(s){ return s.urgency==='urgente'; });
+    const normales = nuevas.filter(function(s){ return s.urgency==='normal'; });
+    
+    if (criticas.length > 0) {
+      reproducirSonido('critico');
+      criticas.forEach(function(s){ mostrarNotificacion(s); });
+    } else if (urgentes.length > 0) {
+      reproducirSonido('urgente');
+      urgentes.forEach(function(s){ mostrarNotificacion(s); });
+    } else if (normales.length > 0) {
+      reproducirSonido('normal');
+      normales.forEach(function(s){ mostrarNotificacion(s); });
+    }
+    
+    // Toast en la app
+    const msg = nuevas.length === 1
+      ? 'Nueva solicitud de ' + nuevas[0].sector + ' (' + nuevas[0].urgency + ')'
+      : nuevas.length + ' nuevas solicitudes recibidas';
+    showToast(msg, nuevas.some(function(s){ return s.urgency==='critico'; }));
+  }
+}
+
+// Iniciar monitoreo cada 2 minutos
+function iniciarMonitoreoSolicitudes() {
+  pedirPermisoNotificaciones();
+  // Primera verificacion a los 5 segundos (para cargar IDs iniciales)
+  setTimeout(function(){
+    verificarSolicitudesNuevas();
+    // Luego cada 2 minutos
+    setInterval(verificarSolicitudesNuevas, 120000);
+  }, 5000);
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
