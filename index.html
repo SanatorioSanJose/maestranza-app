@@ -312,7 +312,7 @@ textarea:focus{border-color:var(--blue);}
       <div class="nav-item" data-page="solicitudes" onclick="navTo(this)" id="nav-solicitudes"><span class="icon">🔔</span> Solicitudes <span class="nav-badge" id="badge-sol" style="display:none">0</span></div>
       <div class="nav-item" data-page="novedades" onclick="navTo(this)" id="nav-novedades"><span class="icon">📋</span> Novedades</div>
       <div class="nav-item" data-page="residuos" onclick="navTo(this)" id="nav-residuos"><span class="icon">🗑️</span> Residuos</div>
-      <div class="nav-item" data-page="roperia" onclick="navTo(this)" id="nav-roperia"><span class="icon">👕</span> Ropería</div>
+      <div class="nav-item" data-page="roperia" onclick="navTo(this)" id="nav-roperia"><span class="icon">👕</span> Ropería<span class="nav-badge" id="rope-badge" style="display:none;background:var(--orange);color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:auto">0</span></div>
       <div class="nav-item" data-page="insumos" onclick="navTo(this)" id="nav-insumos"><span class="icon">📦</span> Insumos</div>
       <div class="nav-section">Administración</div>
       <div class="nav-item" data-page="requerimientos" onclick="navTo(this)" id="nav-reqs"><span class="icon">📝</span> Requerimientos</div>
@@ -591,20 +591,11 @@ textarea:focus{border-color:var(--blue);}
         <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--teal-dim);display:inline-block"></span>SaDoFe</span>
       </div>
       </div>
-      <div class="card"><div class="card-header"><span>🔐 PINes de Sectores Externos</span></div>
+      <div class="card" id="card-pines"><div class="card-header"><span>🔐 PINes de Sectores Externos</span></div>
       <div class="card-body">
         <div class="supervisor-note">Entregá estos PINes a cada sector. Solo usarlos para solicitar intervenciones a maestranza.</div>
         <table class="data-table"><thead><tr><th>Sector</th><th>PIN</th></tr></thead>
-        <tbody>
-          <tr><td>🔪 Enfermería Quirófano</td><td style="font-family:var(--mono);font-weight:700">4253</td></tr>
-          <tr><td>🛡️ Seguridad</td><td style="font-family:var(--mono);font-weight:700">8074</td></tr>
-          <tr><td>🔧 Mantenimiento</td><td style="font-family:var(--mono);font-weight:700">7543</td></tr>
-          <tr><td>📡 Imágenes</td><td style="font-family:var(--mono);font-weight:700">3143</td></tr>
-          <tr><td>🧪 Laboratorio</td><td style="font-family:var(--mono);font-weight:700">8033</td></tr>
-          <tr><td>❤️ Hemodinamia</td><td style="font-family:var(--mono);font-weight:700">2912</td></tr>
-          <tr><td>👔 RR.HH.</td><td style="font-family:var(--mono);font-weight:700">2712</td></tr>
-          <tr><td>⚖️ Legales</td><td style="font-family:var(--mono);font-weight:700">2204</td></tr>
-        </tbody></table>
+        <tbody id="pines-tbody"><tr><td colspan="2" style="color:var(--text2);text-align:center;padding:20px">Cargando desde Sheets...</td></tr></tbody></table>
       </div></div>
     </div>
 
