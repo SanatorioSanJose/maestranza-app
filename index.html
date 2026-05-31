@@ -1580,27 +1580,39 @@ async function enviarPedidoRopSector() {
   const obs = document.getElementById('rop-sec-obs')?.value.trim();
   const sector = document.getElementById('sf-nombre')?.textContent || '-';
   if(!nombre||!tipo||!habitacion){
-    showMsg('sector-msg','Completa nombre, tipo de pedido y habitacion.','error');
+    const msgEl = document.getElementById('roperia-horario-msg');
+    if(msgEl){msgEl.style.display='block';msgEl.textContent='Completa nombre, tipo de pedido y habitacion.';}
     return;
   }
   const motivo = habitacion + (obs ? ' - ' + obs : '');
   const btn = document.getElementById('btn-enviar-rop-sector');
-  if(btn) btn.disabled = true;
-  const d = await sheetPost({
-    action:'guardarPedidoRoperia',
-    sector: sector,
-    solicitante: nombre,
-    prenda: tipo,
-    cantidad: cantidad || '1',
-    motivo: motivo
-  });
-  if(btn) btn.disabled = false;
-  if(d.ok) {
-    document.getElementById('sector-ok').style.display = 'block';
-    document.getElementById('sector-form').style.display = 'none';
-    document.getElementById('sector-ok-msg').textContent = 'Pedido de roperia enviado. El personal lo atendera a la brevedad.';
-  } else {
-    showMsg('sector-msg','Error al enviar. Intenta de nuevo.','error');
+  if(btn){btn.disabled=true;btn.textContent='Enviando...';}
+  try {
+    const r = await fetch(SHEET_URL, {
+      method:'POST',
+      body: JSON.stringify({
+        action:'guardarPedidoRoperia',
+        sector: sector,
+        solicitante: nombre,
+        prenda: tipo,
+        cantidad: cantidad || '1',
+        motivo: motivo
+      })
+    });
+    const d = await r.json();
+    if(btn){btn.disabled=false;btn.textContent='Enviar pedido a Roperia';}
+    if(d.ok) {
+      document.getElementById('sector-ok').style.display = 'block';
+      document.getElementById('sector-form').style.display = 'none';
+      document.getElementById('sector-ok-msg').textContent = 'Pedido de roperia enviado. El personal lo atendera a la brevedad.';
+    } else {
+      const msgEl = document.getElementById('roperia-horario-msg');
+      if(msgEl){msgEl.style.display='block';msgEl.textContent='Error al enviar. Intenta de nuevo.';}
+    }
+  } catch(e) {
+    if(btn){btn.disabled=false;btn.textContent='Enviar pedido a Roperia';}
+    const msgEl = document.getElementById('roperia-horario-msg');
+    if(msgEl){msgEl.style.display='block';msgEl.textContent='Error de conexion. Intenta de nuevo.';}
   }
 }
 
