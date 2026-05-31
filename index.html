@@ -213,33 +213,61 @@ textarea:focus{border-color:var(--blue);}
         <button type="button" id="tab-maestranza" onclick="switchSectorTab('maestranza')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff;border:none;font-family:var(--font)">🔧 Maestranza</button>
         <button type="button" id="tab-roperia" onclick="switchSectorTab('roperia')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;border:none;font-family:var(--font)">👕 Ropería</button>
       </div>
+      <div id="sector-form-maestranza">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
         <span style="font-size:28px" id="sf-icon">🏥</span>
         <div><div style="font-size:16px;font-weight:800" id="sf-nombre">—</div><div style="font-size:11px;color:var(--text2)">Solicitud a Maestranza</div></div>
       </div>
-      <div class="field-group"><label class="field-label">Tu nombre completo</label><input type="text" id="sf-persona" placeholder="Ej: Martínez Laura" /></div>
-      <div class="field-group"><label class="field-label">Lugar / Habitación</label><input type="text" id="sf-lugar" placeholder="Ej: Hab. 205, Pasillo piso 2..." /></div>
-      <div class="field-group"><label class="field-label">Tipo de intervención</label>
+      <div class="field-group"><label class="field-label">Tu nombre completo</label><input type="text" id="sf-persona" placeholder="Ej: Martinez Laura" /></div>
+      <div class="field-group"><label class="field-label">Lugar / Habitacion</label><input type="text" id="sf-lugar" placeholder="Ej: Hab. 205, Pasillo piso 2..." /></div>
+      <div class="field-group"><label class="field-label">Tipo de intervencion</label>
         <select id="sf-tipo">
-          <option value="">— Seleccioná —</option>
+          <option value="">— Selecciona —</option>
           <option>Derrame / limpieza de fluidos</option>
-          <option>Limpieza urgente de habitación</option>
-          <option>Preparación de habitación para ingreso</option>
+          <option>Limpieza urgente de habitacion</option>
+          <option>Preparacion de habitacion para ingreso</option>
           <option>Retiro de residuos</option>
-          <option>Limpieza de área común</option>
+          <option>Limpieza de area comun</option>
           <option>Problema con ropa de cama</option>
-          <option>Limpieza de baño</option>
-          <option>Otro (detallar en descripción)</option>
+          <option>Limpieza de bano</option>
+          <option>Otro (detallar en descripcion)</option>
         </select>
       </div>
       <div class="field-label" style="margin-bottom:8px">Nivel de urgencia</div>
       <div class="urgency-grid">
-        <button class="urgency-btn" onclick="selectUrgency('normal',this)">🟢<br>Normal<br><span style="font-weight:400;font-size:10px">Cuando puedan</span></button>
-        <button class="urgency-btn" onclick="selectUrgency('urgente',this)">🟡<br>Urgente<br><span style="font-weight:400;font-size:10px">Antes de 30 min</span></button>
-        <button class="urgency-btn" onclick="selectUrgency('critico',this)">🔴<br>Crítico<br><span style="font-weight:400;font-size:10px">Inmediato</span></button>
+        <button class="urgency-btn" onclick="selectUrgency('normal',this)">Normal<br><span style="font-weight:400;font-size:10px">Cuando puedan</span></button>
+        <button class="urgency-btn" onclick="selectUrgency('urgente',this)">Urgente<br><span style="font-weight:400;font-size:10px">Antes de 30 min</span></button>
+        <button class="urgency-btn" onclick="selectUrgency('critico',this)">Critico<br><span style="font-weight:400;font-size:10px">Inmediato</span></button>
       </div>
-      <div class="form-field"><label class="field-label">Descripción detallada</label><textarea id="sf-desc" placeholder="Describí qué pasó y qué necesitás..."></textarea></div>
+      <div class="form-field"><label class="field-label">Descripcion detallada</label><textarea id="sf-desc" placeholder="Describe que paso y que necesitas..."></textarea></div>
       <button class="btn-primary" onclick="enviarSolicitud()">Enviar solicitud a Maestranza</button>
+      </div>
+      <!-- FORM ROPERIA -->
+      <div id="form-roperia-sector" style="display:none">
+        <div id="roperia-horario-msg" style="display:none;background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--amber);margin-bottom:14px"></div>
+        <div class="field-group"><label class="field-label">Tu nombre completo</label><input type="text" id="rop-sec-nombre" placeholder="Nombre y apellido" /></div>
+        <div class="field-group"><label class="field-label">Tipo de pedido</label>
+          <select id="rop-sec-tipo">
+            <option value="">— Selecciona —</option>
+            <option>Provision de ropa de cama (sabanas, fundas, almohadas)</option>
+            <option>Provision de toallas y toallones</option>
+            <option>Provision de ropa de bano</option>
+            <option>Retiro de ropa sucia</option>
+            <option>Cambio urgente de ropa de cama</option>
+            <option>Provision de camisolin de paciente</option>
+            <option>Provision de frazadas o acolchados</option>
+            <option>Ropa manchada o en mal estado - reemplazar</option>
+            <option>Otro (detallar en observacion)</option>
+          </select>
+        </div>
+        <div class="field-group"><label class="field-label">Habitacion o sector</label><input type="text" id="rop-sec-habitacion" placeholder="Ej: Hab 205, Pasillo piso 2..." /></div>
+        <div class="field-group"><label class="field-label">Cantidad aproximada</label><input type="text" id="rop-sec-cantidad" placeholder="Ej: 2 juegos, 3 toallas..." /></div>
+        <div class="field-group"><label class="field-label">Observacion adicional</label><textarea id="rop-sec-obs" placeholder="Aclaraciones sobre el pedido..."></textarea></div>
+        <div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px;font-size:12px;color:var(--amber);margin-bottom:16px">
+          La ropa no debe usarse para tirar al piso ni para fines que no correspondan. No solicitar almohadas ortopedicas u otros elementos tecnicos.
+        </div>
+        <button type="button" class="btn-primary" onclick="enviarPedidoRopSector()" id="btn-enviar-rop-sector">Enviar pedido a Roperia</button>
+      </div>
     </div>
     <div id="sector-success" style="display:none">
       <div class="success-card">
