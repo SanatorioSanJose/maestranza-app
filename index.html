@@ -341,9 +341,7 @@ textarea:focus{border-color:var(--blue);}
         <div class="badge badge-green" id="turno-badge">—</div>
       </div>
       <div id="dash-alerts"></div>
-      <div class="grid-4">
-        <div class="stat-card"><div class="stat-label">Habitaciones OK</div><div class="stat-val" style="color:var(--green)" id="stat-hab-ok">0</div><div class="stat-meta" id="stat-hab-total">cargando...</div></div>
-        <div class="stat-card"><div class="stat-label">Pendientes limpieza</div><div class="stat-val" style="color:var(--amber)" id="stat-hab-pend">0</div><div class="stat-meta">en cola de turno</div></div>
+      <div class="grid-2">
         <div class="stat-card" id="stat-sol" style="cursor:pointer" onclick="navToPage('solicitudes')"><div class="stat-label">Solicitudes activas</div><div class="stat-val" id="stat-sol-num" style="color:var(--orange)">0</div><div class="stat-meta">de otros servicios</div></div>
         <div class="stat-card" style="cursor:pointer" onclick="navToPage('roperia')"><div class="stat-label">Pedidos roperia</div><div class="stat-val" style="color:var(--purple)" id="stat-rope-dash">0</div><div class="stat-meta">pendientes hoy</div></div>
       </div>
@@ -1087,6 +1085,10 @@ async function actualizarDashRoperia() {
   const pedRop = d.ok && d.pedidos ? d.pedidos.length : 0;
   const el = document.getElementById('dash-count-roperia');
   if(el) el.textContent = pedRop;
+  const elDash = document.getElementById('stat-rope-dash');
+  if(elDash) elDash.textContent = pedRop;
+  const rb = document.getElementById('rope-badge');
+  if(rb){rb.style.display=pedRop>0?'':'none';rb.textContent=pedRop;}
   const prog = document.getElementById('prog-rop-txt');
   if(prog) prog.textContent = pedRop + ' pendientes';
   
