@@ -1045,7 +1045,10 @@ function launchApp(){
   }
   document.getElementById('sb-name').textContent=currentUser.nombre;
   const perms={'nav-solicitudes':['jefe','supervisor','operario','direccion'],'nav-novedades':['jefe','supervisor','operario','direccion'],'nav-residuos':['jefe','supervisor','operario','direccion'],'nav-roperia':['jefe','supervisor','roperia','direccion'],'nav-insumos':['jefe','supervisor','direccion'],'nav-reqs':['jefe','supervisor','operario','roperia','direccion'],'nav-personal':['jefe','supervisor','direccion'],'nav-monitor':['jefe'],'nav-infectologia':['jefe','infectologia']};
-  Object.entries(perms).forEach(([id,roles])=>{const el=document.getElementById(id);if(el)el.style.display=roles.includes(currentUser.perfil)?'':'none';});
+  Object.keys(perms).forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display=perms[id].indexOf(currentUser.perfil)>=0?'':'none';
+  });
   const isJefe=currentUser.perfil==='jefe';
   document.getElementById('monitoreo-block').style.display=isJefe?'block':'none';
   document.getElementById('monitoreo-denied').style.display=isJefe?'none':'block';
