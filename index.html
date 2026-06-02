@@ -1340,7 +1340,28 @@ function actualizarStatsHab(){
   if(el2)el2.textContent=pend;
   if(el3)el3.textContent='de '+rooms.length+' camas';
 }
-function renderRooms(list){list=list||rooms;const g=document.getElementById('rooms-grid');if(g)g.innerHTML=list.map(r=>`<div class="room-card" onclick="openRoom('${r.num}')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="room-num">${r.num}</div><span class="badge badge-${r.type==='premium'?'teal':r.type==='pami'?'amber':r.type==='uti'?'red':r.type==='obra-social'?'blue':'purple'}" style="font-size:9px">${r.type}</span></div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span><div><span class="iso-tag ${iC[r.iso]}">${iL[r.iso]}</span></div>${r.pax>0?`<div style="font-size:11px;color:var(--text2);margin-top:3px">${r.pax} paciente${r.pax>1?'s':''}</div>`:''}</div>`).join('');}
+function renderRooms(list){
+  list=list||rooms;
+  const g=document.getElementById('rooms-grid');
+  if(!g)return;
+  g.innerHTML=list.map(function(r){
+    const indH=infectIndicaciones.find(function(i){return i.ambito==='habitacion'&&String(i.identificador)===String(r.num);});
+    const indS=infectIndicaciones.find(function(i){return i.ambito==='sector'&&r.sector&&r.sector.indexOf(i.identificador)>=0;});
+    const ind=indH||indS;
+    const isoEf=ind?ind.aislamiento:r.iso;
+    const typeColor=r.type==='premium'?'teal':r.type==='pami'?'amber':r.type==='uti'?'red':r.type==='obra-social'?'blue':'purple';
+    var html='<div class="room-card" onclick="openRoom(&quot;'+r.num+'&quot;)">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">';
+    html+='<div class="room-num">'+r.num+'</div>';
+    html+='<span class="badge badge-'+typeColor+'" style="font-size:9px">'+r.type+'</span></div>';
+    html+='<span class="room-status '+sC[r.status]+'">'+sL[r.status]+'</span>';
+    html+='<div><span class="iso-tag '+(iC[isoEf]||'')+'">'+( iL[isoEf]||isoEf)+'</span></div>';
+    if(ind)html+='<div style="font-size:10px;color:var(--blue);margin-top:2px">⚕️ Infectología</div>';
+    if(r.pax>0)html+='<div style="font-size:11px;color:var(--text2);margin-top:3px">'+r.pax+' paciente'+(r.pax>1?'s':'')+'</div>';
+    html+='</div>';
+    return html;
+  }).join('');
+}
 function filterRooms(f){renderRooms(f==='alta'?rooms.filter(r=>r.status==='alta'):f==='pending'?rooms.filter(r=>r.status==='pending'):f==='iso'?rooms.filter(r=>r.iso!=='ninguno'):f==='premium'?rooms.filter(r=>r.type==='premium'):f==='pami'?rooms.filter(r=>r.type==='pami'):f==='uti'?rooms.filter(r=>r.type==='uti'):rooms);}
 function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;
   // Buscar indicaciones de infectología para esta habitación y su sector
