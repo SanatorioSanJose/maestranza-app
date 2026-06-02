@@ -1363,7 +1363,7 @@ function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const
   }}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
+function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='habitaciones'){cargarInfectologia();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
     const h=new Date().getHours();
     const esNoche=(h>=21||h<7);
     if(currentUser.perfil==='operario'&&!esNoche){
