@@ -1349,7 +1349,27 @@ function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;
   const indActiva = indHab || indSec;
   // Si hay indicación de infectología, sobreescribir el aislamiento visual
   const isoEfectivo = indActiva ? indActiva.aislamiento : r.iso;
-  document.getElementById('modal-hab-title').textContent=`Habitación ${r.num}`;const ce=['jefe','supervisor'].includes(currentUser?.perfil);document.getElementById('modal-hab-body').innerHTML=`<div style="margin-bottom:14px"><div class="form-row" style="margin-bottom:8px"><div><div class="section-label">Estado</div><span class="room-status ${sC[r.status]}">${sL[r.status]}</span></div><div><div class="section-label">Tipo</div><span class="badge badge-teal">${r.type}</span></div></div><div class="section-label" style="margin-top:10px">Aislamiento</div><span class="iso-tag ${iC[r.iso]}" style="font-size:12px;padding:3px 9px">${iL[r.iso]}</span><div style="background:var(--bg3);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">EPP requerido:</strong> ${iE[r.iso]}</div></div>${r.pax===2?'<div class="alert-box alert-amber">⚠️ 2 pacientes: usar paños y recipientes <strong>diferentes</strong> para cada sector.</div>':''}${r.status==='alta'?'<div class="alert-box alert-red">🔴 Alta: realizar limpieza terminal completa antes de nueva admisión.</div>':''}<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-sm" onclick="markOK(\'${r.num}\')">✅ Marcar servicio OK</button>${ce?`<button class="btn-sm secondary" onclick="changeStatus('${r.num}')">Cambiar estado</button>`:''}</div>`;openModal('modal-hab');}
+  document.getElementById('modal-hab-title').textContent=`Habitación ${r.num}`;const ce=['jefe','supervisor'].includes(currentUser?.perfil);var bodyHtml = '<div style="margin-bottom:14px">';
+  bodyHtml += '<div style="display:flex;gap:16px;margin-bottom:10px">';
+  bodyHtml += '<div><div class="section-label">Estado</div><span class="room-status '+sC[r.status]+'">'+sL[r.status]+'</span></div>';
+  bodyHtml += '<div><div class="section-label">Tipo</div><span class="badge badge-teal">'+r.type+'</span></div></div>';
+  bodyHtml += '<div class="section-label" style="margin-top:10px">Aislamiento</div>';
+  bodyHtml += '<span class="iso-tag '+(iC[isoEfectivo]||iC['ninguno'])+'" style="font-size:12px;padding:3px 9px">'+(iL[isoEfectivo]||isoEfectivo)+'</span>';
+  bodyHtml += '<div style="background:var(--bg3);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">EPP requerido:</strong> '+(iE[isoEfectivo]||iE['ninguno'])+'</div>';
+  if(indActiva) {
+    bodyHtml += '<div style="background:var(--blue-dim);border:1px solid var(--blue);border-radius:8px;padding:10px;margin-top:8px;font-size:12px">';
+    bodyHtml += '<strong style="color:var(--blue)">⚕️ Indicación de Infectología:</strong><br>';
+    bodyHtml += (indActiva.indicaciones || 'Sin indicaciones adicionales.')+'<br>';
+    bodyHtml += '<small style="color:var(--text2)">Actualizado por: '+indActiva.actualizadoPor+'</small></div>';
+  }
+  bodyHtml += '</div>';
+  if(r.pax===2) bodyHtml += '<div class="alert-box alert-amber">2 pacientes: usar panos y recipientes diferentes para cada sector.</div>';
+  if(r.status==='alta') bodyHtml += '<div class="alert-box alert-red">Alta: realizar limpieza terminal completa antes de nueva admision.</div>';
+  bodyHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  bodyHtml += '<button class="btn-sm" onclick="markOK(\''+ r.num +'\')">Marcar servicio OK</button>';
+  if(ce) bodyHtml += '<button class="btn-sm secondary" onclick="changeStatus(\''+ r.num +'\')">Cambiar estado</button>';
+  bodyHtml += '</div>';
+  document.getElementById('modal-hab-body').innerHTML = bodyHtml;openModal('modal-hab');}
 function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';renderRooms();closeModal('modal-hab');sheetPost({action:'guardarHabitacion',habitacion:num,accion:'Limpieza OK',usuario:currentUser?.nombre||'—',turno:document.getElementById('turno-badge')?.textContent||'—'});showToast(`✅ Hab. ${num} — Servicio registrado`);}
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast('Estado hab. '+num+': '+sL[r.status]);
   if(r.status==='alta'){
