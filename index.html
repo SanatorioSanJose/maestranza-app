@@ -408,7 +408,41 @@ textarea:focus{border-color:var(--blue);}
           <button class="btn-sm secondary" onclick="filterRooms('uti')">UTI</button>
         </div>
       </div>
-      <div id="rooms-grid" class="rooms-grid"></div>
+      <div style="background:linear-gradient(135deg,#0d3d38,#1a4a3a);border:1px solid var(--teal);border-radius:12px;padding:16px 20px;margin-bottom:20px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+    <span style="font-size:18px">⚕️</span>
+    <div style="font-size:13px;font-weight:700;color:var(--teal)">Orden de limpieza recomendado por Infectología</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div style="background:rgba(20,184,166,0.15);border:1px solid var(--teal);border-radius:8px;padding:8px 12px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:18px;margin-bottom:4px">1️⃣</div>
+      <div style="font-size:11px;font-weight:700;color:var(--teal)">Protector</div>
+      <div style="font-size:10px;color:var(--text2)">Inmunodeprimido</div>
+    </div>
+    <div style="background:rgba(34,197,94,0.1);border:1px solid var(--green);border-radius:8px;padding:8px 12px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:18px;margin-bottom:4px">2️⃣</div>
+      <div style="font-size:11px;font-weight:700;color:var(--green)">Sin aislamiento</div>
+      <div style="font-size:10px;color:var(--text2)">Habitaciones comunes</div>
+    </div>
+    <div style="background:rgba(59,130,246,0.1);border:1px solid var(--blue);border-radius:8px;padding:8px 12px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:18px;margin-bottom:4px">3️⃣</div>
+      <div style="font-size:11px;font-weight:700;color:var(--blue)">Contacto</div>
+      <div style="font-size:10px;color:var(--text2)">Aislamiento contacto</div>
+    </div>
+    <div style="background:rgba(245,158,11,0.1);border:1px solid var(--amber);border-radius:8px;padding:8px 12px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:18px;margin-bottom:4px">4️⃣</div>
+      <div style="font-size:11px;font-weight:700;color:var(--amber)">Respiratorio</div>
+      <div style="font-size:10px;color:var(--text2)">Gotas / Aereo</div>
+    </div>
+    <div style="background:rgba(168,85,247,0.1);border:1px solid var(--purple);border-radius:8px;padding:8px 12px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:18px;margin-bottom:4px">5️⃣</div>
+      <div style="font-size:11px;font-weight:700;color:var(--purple)">Contacto CD</div>
+      <div style="font-size:10px;color:var(--text2)">Clostridium difficile</div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--text2);margin-top:10px;text-align:center">Siempre verificar las indicaciones especiales de cada habitación antes de ingresar</div>
+</div>
+<div id="rooms-grid" class="rooms-grid"></div>
     </div>
 
     <!-- NOVEDADES -->
@@ -859,7 +893,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbyCv8_0G0Kese_ifsvzEl-fJgHW5t2qFRtm32whuleD0IJGj1WTNI5AZ75vA8mICFIlCQ/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbyPEcvJ1vavJGDSHAy17HvTq_8w6chWHJCbaVQ7rCIaRGuLDW2eb4D6UtDejUWGlu1RvA/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -929,6 +963,7 @@ function showSectorScreen(){
   showScr('scr-sector');
   // Always reload to get latest from Sheets
   cargarSectores();
+  cargarConfigInfectologia();
   iniciarMonitoreoSolicitudes();
 }
 
@@ -1327,9 +1362,35 @@ const rooms=[
 ];
 const sL={ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta',reparacion:'En Reparación',fuera:'Fuera de Servicio',reservada:'Reservada'};
 const sC={ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta',reparacion:'s-reparacion',fuera:'s-fuera',reservada:'s-reservada'};
-const iL={contacto:'Aislam. Contacto',respiratorio:'Aislam. Gotas',aire:'Aislam. Aire',protector:'Aislam. Protector',ninguno:'Sin aislamiento'};
-const iC={contacto:'iso-contacto',respiratorio:'iso-respiratorio',aire:'iso-aire',protector:'iso-protector',ninguno:'iso-ninguno'};
-const iE={contacto:'Guantes + camisolín + barbijo quirúrgico.',respiratorio:'Guantes + camisolín + barbijo quirúrgico. Puerta cerrada.',aire:'EPP completo + N95. Solo con autorización.',protector:'EPP completo. Limpieza profunda.',ninguno:'EPP estándar: guantes y delantal.'};
+let iL={ninguno:'Sin aislamiento',contacto:'Aislam. Contacto',respiratorio:'Aislam. Gotas',aereo:'Aislam. Aereo',protector:'Aislam. Protector',contacto_cd:'Aislam. Contacto CD'};
+let iE={ninguno:'Guantes de latex resistente.',contacto:'Guantes + camisolin.',respiratorio:'Guantes + barbijo quirurgico + antiparras.',aereo:'Antiparras + barbijo de alta eficacia. Abrir ventana mientras se limpia.',protector:'Barbijo quirurgico.',contacto_cd:'Higiene de manos con agua y jabon. Guantes + camisolin.'};
+let iC={ninguno:'iso-ninguno',contacto:'iso-contacto',respiratorio:'iso-respiratorio',aereo:'iso-aire',protector:'iso-protector',contacto_cd:'iso-contacto'};
+
+async function cargarConfigInfectologia() {
+  const d = await sheetPost({action:'obtenerConfigInfectologia'});
+  if(!d.ok || !d.tipos || !d.tipos.length) return;
+  // Reset objects
+  iL={}; iE={}; iC={};
+  const colores={ninguno:'iso-ninguno',contacto:'iso-contacto',respiratorio:'iso-respiratorio',aereo:'iso-aire',protector:'iso-protector',contacto_cd:'iso-contacto'};
+  d.tipos.forEach(function(t){
+    iL[t.codigo]=t.nombre;
+    iE[t.codigo]=t.epp;
+    iC[t.codigo]=colores[t.codigo]||'iso-contacto';
+  });
+  // Update infectologia select options
+  var sel=document.getElementById('inf-ais');
+  if(sel){
+    sel.innerHTML='';
+    d.tipos.forEach(function(t){
+      var opt=document.createElement('option');
+      opt.value=t.codigo;
+      opt.textContent=t.nombre;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+
 function actualizarStatsHab(){
   const ok=rooms.filter(r=>r.status==='ok').length;
   const pend=rooms.filter(r=>r.status==='pending'||r.status==='alta').length;
