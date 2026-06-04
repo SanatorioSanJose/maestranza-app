@@ -891,7 +891,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbyY19I_iylVMleqlBiv16LDvsFSR5r0Xu_KPjUCJZhDyxqxbdhX9O6D3WB-sQQvk1SsPQ/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbxwIjfFb3iN5p4ZbJSSeFLlPbYeeFPcl5dQLbvFemUScF5sv0of9SHUpXCeibuPoXLD/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -974,6 +974,13 @@ function showSectorScreen(){
   // Always reload to get latest from Sheets
   cargarSectores();
   cargarConfigInfectologia();
+  // Reapply perms after short delay to ensure DOM is ready
+  setTimeout(function(){
+    Object.keys(perms).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.style.display=perms[id].indexOf(currentUser.perfil)>=0?'':'none';
+    });
+  }, 100);
   cargarPrecios();
   iniciarMonitoreoSolicitudes();
 }
