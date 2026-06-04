@@ -520,45 +520,26 @@ textarea:focus{border-color:var(--blue);}
         </div>
       </div>
 
-       <!-- TAB: REMITO SALIDA (07:30) -->
+       <!-- TAB: REMITO SALIDA / RECEPCION -->
       <div id="rop-tab-movimiento" style="display:none">
-        <div class="card">
-          <div class="card-header">
-            <span>📤 Remito de Salida — 07:30 hs</span>
-            <div style="display:flex;gap:8px">
-              <button class="btn-sm secondary" onclick="limpiarRemito('salida')">Limpiar</button>
-              <button class="btn-sm" onclick="generarRemitoSalida()">Confirmar y Generar Remito</button>
-            </div>
-          </div>
+        <div class="card"><div class="card-header"><span>📤 Remito de Salida — 07:30 hs</span>
+          <div style="display:flex;gap:8px"><button class="btn-sm secondary" onclick="limpiarRemito('salida')">Limpiar</button>
+          <button class="btn-sm" onclick="generarRemitoSalida()">Confirmar y Generar Remito</button></div></div>
           <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Ingresa la cantidad de cada prenda que se entrega a SANIRAP. Deja en 0 las que no salen hoy.</div>
-          <div id="rop-remito-salida-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:16px">
-            <div style="color:var(--text2);text-align:center;padding:20px">Cargando prendas...</div>
-          </div>
+          <div id="rop-remito-salida-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:16px"><div style="color:var(--text2);text-align:center;padding:20px">Cargando prendas...</div></div>
           <div id="rop-remito-salida-total" style="display:none;background:var(--bg3);border-radius:8px;padding:14px">
             <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>Subtotal sin IVA:</span><span id="rst-sin-iva">$0</span></div>
             <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>IVA (21%):</span><span id="rst-iva">$0</span></div>
             <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--teal)"><span>TOTAL CON IVA:</span><span id="rst-total">$0</span></div>
-          </div>
-        </div>
-      </div>
-      <!-- TAB: RECEPCION (11:30) -->
+          </div></div></div>
       <div id="rop-tab-recepcion" style="display:none">
-        <div class="card">
-          <div class="card-header">
-            <span>📥 Recepcion de Ropa Limpia — 11:30 hs</span>
-            <div style="display:flex;gap:8px">
-              <button class="btn-sm secondary" onclick="limpiarRemito('recepcion')">Limpiar</button>
-              <button class="btn-sm success" onclick="confirmarRecepcion()">Confirmar Recepcion</button>
-            </div>
-          </div>
+        <div class="card"><div class="card-header"><span>📥 Recepcion de Ropa Limpia — 11:30 hs</span>
+          <div style="display:flex;gap:8px"><button class="btn-sm secondary" onclick="limpiarRemito('recepcion')">Limpiar</button>
+          <button class="btn-sm success" onclick="confirmarRecepcion()">Confirmar Recepcion</button></div></div>
           <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Ingresa la cantidad recibida. Se compara con lo que salio ayer.</div>
-          <div id="rop-remito-recep-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:16px">
-            <div style="color:var(--text2);text-align:center;padding:20px">Cargando prendas...</div>
-          </div>
+          <div id="rop-remito-recep-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:16px"><div style="color:var(--text2);text-align:center;padding:20px">Cargando prendas...</div></div>
           <div id="rop-recep-diferencias" style="display:none;margin-top:12px"></div>
-        </div>
-      </div>
-
+        </div></div>
     <!-- INSUMOS -->
     <div class="page" id="page-insumos">
       <div class="page-header"><div><div class="page-title">Insumos y Amenities</div><div class="page-sub">Control semanal de stock</div></div><button class="btn-sm" onclick="openModal('modal-insumo')">+ Reportar Faltante</button></div>
@@ -891,7 +872,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbzTcNKGbbmgVOLlb-96zoVO2uLd0_ris9_LDyFT43MVYdR2bDsKzYVbebsbkovhcIqwOw/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbxZy4IBoX2OBVSpAV6AyEdHhEcLUaZfLsv9z4dsDL8UUbr7qQuqdPtS1IhBE2IVjQGQOQ/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -974,13 +955,6 @@ function showSectorScreen(){
   // Always reload to get latest from Sheets
   cargarSectores();
   cargarConfigInfectologia();
-  // Reapply perms after short delay to ensure DOM is ready
-  setTimeout(function(){
-    Object.keys(perms).forEach(function(id){
-      var el=document.getElementById(id);
-      if(el) el.style.display=perms[id].indexOf(currentUser.perfil)>=0?'':'none';
-    });
-  }, 100);
   cargarPrecios();
   iniciarMonitoreoSolicitudes();
 }
@@ -1483,7 +1457,7 @@ function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const
   }}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='habitaciones'){cargarInfectologia();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
+function navToPage(page){document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');x.style.display='';});var pg=document.getElementById('page-'+page);if(pg){pg.classList.add('active');pg.style.display='block';}const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='habitaciones'){cargarInfectologia();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
     const h=new Date().getHours();
     const esNoche=(h>=21||h<7);
     if(currentUser.perfil==='operario'&&!esNoche){
@@ -1944,6 +1918,7 @@ async function enviarReclamoMultiple() {
   else showToast('Error al enviar reclamo.',true);
 }
 
+
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
 document.addEventListener('DOMContentLoaded',function(){cargarSectores();});
 
@@ -2286,9 +2261,10 @@ setInterval(verificarCambioDeTurno, 60000); // verificar cada minuto
 let roperiaInventario = [];
 let roperiaEmailReclamo = 'nestor@sanirap.com';
 let ropMovActual = null; // guarda el último movimiento para reclamo
+
 function switchRoperiaTab(tab) {
   ['inventario','pedidos','perdidas','movimiento','recepcion'].forEach(function(t){
-    const el=document.getElementById('rop-tab-'+t);
+    var el=document.getElementById('rop-tab-'+t);
     if(el) el.style.display=t===tab?'block':'none';
   });
   if(tab==='inventario') cargarInventarioRoperia();
