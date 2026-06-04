@@ -471,8 +471,7 @@ textarea:focus{border-color:var(--blue);}
           <button class="btn-sm secondary" onclick="switchRoperiaTab('pedidos')">📋 Pedidos</button>
           <button class="btn-sm secondary" onclick="switchRoperiaTab('perdidas')">⚠️ Pérdidas</button>
           <button class="btn-sm secondary" onclick="generarParteManual()">📧 Generar Parte</button>
-              <button class="btn-sm danger" onclick="switchRoperiaTab('movimiento')">📤 Salida 07:30</button>
-              <button class="btn-sm success" onclick="switchRoperiaTab('recepcion')">📥 Recepcion 11:30</button>
+          <button class="btn-sm" onclick="switchRoperiaTab('movimiento')">+ Registrar Movimiento</button>
         </div>
       </div>
 
@@ -520,26 +519,48 @@ textarea:focus{border-color:var(--blue);}
         </div>
       </div>
 
-       <!-- TAB: REMITO SALIDA / RECEPCION -->
+      <!-- TAB: MOVIMIENTO -->
       <div id="rop-tab-movimiento" style="display:none">
-        <div class="card"><div class="card-header"><span>📤 Remito de Salida — 07:30 hs</span>
-          <div style="display:flex;gap:8px"><button class="btn-sm secondary" onclick="limpiarRemito('salida')">Limpiar</button>
-          <button class="btn-sm" onclick="generarRemitoSalida()">Confirmar y Generar Remito</button></div></div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Ingresa la cantidad de cada prenda que se entrega a SANIRAP. Deja en 0 las que no salen hoy.</div>
-          <div id="rop-remito-salida-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:16px"><div style="color:var(--text2);text-align:center;padding:20px">Cargando prendas...</div></div>
-          <div id="rop-remito-salida-total" style="display:none;background:var(--bg3);border-radius:8px;padding:14px">
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>Subtotal sin IVA:</span><span id="rst-sin-iva">$0</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>IVA (21%):</span><span id="rst-iva">$0</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--teal)"><span>TOTAL CON IVA:</span><span id="rst-total">$0</span></div>
-          </div></div></div>
-      <div id="rop-tab-recepcion" style="display:none">
-        <div class="card"><div class="card-header"><span>📥 Recepcion de Ropa Limpia — 11:30 hs</span>
-          <div style="display:flex;gap:8px"><button class="btn-sm secondary" onclick="limpiarRemito('recepcion')">Limpiar</button>
-          <button class="btn-sm success" onclick="confirmarRecepcion()">Confirmar Recepcion</button></div></div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Ingresa la cantidad recibida. Se compara con lo que salio ayer.</div>
-          <div id="rop-remito-recep-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:16px"><div style="color:var(--text2);text-align:center;padding:20px">Cargando prendas...</div></div>
-          <div id="rop-recep-diferencias" style="display:none;margin-top:12px"></div>
-        </div></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span>📤 Entrega a SANIRAP (07:30 hs)</span></div>
+            <div class="card-body">
+              <div class="form-field"><label>Prenda</label><select id="rop-mov-prenda-entrega"><option value="">— Seleccioná —</option></select></div>
+              <div class="form-field"><label>Cantidad entregada</label><input type="text" id="rop-mov-cant-entrega" placeholder="Cantidad" /></div>
+              <button class="btn-sm danger" onclick="registrarMovimiento('Entrega')">Registrar Entrega a SANIRAP</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span>📥 Recepción de SANIRAP (11:30 hs)</span></div>
+            <div class="card-body">
+              <div class="form-field"><label>Prenda</label><select id="rop-mov-prenda-recep"><option value="">— Seleccioná —</option></select></div>
+              <div class="form-field"><label>Cantidad recibida</label><input type="text" id="rop-mov-cant-recep" placeholder="Cantidad" /></div>
+              <div class="form-field"><label>Cantidad según remito SANIRAP</label><input type="text" id="rop-mov-cant-remito" placeholder="Cantidad en remito" /></div>
+              <div class="form-field"><label>Novedad (opcional)</label>
+                <select id="rop-mov-novedad">
+                  <option value="">Sin novedad</option>
+                  <option>Manchada</option><option>Rota</option><option>Desteñida</option>
+                  <option>Con agujeros</option><option>Deteriorada</option><option>Otra</option>
+                </select>
+              </div>
+              <button class="btn-sm success" onclick="registrarMovimiento('Recepcion')">Registrar Recepción</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="rop-reclamo-card" style="display:none;border-color:var(--red)">
+          <div class="card-header" style="color:var(--red)"><span>⚠️ Faltante detectado — Reclamo a SANIRAP</span></div>
+          <div class="card-body">
+            <div id="rop-reclamo-detalle" style="font-size:13px;margin-bottom:16px"></div>
+            <div class="form-field"><label>Observación adicional (opcional)</label><textarea id="rop-reclamo-obs" placeholder="Podés agregar un comentario al reclamo..."></textarea></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm danger" onclick="enviarReclamo()">📧 Enviar reclamo por email a SANIRAP</button>
+              <button class="btn-sm secondary" onclick="document.getElementById('rop-reclamo-card').style.display='none'">Descartar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- INSUMOS -->
     <div class="page" id="page-insumos">
       <div class="page-header"><div><div class="page-title">Insumos y Amenities</div><div class="page-sub">Control semanal de stock</div></div><button class="btn-sm" onclick="openModal('modal-insumo')">+ Reportar Faltante</button></div>
@@ -904,18 +925,6 @@ async function doRegistro(){
 
 function doLogout(){currentUser=null;document.getElementById('app').style.display='none';showScreen('screen-login');document.getElementById('login-nombre').value='';document.getElementById('login-pin').value='';}
 
-async function cargarPrecios() {
-  const d = await sheetPost({action:'obtenerPrecios'});
-  if(d.ok && d.precios) ropPrecios = d.precios;
-}
-
-function getPrecio(descripcion) {
-  if(!ropPrecios.length) return {sinIva:0, conIva:0};
-  const key = String(descripcion).toUpperCase().trim();
-  const p = ropPrecios.find(function(x){ return x.prenda === key; });
-  return p || {sinIva:0, conIva:0};
-}
-
 async function cargarSectores() {
   const sel = document.getElementById('sector-nombre');
   if(sel) sel.innerHTML = '<option value="">Cargando...</option>';
@@ -955,7 +964,6 @@ function showSectorScreen(){
   // Always reload to get latest from Sheets
   cargarSectores();
   cargarConfigInfectologia();
-  cargarPrecios();
   iniciarMonitoreoSolicitudes();
 }
 
@@ -1724,201 +1732,6 @@ async function enviarPedidoRopSector() {
   }
 }
 
-// ===== SISTEMA DE REMITOS SANIRAP =====
-var remitoSalidaData = {};
-var ropDiferencias = [];
-var preciosRemito = [];
-
-async function cargarListaRemito(tipo) {
-  var listId = tipo==='salida' ? 'rop-remito-salida-lista' : 'rop-remito-recep-lista';
-  var el = document.getElementById(listId);
-  if(!el) return;
-  if(!preciosRemito.length) {
-    var d = await sheetPost({action:'obtenerPrecios'});
-    if(d.ok && d.precios) preciosRemito = d.precios;
-    else { el.innerHTML='<div style="color:var(--red);padding:20px">Error cargando precios. Verificar hoja Roperia_Precios.</div>'; return; }
-  }
-  el.innerHTML = preciosRemito.map(function(p){
-    var id = tipo+'_'+p.prenda.replace(/[^a-zA-Z0-9]/g,'_');
-    return '<div style="background:var(--bg3);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">'+
-      '<div style="flex:1"><div style="font-size:12px;font-weight:600">'+p.prenda+'</div>'+
-      '<div style="font-size:10px;color:var(--text2)">$'+Number(p.conIva).toLocaleString('es-AR')+' c/IVA</div></div>'+
-      '<input type="number" id="'+id+'" min="0" value="0" '+
-      'style="width:64px;text-align:center;font-size:15px;font-weight:700;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text)" '+
-      'onchange="actualizarTotalRemito()">'+
-    '</div>';
-  }).join('');
-  actualizarTotalRemito();
-}
-
-function actualizarTotalRemito() {
-  var sinIva=0, conIva=0;
-  preciosRemito.forEach(function(p){
-    var id='salida_'+p.prenda.replace(/[^a-zA-Z0-9]/g,'_');
-    var el=document.getElementById(id);
-    var cant=parseInt(el ? el.value : 0)||0;
-    if(cant>0){ conIva+=cant*p.conIva; sinIva+=cant*p.sinIva; }
-  });
-  conIva=Math.round(conIva*100)/100; sinIva=Math.round(sinIva*100)/100;
-  var iva=Math.round((conIva-sinIva)*100)/100;
-  var tot=document.getElementById('rop-remito-salida-total');
-  if(tot) tot.style.display=conIva>0?'block':'none';
-  var s=document.getElementById('rst-sin-iva'); if(s) s.textContent='$'+sinIva.toLocaleString('es-AR');
-  var iv=document.getElementById('rst-iva'); if(iv) iv.textContent='$'+iva.toLocaleString('es-AR');
-  var t=document.getElementById('rst-total'); if(t) t.textContent='$'+conIva.toLocaleString('es-AR');
-}
-
-function limpiarRemito(tipo) {
-  preciosRemito.forEach(function(p){
-    var id=tipo+'_'+p.prenda.replace(/[^a-zA-Z0-9]/g,'_');
-    var el=document.getElementById(id); if(el) el.value=0;
-  });
-  if(tipo==='salida') actualizarTotalRemito();
-}
-
-async function generarRemitoSalida() {
-  var items=[], sinIva=0, conIva=0;
-  remitoSalidaData={};
-  preciosRemito.forEach(function(p){
-    var id='salida_'+p.prenda.replace(/[^a-zA-Z0-9]/g,'_');
-    var el=document.getElementById(id);
-    var cant=parseInt(el ? el.value : 0)||0;
-    if(cant>0){
-      var ct=Math.round(cant*p.conIva*100)/100;
-      var cs=Math.round(cant*p.sinIva*100)/100;
-      conIva+=ct; sinIva+=cs;
-      items.push({prenda:p.prenda,cant:cant,precioUnit:p.conIva,precioSinIva:p.sinIva,total:ct});
-      remitoSalidaData[p.prenda]=cant;
-    }
-  });
-  if(!items.length){ showToast('Ingresa al menos una prenda con cantidad mayor a 0.',true); return; }
-  conIva=Math.round(conIva*100)/100; sinIva=Math.round(sinIva*100)/100;
-  var fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
-  var hora=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-  var turno=document.getElementById('turno-badge') ? document.getElementById('turno-badge').textContent : 'Manana';
-  for(var i=0;i<items.length;i++){
-    var item=items[i];
-    await sheetPost({action:'guardarMovimiento',tipo:'Entrega',codigo:item.prenda.substring(0,8),
-      descripcion:item.prenda,cantEntregada:item.cant,cantRecibida:0,diferencia:0,
-      novedad:'',turno:turno,usuario:currentUser ? currentUser.nombre : '',
-      costoUnitario:item.precioUnit,costoTotal:item.total});
-  }
-  abrirDocumentoRemito(items,sinIva,conIva,fecha,hora,'SALIDA');
-  showToast('Remito generado y guardado correctamente');
-}
-
-function abrirDocumentoRemito(items,sinIva,conIva,fecha,hora,tipo) {
-  var iva=Math.round((conIva-sinIva)*100)/100;
-  var filas=items.map(function(item,i){
-    return '<tr style="background:'+(i%2===0 ? '#f9fafb' : '#fff')+'">'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb">'+item.prenda+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:center;font-weight:700">'+item.cant+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:right">$'+Number(item.precioSinIva).toLocaleString('es-AR')+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:right">$'+Number(item.precioUnit).toLocaleString('es-AR')+'</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:700">$'+Number(item.total).toLocaleString('es-AR')+'</td>'+
-    '</tr>';
-  }).join('');
-  var operario = currentUser ? currentUser.nombre : '';
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<title>Remito '+tipo+' SANIRAP - '+fecha+'</title>'+
-    '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:24px}'+
-    '.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:14px;border-bottom:3px solid #0d7a6b}'+
-    '.logo{font-size:22px;font-weight:800;color:#0d7a6b}.logo span{color:#111}'+
-    '.san{text-align:right}.san strong{font-size:15px;display:block}'+
-    'h2{background:#0d7a6b;color:#fff;padding:10px 16px;border-radius:6px;font-size:15px;margin-bottom:6px}'+
-    '.meta{font-size:12px;color:#555;margin-bottom:18px}'+
-    'table{width:100%;border-collapse:collapse;margin-bottom:16px}'+
-    'th{background:#0d7a6b;color:#fff;padding:9px 10px;font-size:12px;text-align:left}'+
-    'th.c{text-align:center}th.r{text-align:right}'+
-    '.tot{margin-left:auto;width:260px;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden}'+
-    '.tot td{padding:8px 14px;font-size:13px;border-bottom:1px solid #f3f4f6}'+
-    '.tot tr:last-child td{font-weight:700;font-size:15px;background:#f0fdf9;color:#0d7a6b}'+
-    '.fir{display:flex;justify-content:space-around;margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb}'+
-    '.f{text-align:center;width:200px}.fl{border-top:1px solid #111;margin-bottom:6px;height:40px}'+
-    '@media print{.np{display:none}}'+
-    '</style></head><body>'+
-    '<div class="hdr">'+
-      '<div><div class="logo">Gest<span>Maestro</span></div><div style="font-size:11px;color:#555;margin-top:3px">Sistema de Gestion Roperia</div></div>'+
-      '<div class="san"><strong>SANATORIO SAN JOSE</strong><span style="font-size:12px;color:#555">Servicio de Roperia CABA</span></div>'+
-    '</div>'+
-    '<h2>'+(tipo==='SALIDA' ? 'REMITO DE SALIDA' : 'REMITO DE RECEPCION')+' — SANIRAP</h2>'+
-    '<div class="meta">Fecha: <strong>'+fecha+'</strong> &nbsp;|&nbsp; Hora: <strong>'+hora+'</strong> &nbsp;|&nbsp; Operario: <strong>'+operario+'</strong></div>'+
-    '<table><thead><tr><th>Prenda</th><th class="c">Cantidad</th><th class="r">Precio s/IVA</th><th class="r">Precio c/IVA</th><th class="r">Total c/IVA</th></tr></thead>'+
-    '<tbody>'+filas+'</tbody></table>'+
-    '<table class="tot"><tbody>'+
-      '<tr><td>Subtotal sin IVA</td><td style="text-align:right">$'+Number(sinIva).toLocaleString('es-AR')+'</td></tr>'+
-      '<tr><td>IVA (21%)</td><td style="text-align:right">$'+Number(iva).toLocaleString('es-AR')+'</td></tr>'+
-      '<tr><td>TOTAL CON IVA</td><td style="text-align:right">$'+Number(conIva).toLocaleString('es-AR')+'</td></tr>'+
-    '</tbody></table>'+
-    '<div class="fir">'+
-      '<div class="f"><div class="fl"></div><div>Firma Operario Roperia</div><div style="font-size:11px;color:#555;margin-top:4px">'+operario+'</div></div>'+
-      '<div class="f"><div class="fl"></div><div>Firma Representante SANIRAP</div></div>'+
-    '</div>'+
-    '<div class="np" style="text-align:center;margin-top:24px">'+
-      '<button onclick="window.print()" style="background:#0d7a6b;color:#fff;border:none;padding:11px 30px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:600">Imprimir / Guardar PDF</button>'+
-    '</div>'+
-    '</body></html>';
-  var w=window.open('','_blank');
-  if(w){ w.document.write(html); w.document.close(); }
-  else showToast('Permite ventanas emergentes para ver el remito.',true);
-}
-
-async function confirmarRecepcion() {
-  var items=[], difs=[];
-  preciosRemito.forEach(function(p){
-    var id='recepcion_'+p.prenda.replace(/[^a-zA-Z0-9]/g,'_');
-    var el=document.getElementById(id);
-    var cantR=parseInt(el ? el.value : 0)||0;
-    var cantS=remitoSalidaData[p.prenda]||0;
-    if(cantR>0||cantS>0){
-      items.push({prenda:p.prenda,cantR:cantR,cantS:cantS});
-      if(cantS>0&&cantR<cantS) difs.push({prenda:p.prenda,cantS:cantS,cantR:cantR,faltante:cantS-cantR});
-    }
-  });
-  if(!items.length){ showToast('Ingresa al menos una cantidad recibida.',true); return; }
-  var turno=document.getElementById('turno-badge') ? document.getElementById('turno-badge').textContent : 'Manana';
-  for(var i=0;i<items.length;i++){
-    var item=items[i];
-    if(item.cantR>0){
-      await sheetPost({action:'guardarMovimiento',tipo:'Recepcion',codigo:item.prenda.substring(0,8),
-        descripcion:item.prenda,cantEntregada:0,cantRecibida:item.cantR,
-        diferencia:item.cantR-item.cantS,novedad:'',turno:turno,
-        usuario:currentUser ? currentUser.nombre : '',costoUnitario:0,costoTotal:0});
-    }
-  }
-  ropDiferencias=difs;
-  var difDiv=document.getElementById('rop-recep-diferencias');
-  if(difDiv){
-    difDiv.style.display='block';
-    if(difs.length>0){
-      var html='<div style="background:#fee2e2;border:1px solid #ef4444;border-radius:8px;padding:14px">'+
-        '<div style="font-weight:700;color:#ef4444;margin-bottom:10px">Diferencias detectadas — '+difs.length+' prenda(s) con faltante</div>'+
-        difs.map(function(d){
-          return '<div style="font-size:12px;padding:5px 0;border-bottom:1px solid rgba(239,68,68,0.2)">'+
-            '<strong>'+d.prenda+'</strong> — Salio: '+d.cantS+' | Recibido: '+d.cantR+' | Faltante: <strong>'+d.faltante+'</strong></div>';
-        }).join('')+
-        '<button class="btn-sm danger" style="margin-top:12px" onclick="enviarReclamoMultiple()">Enviar reclamo a SANIRAP</button>'+
-      '</div>';
-      difDiv.innerHTML=html;
-    } else {
-      difDiv.innerHTML='<div style="background:#dcfce7;border:1px solid #22c55e;border-radius:8px;padding:12px;color:#15803d;font-weight:600">Recepcion completa — no hay diferencias</div>';
-    }
-  }
-  showToast('Recepcion registrada correctamente');
-}
-
-async function enviarReclamoMultiple() {
-  if(!ropDiferencias.length) return;
-  var fecha=new Date().toLocaleDateString('es-AR');
-  var detalle='';
-  ropDiferencias.forEach(function(d){ detalle+=d.prenda+': salio '+d.cantS+', recibido '+d.cantR+', faltante '+d.faltante+'\n'; });
-  var totalFaltante=ropDiferencias.reduce(function(a,d){return a+d.faltante;},0);
-  var d=await sheetPost({action:'enviarReclamoSanirap',fecha:fecha,detalle:detalle,totalFaltante:totalFaltante,turno:'Manana',usuario:currentUser ? currentUser.nombre : ''});
-  if(d.ok) showToast('Reclamo enviado a SANIRAP correctamente');
-  else showToast('Error al enviar reclamo.',true);
-}
-
-
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
 document.addEventListener('DOMContentLoaded',function(){cargarSectores();});
 
@@ -2179,25 +1992,8 @@ async function generarParteDiario(automatico) {
   const reclamos = movimientos.filter(m=>m.tipo==='Reclamo enviado');
   
   if(entregas.length) {
-    let totalSinIva = 0, totalConIva = 0;
     cuerpo += '\nEntregas a SANIRAP (07:30 hs):\n';
-    cuerpo += '  Prenda | Cant | P.Unit s/IVA | P.Unit c/IVA | Total c/IVA\n';
-    cuerpo += '  ' + '-'.repeat(65) + '\n';
-    entregas.forEach(function(m){
-      const cu = Number(m.costoUnitario)||0;
-      const ct = Number(m.costoTotal)||0;
-      const cuSinIva = Math.round(cu/1.21*100)/100;
-      totalSinIva += Math.round(ct/1.21*100)/100;
-      totalConIva += ct;
-      cuerpo += '  ' + m.descripcion + ' | ' + m.cantEntregada + ' u. | $' + cuSinIva.toLocaleString('es-AR') + ' | $' + cu.toLocaleString('es-AR') + ' | $' + ct.toLocaleString('es-AR') + '\n';
-    });
-    totalConIva = Math.round(totalConIva*100)/100;
-    totalSinIva = Math.round(totalSinIva*100)/100;
-    const iva = Math.round((totalConIva-totalSinIva)*100)/100;
-    cuerpo += '  ' + '-'.repeat(65) + '\n';
-    cuerpo += '  SUBTOTAL SIN IVA: $' + totalSinIva.toLocaleString('es-AR') + '\n';
-    cuerpo += '  IVA (21%):        $' + iva.toLocaleString('es-AR') + '\n';
-    cuerpo += '  TOTAL CON IVA:    $' + totalConIva.toLocaleString('es-AR') + '\n';
+    entregas.forEach(m=>{ cuerpo += '  • ' + (m.descripcion) + ': ' + (m.cantEntregada) + ' u.\n'; });
   }
   if(recepciones.length) {
     cuerpo += '\nRecepciones de SANIRAP (11:30 hs):\n';
@@ -2229,7 +2025,6 @@ async function generarParteDiario(automatico) {
   const d = await sheetPost({
     action: 'enviarParteDiario',
     turno, fecha, cuerpo,
-    movimientos: entregas,
     emailDestino: 'maestranza@sanatoriosanjose.org.ar',
     usuario: currentUser?.nombre||'—'
   });
@@ -2263,15 +2058,14 @@ let roperiaEmailReclamo = 'nestor@sanirap.com';
 let ropMovActual = null; // guarda el último movimiento para reclamo
 
 function switchRoperiaTab(tab) {
-  ['inventario','pedidos','perdidas','movimiento','recepcion'].forEach(function(t){
-    var el=document.getElementById('rop-tab-'+t);
-    if(el) el.style.display=t===tab?'block':'none';
+  ['inventario','pedidos','perdidas','movimiento'].forEach(t => {
+    const el = document.getElementById('rop-tab-'+t);
+    if(el) el.style.display = t===tab ? 'block' : 'none';
   });
   if(tab==='inventario') cargarInventarioRoperia();
   if(tab==='pedidos') cargarPedidosRoperia();
   if(tab==='perdidas') { cargarPerdidasRoperia(); poblarSelectsPrendas(); }
-  if(tab==='movimiento') cargarListaRemito('salida');
-  if(tab==='recepcion') cargarListaRemito('recepcion');
+  if(tab==='movimiento') poblarSelectsPrendas();
 }
 
 async function cargarInventarioRoperia() {
@@ -2329,17 +2123,10 @@ async function registrarMovimiento(tipo) {
     diferencia = cant - cantRemito; // negativo = faltante
   }
   
-  // Calcular costo
-  const descPrenda = prenda?.descripcion || codigo;
-  const precio = getPrecio(descPrenda);
-  const costoUnitario = precio.conIva || 0;
-  const costoTotal = esEntrega ? costoUnitario * cant : 0;
-
   await sheetPost({
-    action:'guardarMovimiento', tipo, codigo, descripcion: descPrenda,
+    action:'guardarMovimiento', tipo, codigo, descripcion: prenda?.descripcion||codigo,
     cantEntregada: esEntrega ? cant : 0, cantRecibida: esEntrega ? 0 : cant,
-    diferencia, novedad, turno, usuario: currentUser?.nombre||'—',
-    costoUnitario, costoTotal
+    diferencia, novedad, turno, usuario: currentUser?.nombre||'—'
   });
 
   // Actualizar stats
