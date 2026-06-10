@@ -212,6 +212,7 @@ textarea:focus{border-color:var(--blue);}
       <div style="display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:20px">
         <button type="button" id="tab-maestranza" onclick="switchSectorTab('maestranza')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff;border:none;font-family:var(--font)">🔧 Maestranza</button>
         <button type="button" id="tab-roperia" onclick="switchSectorTab('roperia')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;border:none;font-family:var(--font)">👕 Ropería</button>
+        <button type="button" id="tab-mispedidos" onclick="switchSectorTab('mispedidos')" style="flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;border:none;font-family:var(--font)">📋 Mis pedidos</button>
       </div>
       <div id="sector-form-maestranza">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)">
@@ -269,6 +270,10 @@ textarea:focus{border-color:var(--blue);}
         <button type="button" class="btn-primary" onclick="enviarPedidoRopSector()" id="btn-enviar-rop-sector">Enviar pedido a Roperia</button>
       </div>
     </div>
+      <div id="sector-form-mispedidos" style="display:none">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px">Pedidos de tu servicio</div>
+        <div id="mis-pedidos-lista"><div style="color:var(--text2);text-align:center;padding:20px">Cargando...</div></div>
+      </div>
     <div id="sector-success" style="display:none">
       <div class="success-card">
         <div class="success-icon">✅</div>
@@ -893,7 +898,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbxZy4IBoX2OBVSpAV6AyEdHhEcLUaZfLsv9z4dsDL8UUbr7qQuqdPtS1IhBE2IVjQGQOQ/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbwamylxuceFYbbNQjT4QiqU9EqBVgRCQCFw1VMSYY0sGdr0Dga67iKliaJs2-dwXV9FOA/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -924,6 +929,41 @@ async function doRegistro(){
 }
 
 function doLogout(){currentUser=null;document.getElementById('app').style.display='none';showScreen('screen-login');document.getElementById('login-nombre').value='';document.getElementById('login-pin').value='';}
+
+
+async function cargarMisPedidos() {
+  const sector = document.getElementById('sf-nombre')?.textContent || '';
+  const lista = document.getElementById('mis-pedidos-lista');
+  if(!lista) return;
+  lista.innerHTML = '<div style="color:var(--text2);text-align:center;padding:20px">Cargando pedidos...</div>';
+  try {
+    const r = await fetch(SHEET_URL, {method:'POST', body: JSON.stringify({action:'obtenerSolicitudesSector', sector: sector})});
+    const d = await r.json();
+    if(!d.ok || !d.solicitudes || !d.solicitudes.length) {
+      lista.innerHTML = '<div style="color:var(--text2);text-align:center;padding:20px">No hay pedidos registrados para este servicio.</div>';
+      return;
+    }
+    const estadoColor = {Pendiente:'var(--amber)', 'en-curso':'var(--blue)', resuelta:'var(--green)'};
+    const estadoLabel = {Pendiente:'Pendiente', 'en-curso':'En curso', resuelta:'Resuelto'};
+    lista.innerHTML = d.solicitudes.map(function(s) {
+      const fecha = s.fecha ? new Date(s.fecha).toLocaleDateString('es-AR', {day:'2-digit',month:'2-digit',year:'numeric'}) : '--';
+      const hora = s.fecha ? new Date(s.fecha).toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}) : '--';
+      const urgColor = s.urgency==='critico'?'var(--red)':s.urgency==='urgente'?'var(--amber)':'var(--green)';
+      return '<div style="background:var(--bg3);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid '+urgColor+'">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+          '<span style="font-size:12px;font-weight:700;color:var(--text)">' + s.tipo + '</span>' +
+          '<span style="font-size:11px;background:'+estadoColor[s.estado]+';color:#fff;padding:2px 8px;border-radius:10px;font-weight:600">' + (estadoLabel[s.estado]||s.estado) + '</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text2);margin-bottom:4px">' + fecha + ' ' + hora + ' — ' + (s.lugar||'') + '</div>' +
+        '<div style="font-size:11px;color:var(--text2)">' + (s.desc||'') + '</div>' +
+        (s.asignadoA ? '<div style="font-size:11px;color:var(--blue);margin-top:4px">Tomado por: <strong>' + s.asignadoA + '</strong></div>' : '') +
+        (s.resueltaA ? '<div style="font-size:11px;color:var(--text2)">Resuelto: ' + s.resueltaA + '</div>' : '') +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    lista.innerHTML = '<div style="color:var(--red);text-align:center;padding:20px">Error al cargar pedidos.</div>';
+  }
+}
 
 async function cargarSectores() {
   const sel = document.getElementById('sector-nombre');
@@ -1624,8 +1664,25 @@ async function switchSectorTab(tab) {
   if(tab === 'maestranza') {
     tabM.style.background = 'var(--blue)'; tabM.style.color = '#fff';
     tabR.style.background = 'transparent'; tabR.style.color = 'var(--text2)';
+    const tabP2 = document.getElementById('tab-mispedidos');
+    if(tabP2) { tabP2.style.background = 'transparent'; tabP2.style.color = 'var(--text2)'; }
+    const fp = document.getElementById('sector-form-mispedidos');
+    if(fp) fp.style.display = 'none';
     if(formM) formM.style.display = 'block';
     if(formR) formR.style.display = 'none';
+  } else if(tab === 'mispedidos') {
+    tabM.style.background = 'transparent'; tabM.style.color = 'var(--text2)';
+    tabR.style.background = 'transparent'; tabR.style.color = 'var(--text2)';
+    const tabP = document.getElementById('tab-mispedidos');
+    if(tabP) { tabP.style.background = 'var(--purple)'; tabP.style.color = '#fff'; }
+    const formM = document.getElementById('sector-form-maestranza');
+    const formR = document.getElementById('form-roperia-sector');
+    const formP = document.getElementById('sector-form-mispedidos');
+    if(formM) formM.style.display = 'none';
+    if(formR) formR.style.display = 'none';
+    if(formP) formP.style.display = 'block';
+    cargarMisPedidos();
+    return;
   } else {
     // Verificar horario y config de roperia
     const ahora = new Date();
@@ -1656,7 +1713,20 @@ async function switchSectorTab(tab) {
       msgHorario.style.display = 'block';
       msgHorario.textContent = 'El personal de ropería de SaDoFe no está disponible hoy. El pedido será atendido por maestranza.';
       roperiaSectorActivo = false;
-    } else {
+    } else if(tab === 'mispedidos') {
+    tabM.style.background = 'transparent'; tabM.style.color = 'var(--text2)';
+    tabR.style.background = 'transparent'; tabR.style.color = 'var(--text2)';
+    const tabP = document.getElementById('tab-mispedidos');
+    if(tabP) { tabP.style.background = 'var(--purple)'; tabP.style.color = '#fff'; }
+    const formM = document.getElementById('sector-form-maestranza');
+    const formR = document.getElementById('form-roperia-sector');
+    const formP = document.getElementById('sector-form-mispedidos');
+    if(formM) formM.style.display = 'none';
+    if(formR) formR.style.display = 'none';
+    if(formP) formP.style.display = 'block';
+    cargarMisPedidos();
+    return;
+  } else {
       msgHorario.style.display = 'none';
       roperiaSectorActivo = true;
       // Cargar prendas en select
@@ -1780,8 +1850,8 @@ function filtrarIndicaciones() {
 function renderInfectTabla() {
   var buscar = (document.getElementById('infect-buscar') ? document.getElementById('infect-buscar').value : '').toLowerCase();
   var canEdit = currentUser && ['jefe','infectologia'].indexOf(currentUser.perfil) >= 0;
-  var habList = infectIndicaciones.filter(function(i){ return i.ambito==='habitacion' && (!buscar || i.identificador.toLowerCase().indexOf(buscar)>=0); });
-  var secList = infectIndicaciones.filter(function(i){ return i.ambito==='sector'; });
+  var habList = infectIndicaciones.filter(function(i){ return i.ambito==='habitacion' && (!buscar || i.identificador.toLowerCase().indexOf(buscar)>=0); }).sort(function(a,b){ return Number(a.identificador)-Number(b.identificador); });
+  var secList = infectIndicaciones.filter(function(i){ return i.ambito==='sector'; }).sort(function(a,b){ return a.identificador.localeCompare(b.identificador); });
   var habTbody = document.getElementById('infect-hab-tbody');
   var secTbody = document.getElementById('infect-sec-tbody');
   function makeRow(i) {
