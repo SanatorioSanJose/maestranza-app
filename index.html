@@ -393,6 +393,7 @@ textarea:focus{border-color:var(--blue);}
           <button class="btn-sm secondary" onclick="filtrarSol('')">Todas</button>
           <button class="btn-sm secondary" onclick="filtrarSol('activas')">Activas</button>
           <button class="btn-sm danger" onclick="filtrarSol('critico')">🔴 Críticas</button>
+          <button class="btn-sm secondary" onclick="cargarSolicitudesDesdeSheets();showToast('Solicitudes actualizadas');" style="border-color:var(--teal);color:var(--teal)">↺ Actualizar</button>
         </div>
       </div>
       <div id="sol-alert-critico" style="display:none" class="alert-box alert-red">🚨 Hay solicitudes críticas que requieren atención inmediata.</div>
@@ -476,6 +477,7 @@ textarea:focus{border-color:var(--blue);}
           <button class="btn-sm secondary" onclick="switchRoperiaTab('pedidos')">📋 Pedidos</button>
           <button class="btn-sm secondary" onclick="switchRoperiaTab('perdidas')">⚠️ Pérdidas</button>
           <button class="btn-sm secondary" onclick="generarParteManual()">📧 Generar Parte</button>
+          <button class="btn-sm secondary" onclick="cargarDashRoperia();showToast('Ropería actualizada');" style="border-color:var(--teal);color:var(--teal)">↺ Actualizar</button>
           <button class="btn-sm" onclick="switchRoperiaTab('movimiento')">+ Registrar Movimiento</button>
         </div>
       </div>
