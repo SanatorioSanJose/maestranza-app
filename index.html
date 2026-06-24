@@ -900,7 +900,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbwamylxuceFYbbNQjT4QiqU9EqBVgRCQCFw1VMSYY0sGdr0Dga67iKliaJs2-dwXV9FOA/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbws-oFHR4rtAU0PazoJ66qFVWLjNh-WMcD7cxn6XUOpF4cu0TZVd42DMT9puFvrCYBmfA/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -960,6 +960,7 @@ async function cargarMisPedidos() {
         '<div style="font-size:11px;color:var(--text2)">' + (s.desc||'') + '</div>' +
         (s.asignadoA ? '<div style="font-size:11px;color:var(--blue);margin-top:4px">Tomado por: <strong>' + s.asignadoA + '</strong></div>' : '') +
         (s.resueltaA ? '<div style="font-size:11px;color:var(--text2)">Resuelto: ' + s.resueltaA + '</div>' : '') +
+        (s.novedad ? '<div style="font-size:11px;background:var(--bg2);border-radius:5px;padding:4px 8px;margin-top:4px;color:var(--text2)">📝 ' + s.novedad + '</div>' : '') +
       '</div>';
     }).join('');
   } catch(e) {
@@ -1042,7 +1043,7 @@ async function cargarSolicitudesDesdeSheets() {
       id: s.id, sector: s.sector, persona: s.persona,
       lugar: s.lugar, tipo: s.tipo, desc: s.desc,
       urgency: s.urgency, estado: s.estado,
-      asignadoA: s.asignadoA || '', resueltaA: s.resueltaA || '',
+      asignadoA: s.asignadoA || '', resueltaA: s.resueltaA || '', novedad: s.novedad || '',
       hora: s.fecha ? new Date(s.fecha).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '--',
       fecha: s.fecha ? new Date(s.fecha).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}) : '--'
     }));
@@ -1233,7 +1234,16 @@ function renderSolicitudes(filtro){
     html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px"><strong>'+s.lugar+'</strong><br>'+s.tipo+'<br>'+s.desc+'</div>';
     html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
     if(s.estado==='resuelta'){html+='<span class="badge badge-green">Resuelta '+s.resueltaA+'</span>';}
-    else if(s.estado==='en-curso'){html+='<span class="badge badge-blue">En curso - '+s.asignadoA+'</span>';if(canManage)html+='<button class="btn-sm success" onclick="resolverSol('+s.id+')">Marcar resuelta</button>';}
+    else if(s.estado==='en-curso'){
+      html+='<span class="badge badge-blue">En curso - '+s.asignadoA+'</span>';
+      if(s.novedad) html+='<div style="font-size:11px;background:var(--bg3);border-radius:6px;padding:5px 8px;margin-top:4px;color:var(--text2)">📝 '+s.novedad+'</div>';
+      if(canManage){
+        html+='<div style="display:flex;gap:6px;margin-top:4px">';
+        html+='<button class="btn-sm success" onclick="resolverSol('+s.id+')">Marcar resuelta</button>';
+        html+='<button class="btn-sm secondary" onclick="agregarNovedadSol('+s.id+')" style="font-size:11px">📝 Novedad</button>';
+        html+='</div>';
+      }
+    }
     else{if(canManage)html+='<button class="btn-sm" onclick="tomarSol('+s.id+')">Tomar / Asignar</button>';else html+='<span class="badge badge-amber">Pendiente</span>';}
     html+='</div></div>';
   });
@@ -1241,8 +1251,8 @@ function renderSolicitudes(filtro){
 }
 
 function filtrarSol(f){renderSolicitudes(f||undefined);}
-function tomarSol(id){const s=solicitudes.find(x=>x.id===id);if(!s)return;s.estado='en-curso';s.asignadoA=currentUser.nombre;renderSolicitudes();actualizarBadges();sheetPost({action:'actualizarSolicitud',id:s.id,estado:'en-curso',asignadoA:currentUser.nombre});showToast(`Solicitud de ${s.sector} tomada`);}
-function resolverSol(id){const s=solicitudes.find(x=>x.id===id);if(!s)return;const now=new Date();s.estado='resuelta';s.resueltaA=now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});renderSolicitudes();actualizarBadges();sheetPost({action:'actualizarSolicitud',id:s.id,estado:'resuelta',asignadoA:s.asignadoA,resueltaA:s.resueltaA});showToast(`✅ Solicitud de ${s.sector} resuelta`);}
+function tomarSol(id){const s=solicitudes.find(x=>x.id===id);if(!s)return;s.estado='en-curso';s.asignadoA=currentUser.nombre;if(!s.novedad)s.novedad='';renderSolicitudes();actualizarBadges();sheetPost({action:'actualizarSolicitud',id:s.id,estado:'en-curso',asignadoA:currentUser.nombre,novedad:''});showToast('Solicitud de '+s.sector+' tomada');}
+function resolverSol(id){const s=solicitudes.find(x=>x.id===id);if(!s)return;const now=new Date();s.estado='resuelta';s.resueltaA=now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});renderSolicitudes();actualizarBadges();sheetPost({action:'actualizarSolicitud',id:s.id,estado:'resuelta',asignadoA:s.asignadoA,resueltaA:s.resueltaA,novedad:s.novedad||''});showToast('Solicitud de '+s.sector+' resuelta');}
 
 function renderMonitoreo(){
   const res=solicitudes.filter(s=>s.estado==='resuelta').length;
@@ -1802,6 +1812,17 @@ async function enviarPedidoRopSector() {
     const msgEl = document.getElementById('roperia-horario-msg');
     if(msgEl){msgEl.style.display='block';msgEl.textContent='Error de conexion. Intenta de nuevo.';}
   }
+}
+
+function agregarNovedadSol(id) {
+  const s = solicitudes.find(x=>x.id===id);
+  if(!s) return;
+  const novedad = prompt('Escribi una novedad para esta solicitud (ej: falta material, se reprograma...):', s.novedad||'');
+  if(novedad === null) return; // cancelled
+  s.novedad = novedad.trim();
+  renderSolicitudes();
+  sheetPost({action:'actualizarSolicitud', id:s.id, estado:s.estado, asignadoA:s.asignadoA, resueltaA:s.resueltaA||'', novedad:s.novedad});
+  showToast('Novedad guardada correctamente');
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
