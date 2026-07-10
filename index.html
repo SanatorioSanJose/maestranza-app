@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GestMaestro — Sanatorio San José</title>
+<title>Maestranza — Sanatorio San José</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700;800&display=swap');
-:root{--bg:#0d1117;--bg2:#161b23;--bg3:#1e2530;--border:#2a3340;--blue:#3b82f6;--blue-dim:#1e3a5f;--teal:#14b8a6;--teal-dim:#0d3d38;--red:#ef4444;--red-dim:#4c1515;--amber:#f59e0b;--amber-dim:#4a2f06;--green:#22c55e;--green-dim:#0f3320;--purple:#a855f7;--orange:#f97316;--orange-dim:#4a1f06;--text:#e2e8f0;--text2:#8b98aa;--text3:#4a5568;--font:'Sora',sans-serif;--mono:'DM Mono',monospace;--radius:10px;--shadow:0 4px 24px rgba(0,0,0,0.4);}
+:root{--bg:#f0f4f8;--bg2:#ffffff;--bg3:#e2e8f0;--border:#cbd5e0;--blue:#3b82f6;--blue-dim:#1e3a5f;--teal:#14b8a6;--teal-dim:#0d3d38;--red:#ef4444;--red-dim:#4c1515;--amber:#f59e0b;--amber-dim:#4a2f06;--green:#22c55e;--green-dim:#0f3320;--purple:#a855f7;--orange:#f97316;--orange-dim:#4a1f06;--text:#1a202c;--text2:#4a5568;--text3:#718096;--font:'Sora',sans-serif;--mono:'DM Mono',monospace;--radius:10px;--shadow:0 4px 24px rgba(0,0,0,0.12);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 .auth-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at 60% 30%,#1a2d4a 0%,#0d1117 60%);padding:24px;}
@@ -167,7 +167,7 @@ textarea:focus{border-color:var(--blue);}
 <!-- LOGIN MAESTRANZA -->
 <div class="auth-screen active" id="screen-login">
   <div class="auth-card">
-    <div class="logo">Gest<span>Maestro</span></div>
+    <div class="logo">Maestranza</div>
     <div class="auth-sub">Sanatorio San José · Maestranza y Ropería</div>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchTab('login')">Ingresar</div>
@@ -196,7 +196,7 @@ textarea:focus{border-color:var(--blue);}
 <!-- SECTOR: SOLICITUDES -->
 <div class="auth-screen" id="screen-sector">
   <div class="auth-card">
-    <div class="logo">Gest<span>Maestro</span></div>
+    <div class="logo">Maestranza</div>
     <div class="auth-sub">Solicitud de servicio a Maestranza</div>
     <div class="auth-msg" id="sector-msg"></div>
     <div id="sector-selector">
@@ -288,7 +288,7 @@ textarea:focus{border-color:var(--blue);}
 <!-- PENDIENTE -->
 <div class="auth-screen" id="screen-pendiente">
   <div class="auth-card">
-    <div class="logo">Gest<span>Maestro</span></div>
+    <div class="logo">Maestranza</div>
     <div style="text-align:center;padding:16px 0">
       <div style="font-size:48px;margin-bottom:14px">⏳</div>
       <div style="font-size:18px;font-weight:800;margin-bottom:8px">Registro enviado</div>
@@ -302,7 +302,7 @@ textarea:focus{border-color:var(--blue);}
 <div id="app">
   <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo">Gest<span>Maestro</span></div>
+      <div class="logo">Maestranza</div>
       <div class="auth-sub" style="margin-bottom:0;font-size:12px">Sanatorio San José</div>
     </div>
     <div class="sidebar-user">
@@ -1382,14 +1382,15 @@ const rooms=[
   {num:'310',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
   {num:'311',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
   {num:'312',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
-  {num:'341',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
-  {num:'342',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
-  {num:'343',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
-  {num:'344',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
-  {num:'345',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
-  {num:'346',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
-  {num:'347',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
-  {num:'348',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Unidad Coronaria',piso:'3°'},
+  {num:'341',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'342',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'343',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'344',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'345',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'346',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'347',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'348',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
+  {num:'349',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Obra Social',piso:'3°'},
   {num:'331',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
   {num:'332',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
   {num:'333',status:'ok',iso:'ninguno',pax:1,type:'obra-social',sector:'Cirugías Programadas',piso:'3°'},
@@ -1411,6 +1412,15 @@ const rooms=[
   {num:'438',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
   {num:'439',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
   {num:'440',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UTI',piso:'4°'},
+  // UCO - PISO 4
+  {num:'401',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
+  {num:'402',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
+  {num:'403',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
+  {num:'404',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
+  {num:'405',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
+  {num:'406',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
+  {num:'407',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
+  {num:'408',status:'ok',iso:'ninguno',pax:1,type:'uti',sector:'UCO',piso:'4°'},
 ];
 const sL={ok:'OK',pending:'Pendiente',busy:'En curso',alta:'Alta',reparacion:'En Reparación',fuera:'Fuera de Servicio',reservada:'Reservada'};
 const sC={ok:'s-ok',pending:'s-pending',busy:'s-busy',alta:'s-alta',reparacion:'s-reparacion',fuera:'s-fuera',reservada:'s-reservada'};
