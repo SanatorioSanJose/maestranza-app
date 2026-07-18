@@ -173,7 +173,7 @@ textarea:focus{border-color:var(--blue);}
 <!-- LOGIN MAESTRANZA -->
 <div class="auth-screen active" id="screen-login">
   <div class="auth-card">
-    <img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza San Jose" style="width:200px;margin-bottom:8px;border-radius:12px">
+    <div style="text-align:center;width:100%"><img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza San Jose" style="width:200px;border-radius:12px;display:block;margin:0 auto 8px auto"></div>
     <div class="auth-sub">Sistema de Maestranza y Ropería</div>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchTab('login')">Ingresar</div>
@@ -222,15 +222,35 @@ textarea:focus{border-color:var(--blue);}
 <!-- SECTOR: SOLICITUDES -->
 <div class="auth-screen" id="screen-sector">
   <div class="auth-card">
-    <img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza" style="width:160px;border-radius:10px;margin-bottom:8px">
+    <div style="text-align:center;width:100%"><img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza" style="width:160px;border-radius:10px;display:block;margin:0 auto 8px auto"></div>
     <div class="auth-sub">Solicitud de servicio a Maestranza</div>
     <div class="auth-msg" id="sector-msg"></div>
     <div id="sector-selector">
       <div class="field-group"><div class="field-label">Tu servicio</div>
         <select id="sector-nombre"><option value="">Cargando servicios...</option></select>
       </div>
-      <div class="field-group"><div class="field-label">PIN del servicio</div><input type="password" id="sector-pin" placeholder="••••" maxlength="4" /></div>
-      <button class="btn-primary" onclick="doSectorLogin()">Continuar</button>
+      <div class="field-group"><div class="field-label">PIN del servicio</div>
+        <div id="sector-pin-display" style="text-align:center;font-size:28px;letter-spacing:8px;padding:10px;background:var(--bg3);border-radius:8px;min-height:52px;border:1px solid var(--border)">••••</div>
+        <input type="hidden" id="sector-pin" value="">
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
+        <button class="nokia-btn" onclick="sectorNokiaTap('1')">1</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('2')">2</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('3')">3</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('4')">4</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('5')">5</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('6')">6</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('7')">7</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('8')">8</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('9')">9</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('*')">*</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('0')">0</button>
+        <button class="nokia-btn" onclick="sectorNokiaTap('#')">#</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="sectorNokiaBorrar()" style="background:linear-gradient(180deg,#ff6b6b,#c0392b);color:#fff;border:none;border-radius:10px;padding:14px;font-size:22px;cursor:pointer;box-shadow:0 4px 0 #922b21;font-weight:700">📵</button>
+        <button onclick="doSectorLogin()" style="background:linear-gradient(180deg,#6bcb6b,#27ae60);color:#fff;border:none;border-radius:10px;padding:14px;font-size:22px;cursor:pointer;box-shadow:0 4px 0 #1e8449;font-weight:700">📞</button>
+      </div>
       <div style="text-align:center;margin-top:14px"><a onclick="showScreen('screen-login')" style="color:var(--text2);font-size:13px;cursor:pointer">← Volver al login de maestranza</a></div>
     </div>
     <div id="sector-form" style="display:none">
@@ -314,7 +334,7 @@ textarea:focus{border-color:var(--blue);}
 <!-- PENDIENTE -->
 <div class="auth-screen" id="screen-pendiente">
   <div class="auth-card">
-    <img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza" style="width:160px;border-radius:10px;margin-bottom:8px">
+    <div style="text-align:center;width:100%"><img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza" style="width:160px;border-radius:10px;display:block;margin:0 auto 8px auto"></div>
     <div style="text-align:center;padding:16px 0">
       <div style="font-size:48px;margin-bottom:14px">⏳</div>
       <div style="font-size:18px;font-weight:800;margin-bottom:8px">Registro enviado</div>
