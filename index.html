@@ -2038,7 +2038,11 @@ function filtrarIndicaciones() {
 function renderInfectTabla() {
   var buscar = (document.getElementById('infect-buscar') ? document.getElementById('infect-buscar').value : '').toLowerCase();
   var canEdit = currentUser && ['jefe','infectologia'].indexOf(currentUser.perfil) >= 0;
-  var habList = infectIndicaciones.filter(function(i){ return i.ambito==='habitacion' && (!buscar || i.identificador.toLowerCase().indexOf(buscar)>=0); }).sort(function(a,b){ return Number(a.identificador)-Number(b.identificador); });
+  var habList = infectIndicaciones.filter(function(i){ return i.ambito==='habitacion' && (!buscar || i.identificador.toLowerCase().indexOf(buscar)>=0); }).sort(function(a,b){
+    var na=parseInt(a.identificador)||99999, nb=parseInt(b.identificador)||99999;
+    if(na!==nb) return na-nb;
+    return a.identificador.localeCompare(b.identificador);
+  });
   var secList = infectIndicaciones.filter(function(i){ return i.ambito==='sector'; }).sort(function(a,b){ return a.identificador.localeCompare(b.identificador); });
   var habTbody = document.getElementById('infect-hab-tbody');
   var secTbody = document.getElementById('infect-sec-tbody');
