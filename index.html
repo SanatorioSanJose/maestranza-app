@@ -49,6 +49,8 @@ select:focus,input:focus{border-color:var(--blue);}
 .sidebar-logout{padding:10px 14px;border-top:1px solid var(--border);}
 .btn-logout{width:100%;background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:8px;font-family:var(--font);font-size:12px;cursor:pointer;transition:all .2s;}
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
+@keyframes bannerPulse{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+.infect-banner{background:linear-gradient(270deg,#0ea5e9,#6366f1,#8b5cf6,#06b6d4,#10b981);background-size:400% 400%;animation:bannerPulse 5s ease infinite;border:none;border-radius:14px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 20px rgba(99,102,241,0.4);}
 .nokia-btn{background:linear-gradient(180deg,#e8edf5,#c8d0dc);color:#1a202c;border:1px solid #a0aab8;border-radius:8px;padding:14px 8px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #8090a0,0 5px 6px rgba(0,0,0,0.2);transition:all 0.08s;font-family:var(--font);}
 .nokia-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8090a0;}
 .btn-primary{background:linear-gradient(180deg,#4a90d9,#2563eb);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #1a4ba0,0 5px 8px rgba(37,99,235,0.3);transition:all 0.08s;font-family:var(--font);width:100%;}
@@ -484,13 +486,13 @@ textarea:focus{border-color:var(--blue);}
           <button class="btn-sm secondary" onclick="filterRooms('uti')">UTI</button>
         </div>
       </div>
-      <div style="background:linear-gradient(135deg,#0d3d38,#1a4a3a);border:1px solid var(--teal);border-radius:12px;padding:16px 20px;margin-bottom:20px">
+      <div class="infect-banner">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
     <span style="font-size:18px">⚕️</span>
     <div style="font-size:13px;font-weight:700;color:#ffffff">Orden de limpieza recomendado por Infectología</div>
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <div style="background:rgba(20,184,166,0.15);border:1px solid var(--teal);border-radius:8px;padding:8px 12px;flex:1;min-width:140px;text-align:center">
+    <div style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 12px;flex:1;min-width:140px;text-align:center;backdrop-filter:blur(4px)">
       <div style="font-size:18px;margin-bottom:4px">1️⃣</div>
       <div style="font-size:11px;font-weight:700;color:#ffffff">Protector</div>
       <div style="font-size:10px;color:rgba(255,255,255,0.8)">Inmunodeprimido</div>
