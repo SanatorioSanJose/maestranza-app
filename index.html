@@ -98,12 +98,12 @@ select:focus,input:focus{border-color:var(--blue);}
 .data-table tr:last-child td{border-bottom:none;}
 .data-table tr:hover td{background:var(--bg3);}
 .badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:20px;}
-.badge-blue{background:var(--blue-dim);color:var(--blue);}
-.badge-green{background:var(--green-dim);color:var(--green);}
-.badge-red{background:var(--red-dim);color:var(--red);}
-.badge-amber{background:var(--amber-dim);color:var(--amber);}
-.badge-teal{background:var(--teal-dim);color:var(--teal);}
-.badge-purple{background:#2d1a4a;color:var(--purple);}
+.badge-blue{background:#2563eb;color:#fff;font-weight:700;}
+.badge-green{background:#16a34a;color:#fff;font-weight:700;}
+.badge-red{background:#dc2626;color:#fff;font-weight:700;}
+.badge-amber{background:#d97706;color:#fff;font-weight:700;}
+.badge-teal{background:#0d9488;color:#fff;font-weight:700;}
+.badge-purple{background:#7c3aed;color:#fff;font-weight:700;}
 .badge-orange{background:var(--orange-dim);color:var(--orange);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .form-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
@@ -1134,12 +1134,12 @@ async function cargarPersonalDesdeSheets() {
     tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px">Sin datos de personal cargados.</td></tr>';
     return;
   }
-  const turnoColor = {TM:'', TT:'var(--amber-dim)', TN:'var(--blue-dim)', SaDoFe:'var(--teal-dim)', Ropería:'var(--green-dim)'};
+  const turnoColor = {TM:'', TT:'#fffbeb', TN:'#eff6ff', SaDoFe:'#f0fdfa', Ropería:'#f0fdf4'};
   tbody.innerHTML = d.personal.map(p => {
     const bg = turnoColor[p.turno] || '';
     const esInactivo = p.estado && p.estado.toLowerCase().includes('inactivo');
     const esSup = p.observaciones && p.observaciones.toLowerCase().includes('supervisora');
-    return '<tr style="' + (bg ? 'background:'+bg : '') + '' + (esInactivo ? ';opacity:.5' : '') + '">\n      <td style="font-family:var(--mono);font-size:12px">' + (p.legajo) + '</td>\n      <td><strong>' + (p.nombre) + '</strong>' + (esSup ? ' <span class="badge badge-purple">Supervisora</span>' : '') + '</td>\n      <td><span class="badge badge-' + (p.turno==='TM'?'blue':p.turno==='TT'?'amber':p.turno==='TN'?'blue':p.turno==='SaDoFe'?'teal':'green') + '">' + (p.turno) + '</span></td>\n      <td style="font-size:12px">' + (p.horario||'') + '</td>\n      <td><span class="badge badge-' + (esInactivo?'red':'green') + '">' + (p.estado||'Activo') + '</span></td>\n      <td style="font-size:11px;color:var(--text2)">' + (p.observaciones||'') + '</td>\n    </tr>';
+    return '<tr style="' + (bg ? 'background:'+bg+';' : 'background:#fff;') + (esInactivo ? 'opacity:.6;' : '') + 'border-bottom:1px solid #e2e8f0;color:#1a202c;">\n      <td style="font-family:var(--mono);font-size:12px">' + (p.legajo) + '</td>\n      <td><strong>' + (p.nombre) + '</strong>' + (esSup ? ' <span class="badge badge-purple">Supervisora</span>' : '') + '</td>\n      <td><span class="badge badge-' + (p.turno==='TM'?'blue':p.turno==='TT'?'amber':p.turno==='TN'?'blue':p.turno==='SaDoFe'?'teal':'green') + '">' + (p.turno) + '</span></td>\n      <td style="font-size:12px">' + (p.horario||'') + '</td>\n      <td><span class="badge badge-' + (esInactivo?'red':'green') + '">' + (p.estado||'Activo') + '</span></td>\n      <td style="font-size:11px;color:var(--text2)">' + (p.observaciones||'') + '</td>\n    </tr>';
   }).join('');
 }
 
