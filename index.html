@@ -1881,6 +1881,22 @@ function agregarNovedadSol(id) {
   showToast('Novedad guardada correctamente');
 }
 
+function sectorNokiaTap(digit) {
+  var inp = document.getElementById('sector-pin');
+  var disp = document.getElementById('sector-pin-display');
+  if(!inp || !disp) return;
+  if(inp.value.length >= 6) return;
+  inp.value += digit;
+  disp.textContent = inp.value.length ? '•'.repeat(inp.value.length) : '••••';
+}
+function sectorNokiaBorrar() {
+  var inp = document.getElementById('sector-pin');
+  var disp = document.getElementById('sector-pin-display');
+  if(!inp || !disp) return;
+  inp.value = inp.value.slice(0,-1);
+  disp.textContent = inp.value.length ? '•'.repeat(inp.value.length) : '••••';
+}
+
 function nokiaTap(digit) {
   const inp = document.getElementById('login-pin');
   const disp = document.getElementById('login-pin-display');
