@@ -49,6 +49,12 @@ select:focus,input:focus{border-color:var(--blue);}
 .sidebar-logout{padding:10px 14px;border-top:1px solid var(--border);}
 .btn-logout{width:100%;background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:8px;font-family:var(--font);font-size:12px;cursor:pointer;transition:all .2s;}
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
+.nokia-btn{background:linear-gradient(180deg,#e8edf5,#c8d0dc);color:#1a202c;border:1px solid #a0aab8;border-radius:8px;padding:14px 8px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #8090a0,0 5px 6px rgba(0,0,0,0.2);transition:all 0.08s;font-family:var(--font);}
+.nokia-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8090a0;}
+.btn-primary{background:linear-gradient(180deg,#4a90d9,#2563eb);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #1a4ba0,0 5px 8px rgba(37,99,235,0.3);transition:all 0.08s;font-family:var(--font);width:100%;}
+.btn-primary:active{transform:translateY(3px);box-shadow:0 1px 0 #1a4ba0;}
+.btn-sm{border-radius:8px;box-shadow:0 3px 0 rgba(0,0,0,0.2);transition:all 0.08s;}
+.btn-sm:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.2);}
 .main-content{flex:1;overflow-y:auto;padding:24px;background:var(--bg);}
 .page{display:none;}.page.active{display:block;}
 .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
@@ -167,8 +173,8 @@ textarea:focus{border-color:var(--blue);}
 <!-- LOGIN MAESTRANZA -->
 <div class="auth-screen active" id="screen-login">
   <div class="auth-card">
-    <div class="logo">Maestranza</div>
-    <div class="auth-sub">Sanatorio San José · Maestranza y Ropería</div>
+    <img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza San Jose" style="width:200px;margin-bottom:8px;border-radius:12px">
+    <div class="auth-sub">Sistema de Maestranza y Ropería</div>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchTab('login')">Ingresar</div>
       <div class="auth-tab" onclick="switchTab('registro')">Primer acceso</div>
@@ -176,8 +182,28 @@ textarea:focus{border-color:var(--blue);}
     <div id="form-login">
       <div class="auth-msg" id="login-msg"></div>
       <div class="field-group"><div class="field-label">Nombre completo</div><input type="text" id="login-nombre" placeholder="Ej: González Ana" /></div>
-      <div class="field-group"><div class="field-label">PIN de 4 dígitos</div><input type="password" id="login-pin" placeholder="••••" maxlength="4" /></div>
-      <button class="btn-primary" onclick="doLogin()">Ingresar</button>
+      <div class="field-group"><div class="field-label">PIN de 4 dígitos</div>
+        <div id="login-pin-display" style="text-align:center;font-size:28px;letter-spacing:8px;padding:10px;background:var(--bg3);border-radius:8px;min-height:52px;border:1px solid var(--border)">••••</div>
+        <input type="hidden" id="login-pin" value="">
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
+        <button class="nokia-btn" onclick="nokiaTap('1')">1</button>
+        <button class="nokia-btn" onclick="nokiaTap('2')">2</button>
+        <button class="nokia-btn" onclick="nokiaTap('3')">3</button>
+        <button class="nokia-btn" onclick="nokiaTap('4')">4</button>
+        <button class="nokia-btn" onclick="nokiaTap('5')">5</button>
+        <button class="nokia-btn" onclick="nokiaTap('6')">6</button>
+        <button class="nokia-btn" onclick="nokiaTap('7')">7</button>
+        <button class="nokia-btn" onclick="nokiaTap('8')">8</button>
+        <button class="nokia-btn" onclick="nokiaTap('9')">9</button>
+        <button class="nokia-btn" onclick="nokiaTap('*')">*</button>
+        <button class="nokia-btn" onclick="nokiaTap('0')">0</button>
+        <button class="nokia-btn" onclick="nokiaTap('#')">#</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="nokiaBorrar()" style="background:linear-gradient(180deg,#ff6b6b,#c0392b);color:#fff;border:none;border-radius:10px;padding:14px;font-size:22px;cursor:pointer;box-shadow:0 4px 0 #922b21;font-weight:700">📵</button>
+        <button onclick="doLogin()" style="background:linear-gradient(180deg,#6bcb6b,#27ae60);color:#fff;border:none;border-radius:10px;padding:14px;font-size:22px;cursor:pointer;box-shadow:0 4px 0 #1e8449;font-weight:700">📞</button>
+      </div>
       <div style="text-align:center;margin-top:14px"><a onclick="showScreen('screen-sector')" style="color:var(--teal);font-size:13px;cursor:pointer;font-weight:600">¿Sos de otro servicio del sanatorio? Ingresá acá →</a></div>
     </div>
     <div id="form-registro" style="display:none">
@@ -196,7 +222,7 @@ textarea:focus{border-color:var(--blue);}
 <!-- SECTOR: SOLICITUDES -->
 <div class="auth-screen" id="screen-sector">
   <div class="auth-card">
-    <div class="logo">Maestranza</div>
+    <img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza" style="width:160px;border-radius:10px;margin-bottom:8px">
     <div class="auth-sub">Solicitud de servicio a Maestranza</div>
     <div class="auth-msg" id="sector-msg"></div>
     <div id="sector-selector">
@@ -288,7 +314,7 @@ textarea:focus{border-color:var(--blue);}
 <!-- PENDIENTE -->
 <div class="auth-screen" id="screen-pendiente">
   <div class="auth-card">
-    <div class="logo">Maestranza</div>
+    <img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza" style="width:160px;border-radius:10px;margin-bottom:8px">
     <div style="text-align:center;padding:16px 0">
       <div style="font-size:48px;margin-bottom:14px">⏳</div>
       <div style="font-size:18px;font-weight:800;margin-bottom:8px">Registro enviado</div>
@@ -302,7 +328,7 @@ textarea:focus{border-color:var(--blue);}
 <div id="app">
   <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo">Maestranza</div>
+      <img src="https://sanatoriosanjose.github.io/maestranza-app/Sanatorio.png" alt="Maestranza" style="width:130px;border-radius:8px;margin-bottom:2px">
       <div class="auth-sub" style="margin-bottom:0;font-size:12px">Sanatorio San José</div>
     </div>
     <div class="sidebar-user">
@@ -1833,6 +1859,22 @@ function agregarNovedadSol(id) {
   renderSolicitudes();
   sheetPost({action:'actualizarSolicitud', id:s.id, estado:s.estado, asignadoA:s.asignadoA, resueltaA:s.resueltaA||'', novedad:s.novedad});
   showToast('Novedad guardada correctamente');
+}
+
+function nokiaTap(digit) {
+  const inp = document.getElementById('login-pin');
+  const disp = document.getElementById('login-pin-display');
+  if(!inp || !disp) return;
+  if(inp.value.length >= 6) return;
+  inp.value += digit;
+  disp.textContent = '•'.repeat(inp.value.length) || '••••';
+}
+function nokiaBorrar() {
+  const inp = document.getElementById('login-pin');
+  const disp = document.getElementById('login-pin-display');
+  if(!inp || !disp) return;
+  inp.value = inp.value.slice(0,-1);
+  disp.textContent = inp.value.length ? '•'.repeat(inp.value.length) : '••••';
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
