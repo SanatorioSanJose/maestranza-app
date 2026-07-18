@@ -363,16 +363,19 @@ textarea:focus{border-color:var(--blue);}
       <div class="sb-name" id="sb-name">—</div>
     </div>
     <nav class="nav">
-      <div class="nav-section">Principal</div>
-      <div class="nav-item active" data-page="dashboard" onclick="navTo(this)"><span class="icon">🏠</span> Dashboard</div>
-      <div class="nav-item" data-page="habitaciones" onclick="navTo(this)"><span class="icon">🛏️</span> Habitaciones</div>
-      <div class="nav-section">Gestión</div>
+      <div class="nav-section" id="nav-sec-principal">Principal</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navTo(this)" id="nav-dashboard"><span class="icon">🏠</span> Dashboard</div>
+      <div class="nav-section" id="nav-section-sector" style="display:none">Mi Servicio</div>
+      <div class="nav-item" data-page="sector-pedidos" onclick="navTo(this)" id="nav-sector-pedidos" style="display:none"><span class="icon">🛒</span> Hacer pedidos</div>
+      <div class="nav-item" data-page="sector-mispedidos" onclick="navTo(this)" id="nav-sector-mispedidos" style="display:none"><span class="icon">📋</span> Mis pedidos</div>
+      <div class="nav-item" data-page="habitaciones" onclick="navTo(this)" id="nav-habitaciones"><span class="icon">🛏️</span> Habitaciones</div>
+      <div class="nav-section" id="nav-sec-gestion">Gestión</div>
       <div class="nav-item" data-page="solicitudes" onclick="navTo(this)" id="nav-solicitudes"><span class="icon">🔔</span> Solicitudes <span class="nav-badge" id="badge-sol" style="display:none">0</span></div>
       <div class="nav-item" data-page="novedades" onclick="navTo(this)" id="nav-novedades"><span class="icon">📋</span> Novedades</div>
       <div class="nav-item" data-page="residuos" onclick="navTo(this)" id="nav-residuos"><span class="icon">🗑️</span> Residuos</div>
       <div class="nav-item" data-page="roperia" onclick="navTo(this)" id="nav-roperia"><span class="icon">👕</span> Ropería<span class="nav-badge" id="rope-badge" style="display:none;background:var(--orange);color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:auto">0</span></div>
       <div class="nav-item" data-page="insumos" onclick="navTo(this)" id="nav-insumos"><span class="icon">📦</span> Insumos</div>
-      <div class="nav-section">Administración</div>
+      <div class="nav-section" id="nav-sec-admin">Administración</div>
       <div class="nav-item" data-page="requerimientos" onclick="navTo(this)" id="nav-reqs"><span class="icon">📝</span> Requerimientos</div>
       <div class="nav-item" data-page="personal" onclick="navTo(this)" id="nav-personal"><span class="icon">👥</span> Personal</div>
       <div class="nav-item" data-page="infectologia" onclick="navTo(this)" id="nav-infectologia" style="display:none"><span class="icon">🦠</span> Infectología</div>
@@ -521,6 +524,31 @@ textarea:focus{border-color:var(--blue);}
   <div style="font-size:10px;color:#ffffff;margin-top:10px;text-align:center;opacity:0.85">Siempre verificar las indicaciones especiales de cada habitación antes de ingresar</div>
 </div>
 <div id="rooms-grid" class="rooms-grid"></div>
+    </div>
+
+    <!-- SECTOR: HACER PEDIDOS -->
+    <div class="page" id="page-sector-pedidos">
+      <div class="page-header"><div><div class="page-title">🛒 Hacer pedidos</div><div class="page-sub" id="sector-page-sub">—</div></div></div>
+      <div id="sector-choice" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:560px">
+        <div onclick="elegirTipoPedido('maestranza')" style="cursor:pointer;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:14px;padding:26px 20px;text-align:center;box-shadow:0 4px 0 #1a3aa0,0 6px 12px rgba(37,99,235,.3)">
+          <div style="font-size:34px;margin-bottom:8px">✨</div>
+          <div style="font-size:16px;font-weight:800;color:#fff">Maestranza</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.78);margin-top:4px">Limpieza, derrames, residuos, preparación de habitaciones</div>
+        </div>
+        <div onclick="elegirTipoPedido('roperia')" style="cursor:pointer;background:linear-gradient(135deg,#14b8a6,#0d9488);border-radius:14px;padding:26px 20px;text-align:center;box-shadow:0 4px 0 #0f766e,0 6px 12px rgba(20,184,166,.3)">
+          <div style="font-size:34px;margin-bottom:8px">👕</div>
+          <div style="font-size:16px;font-weight:800;color:#fff">Ropería</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.78);margin-top:4px">Ropa de cama, toallas, camisolines, retiro de ropa sucia</div>
+        </div>
+      </div>
+      <a id="sector-back" onclick="volverAElegir()" style="display:none;color:var(--text2);font-size:13px;cursor:pointer;font-weight:600;margin-bottom:12px">← Elegir otro tipo de pedido</a>
+      <div id="sector-pedidos-slot" class="card" style="max-width:560px;display:none;margin-top:12px;padding:22px"></div>
+    </div>
+
+    <!-- SECTOR: MIS PEDIDOS -->
+    <div class="page" id="page-sector-mispedidos">
+      <div class="page-header"><div><div class="page-title">📋 Mis pedidos</div><div class="page-sub">Estado de las solicitudes de tu servicio</div></div><button class="btn-sm secondary" onclick="cargarMisPedidos()">↻ Actualizar</button></div>
+      <div id="sector-mispedidos-slot" class="card" style="max-width:700px;padding:18px"></div>
     </div>
 
     <!-- NOVEDADES -->
@@ -1002,7 +1030,26 @@ async function doRegistro(){
   catch(e){hideLoading();showMsg('registro-msg','Error de conexión.','error');}
 }
 
-function doLogout(){currentUser=null;document.getElementById('app').style.display='none';showScreen('screen-login');document.getElementById('login-nombre').value='';document.getElementById('login-pin').value='';}
+function doLogout(){
+  var eraSector=currentUser&&currentUser.perfil==='sector';
+  currentUser=null;
+  document.getElementById('app').style.display='none';
+  if(eraSector){
+    currentSector=null;
+    // Restaurar el mensaje a la pantalla de login de sectores
+    var sel=document.getElementById('sector-selector');
+    if(sel&&sel.parentElement)sel.parentElement.insertBefore(document.getElementById('sector-msg'),sel);
+    document.getElementById('sector-pin').value='';
+    var pd=document.getElementById('sector-pin-display');if(pd)pd.textContent='••••';
+    sel.style.display='block';
+    document.getElementById('sector-msg').className='auth-msg';
+    showScreen('screen-sector');
+  } else {
+    showScreen('screen-login');
+  }
+  document.getElementById('login-nombre').value='';
+  document.getElementById('login-pin').value='';
+}
 
 
 async function cargarMisPedidos() {
@@ -1089,9 +1136,61 @@ function doSectorLogin(){
   currentSector=s;
   document.getElementById('sf-nombre').textContent=s;
   document.getElementById('sf-icon').textContent=SECTOR_ICONS[s]||'🏥';
-  document.getElementById('sector-selector').style.display='none';
-  document.getElementById('sector-form').style.display='block';
   document.getElementById('sector-msg').className='auth-msg';
+  launchSectorApp();
+}
+
+// ---- MODO SERVICIO EXTERNO: app completa con menú lateral reducido ----
+function launchSectorApp(){
+  currentUser={nombre:currentSector,perfil:'sector'};
+  showScreen(null);
+  document.getElementById('app').style.display='flex';
+  // Identidad en la sidebar
+  const badge=document.getElementById('sb-role-badge');
+  badge.textContent='Servicio';
+  badge.style.background='var(--teal-dim)';badge.style.color='var(--teal)';
+  document.getElementById('sb-name').textContent=(SECTOR_ICONS[currentSector]||'🏥')+' '+currentSector;
+  // Menú: solo Hacer pedidos, Mis pedidos y Habitaciones
+  document.querySelectorAll('.nav .nav-item').forEach(function(el){
+    var pg=el.dataset.page;
+    el.style.display=(pg==='sector-pedidos'||pg==='sector-mispedidos'||pg==='habitaciones')?'':'none';
+  });
+  document.querySelectorAll('.nav .nav-section').forEach(function(el){
+    el.style.display=(el.id==='nav-section-sector')?'':'none';
+  });
+  // Mover los formularios existentes dentro de las páginas de la app (se reutilizan tal cual)
+  var slotP=document.getElementById('sector-pedidos-slot');
+  slotP.appendChild(document.getElementById('sector-msg'));
+  slotP.appendChild(document.getElementById('sector-form'));
+  slotP.appendChild(document.getElementById('sector-success'));
+  var slotM=document.getElementById('sector-mispedidos-slot');
+  slotM.appendChild(document.getElementById('sector-form-mispedidos'));
+  // Ocultar la barra de tabs interna (ahora se navega por el menú lateral)
+  var tabM=document.getElementById('tab-maestranza');
+  if(tabM&&tabM.parentElement)tabM.parentElement.style.display='none';
+  document.getElementById('sector-page-sub').textContent=(SECTOR_ICONS[currentSector]||'🏥')+' '+currentSector;
+  volverAElegir();
+  // Datos de habitaciones (solo lectura para sectores)
+  renderRooms();actualizarStatsHab();cargarInfectologia();
+  navToPage('sector-pedidos');
+}
+
+function elegirTipoPedido(t){
+  document.getElementById('sector-choice').style.display='none';
+  document.getElementById('sector-back').style.display='inline-block';
+  document.getElementById('sector-pedidos-slot').style.display='block';
+  document.getElementById('sector-form').style.display='block';
+  document.getElementById('sector-success').style.display='none';
+  switchSectorTab(t);
+}
+
+function volverAElegir(){
+  var ch=document.getElementById('sector-choice');if(ch)ch.style.display='grid';
+  var bk=document.getElementById('sector-back');if(bk)bk.style.display='none';
+  var sl=document.getElementById('sector-pedidos-slot');if(sl)sl.style.display='none';
+  var f=document.getElementById('sector-form');if(f)f.style.display='none';
+  var s=document.getElementById('sector-success');if(s)s.style.display='none';
+  var m=document.getElementById('sector-msg');if(m)m.className='auth-msg';
 }
 
 function selectUrgency(level,btn){
@@ -1163,11 +1262,18 @@ async function enviarSolicitud(){
 }
 
 function resetSectorForm(){
-  ['sf-persona','sf-lugar','sf-desc','sector-pin'].forEach(id=>document.getElementById(id).value='');
+  ['sf-persona','sf-lugar','sf-desc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sf-tipo').value='';
-  document.getElementById('sector-nombre').value='';
-  selectedUrgency='';currentSector=null;
+  selectedUrgency='';
   document.querySelectorAll('.urgency-btn').forEach(b=>b.className='urgency-btn');
+  if(currentUser&&currentUser.perfil==='sector'){
+    // Dentro de la app: volver al selector Maestranza / Ropería sin cerrar sesión
+    volverAElegir();
+    return;
+  }
+  document.getElementById('sector-pin').value='';
+  document.getElementById('sector-nombre').value='';
+  currentSector=null;
   document.getElementById('sector-selector').style.display='block';
   document.getElementById('sector-form').style.display='none';
   document.getElementById('sector-success').style.display='none';
@@ -1582,10 +1688,14 @@ function openRoom(num){const r=rooms.find(x=>x.num===num);if(!r)return;
   bodyHtml += '</div>';
   if(r.pax===2) bodyHtml += '<div class="alert-box alert-amber">2 pacientes: usar panos y recipientes diferentes para cada sector.</div>';
   if(r.status==='alta') bodyHtml += '<div class="alert-box alert-red">Alta: realizar limpieza terminal completa antes de nueva admision.</div>';
-  bodyHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
-  bodyHtml += '<button class="btn-sm" onclick="markOK(\''+ r.num +'\')">Marcar servicio OK</button>';
-  if(ce) bodyHtml += '<button class="btn-sm secondary" onclick="changeStatus(\''+ r.num +'\')">Cambiar estado</button>';
-  bodyHtml += '</div>';
+  if(currentUser?.perfil!=='sector'){
+    bodyHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    bodyHtml += '<button class="btn-sm" onclick="markOK(\''+ r.num +'\')">Marcar servicio OK</button>';
+    if(ce) bodyHtml += '<button class="btn-sm secondary" onclick="changeStatus(\''+ r.num +'\')">Cambiar estado</button>';
+    bodyHtml += '</div>';
+  } else {
+    bodyHtml += '<div style="background:var(--bg3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text3);text-align:center">👁️ Vista de solo lectura — la gestión la realiza el personal de maestranza</div>';
+  }
   document.getElementById('modal-hab-body').innerHTML = bodyHtml;openModal('modal-hab');}
 function markOK(num){const r=rooms.find(x=>x.num===num);if(r)r.status='ok';renderRooms();closeModal('modal-hab');sheetPost({action:'guardarHabitacion',habitacion:num,accion:'Limpieza OK',usuario:currentUser?.nombre||'—',turno:document.getElementById('turno-badge')?.textContent||'—'});showToast(`✅ Hab. ${num} — Servicio registrado`);}
 function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const l=['ok','pending','busy','alta'];r.status=l[(l.indexOf(r.status)+1)%l.length];renderRooms();closeModal('modal-hab');showToast('Estado hab. '+num+': '+sL[r.status]);
@@ -1600,7 +1710,7 @@ function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const
   }}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');x.style.display='';});var pg=document.getElementById('page-'+page);if(pg){pg.classList.add('active');pg.style.display='block';}const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='habitaciones'){cargarInfectologia();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
+function navToPage(page){document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');x.style.display='';});var pg=document.getElementById('page-'+page);if(pg){pg.classList.add('active');pg.style.display='block';}const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='habitaciones'){cargarInfectologia();}if(page==='sector-mispedidos'){var fmp=document.getElementById('sector-form-mispedidos');if(fmp)fmp.style.display='block';cargarMisPedidos();}if(page==='sector-pedidos'){var sfEl=document.getElementById('sector-form');if(!sfEl||sfEl.style.display==='none'||document.getElementById('sector-success').style.display==='block')volverAElegir();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
     const h=new Date().getHours();
     const esNoche=(h>=21||h<7);
     if(currentUser.perfil==='operario'&&!esNoche){
