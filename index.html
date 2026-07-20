@@ -1165,9 +1165,12 @@ function launchSectorApp(){
   slotP.appendChild(document.getElementById('sector-success'));
   var slotM=document.getElementById('sector-mispedidos-slot');
   slotM.appendChild(document.getElementById('sector-form-mispedidos'));
-  // Ocultar la barra de tabs interna (ahora se navega por el menú lateral)
+  // Mantener las pestañas Maestranza/Ropería visibles para poder cambiar de servicio en un toque;
+  // ocultar solo "Mis pedidos" porque ahora es un botón del menú lateral
   var tabM=document.getElementById('tab-maestranza');
-  if(tabM&&tabM.parentElement)tabM.parentElement.style.display='none';
+  if(tabM&&tabM.parentElement)tabM.parentElement.style.display='flex';
+  var tabP=document.getElementById('tab-mispedidos');
+  if(tabP)tabP.style.display='none';
   document.getElementById('sector-page-sub').textContent=(SECTOR_ICONS[currentSector]||'🏥')+' '+currentSector;
   volverAElegir();
   // Datos de habitaciones (solo lectura para sectores)
