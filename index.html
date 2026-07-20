@@ -425,6 +425,40 @@ textarea:focus{border-color:var(--blue);}
           <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px">del total recibido</div>
         </div>
       </div>
+      <!-- HISTORIAL DE TRABAJO -->
+      <div class="card" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border:none;margin-bottom:20px">
+        <div class="card-body" style="padding:20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <span style="font-size:18px">📈</span>
+            <div style="font-size:13px;font-weight:700;color:#fff">Trabajo acumulado del servicio</div>
+            <span style="font-size:10px;color:rgba(255,255,255,.55);margin-left:auto">Registro histórico completo</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px">
+            <div style="text-align:center;background:rgba(255,255,255,.06);border-radius:10px;padding:12px 8px">
+              <div id="hist-total" style="font-size:34px;font-weight:800;color:#fff;line-height:1">0</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:5px;text-transform:uppercase;letter-spacing:.5px">Intervenciones registradas</div>
+            </div>
+            <div style="text-align:center;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:10px;padding:12px 8px">
+              <div id="hist-resueltas" style="font-size:34px;font-weight:800;color:#4ade80;line-height:1">0</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:5px;text-transform:uppercase;letter-spacing:.5px">Resueltas</div>
+            </div>
+            <div style="text-align:center;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:10px;padding:12px 8px">
+              <div id="hist-mes" style="font-size:34px;font-weight:800;color:#60a5fa;line-height:1">0</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:5px;text-transform:uppercase;letter-spacing:.5px">Este mes</div>
+            </div>
+            <div style="text-align:center;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);border-radius:10px;padding:12px 8px">
+              <div id="hist-hoy" style="font-size:34px;font-weight:800;color:#fbbf24;line-height:1">0</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:5px;text-transform:uppercase;letter-spacing:.5px">Hoy</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:8px;background:rgba(255,255,255,.12);border-radius:6px;overflow:hidden">
+              <div id="hist-efic-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:6px;transition:width .8s ease"></div>
+            </div>
+            <div id="hist-efic-txt" style="font-size:11px;font-weight:700;color:#4ade80;min-width:110px;text-align:right">—</div>
+          </div>
+        </div>
+      </div>
       <!-- CHARTS + RECENT -->
       <div class="grid-2">
         <div class="card">
@@ -1218,6 +1252,7 @@ async function cargarSolicitudesDesdeSheets() {
       lugar: s.lugar, tipo: s.tipo, desc: s.desc,
       urgency: s.urgency, estado: s.estado,
       asignadoA: s.asignadoA || '', resueltaA: s.resueltaA || '', novedad: s.novedad || '',
+      fechaRaw: s.fecha || '',
       hora: s.fecha ? new Date(s.fecha).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '--',
       fecha: s.fecha ? new Date(s.fecha).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}) : '--'
     }));
@@ -1335,6 +1370,7 @@ function actualizarBadges(){
   const pt=document.getElementById('prog-sol-txt');if(pt)pt.textContent=`${resueltas}/${total}`;
   const pb=document.getElementById('prog-sol-bar');if(pb)pb.style.width=total>0?`${Math.round(resueltas/total*100)}%`:'0%';
   renderSolPreview();
+  renderHistorial();
   actualizarDashRoperia();
   if(currentUser?.perfil==='jefe')renderMonitoreo();
 }
@@ -1387,6 +1423,46 @@ async function actualizarDashRoperia() {
       monRop.innerHTML = monHtml;
     }
   }
+}
+
+// ---- HISTORIAL DE TRABAJO ACUMULADO (desde Google Sheets) ----
+function animarContador(el,fin){
+  if(!el)return;
+  var inicio=parseInt(el.textContent)||0;
+  if(inicio===fin){el.textContent=fin;return;}
+  var dur=700,t0=null;
+  function paso(t){
+    if(!t0)t0=t;
+    var p=Math.min((t-t0)/dur,1);
+    el.textContent=Math.round(inicio+(fin-inicio)*(1-Math.pow(1-p,3)));
+    if(p<1)requestAnimationFrame(paso);
+  }
+  requestAnimationFrame(paso);
+}
+function renderHistorial(){
+  var elTotal=document.getElementById('hist-total');
+  if(!elTotal)return;
+  var hoy=new Date();
+  var total=solicitudes.length,resueltas=0,mes=0,hoyC=0;
+  solicitudes.forEach(function(s){
+    if(s.estado==='resuelta')resueltas++;
+    if(s.fechaRaw){
+      var d=new Date(s.fechaRaw);
+      if(!isNaN(d.getTime())){
+        if(d.getMonth()===hoy.getMonth()&&d.getFullYear()===hoy.getFullYear()){
+          mes++;
+          if(d.getDate()===hoy.getDate())hoyC++;
+        }
+      }
+    }
+  });
+  animarContador(elTotal,total);
+  animarContador(document.getElementById('hist-resueltas'),resueltas);
+  animarContador(document.getElementById('hist-mes'),mes);
+  animarContador(document.getElementById('hist-hoy'),hoyC);
+  var pct=total>0?Math.round(resueltas/total*100):0;
+  var bar=document.getElementById('hist-efic-bar');if(bar)bar.style.width=pct+'%';
+  var txt=document.getElementById('hist-efic-txt');if(txt)txt.textContent=pct+'% resueltas';
 }
 
 function renderSolPreview(){
