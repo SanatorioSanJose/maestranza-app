@@ -1034,7 +1034,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbws-oFHR4rtAU0PazoJ66qFVWLjNh-WMcD7cxn6XUOpF4cu0TZVd42DMT9puFvrCYBmfA/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbyxgN5I3IjHn2H_91fDeHImSIV315eOtoVJk7nrso6xa_oqwD5dI_5z9ddl7XKZtdzM3Q/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -1351,6 +1351,7 @@ function launchApp(){
   renderRooms();
   actualizarStatsHab();
   cargarSolicitudesDesdeSheets();
+  cargarHistorial();
   cargarInfectologia();
 }
 
@@ -1426,6 +1427,14 @@ async function actualizarDashRoperia() {
 }
 
 // ---- HISTORIAL DE TRABAJO ACUMULADO (desde Google Sheets) ----
+let historialSheets=null;
+async function cargarHistorial(){
+  const d=await sheetPost({action:'obtenerHistorial'});
+  if(d&&d.ok&&typeof d.total!=='undefined'){
+    historialSheets={total:Number(d.total)||0,resueltas:Number(d.resueltas)||0,mes:Number(d.mes)||0,hoy:Number(d.hoy)||0};
+    renderHistorial();
+  }
+}
 function animarContador(el,fin){
   if(!el)return;
   var inicio=parseInt(el.textContent)||0;
@@ -1442,6 +1451,18 @@ function animarContador(el,fin){
 function renderHistorial(){
   var elTotal=document.getElementById('hist-total');
   if(!elTotal)return;
+  // Si el backend ya nos dio los totales históricos reales, usarlos
+  if(historialSheets){
+    animarContador(elTotal,historialSheets.total);
+    animarContador(document.getElementById('hist-resueltas'),historialSheets.resueltas);
+    animarContador(document.getElementById('hist-mes'),historialSheets.mes);
+    animarContador(document.getElementById('hist-hoy'),historialSheets.hoy);
+    var pctS=historialSheets.total>0?Math.round(historialSheets.resueltas/historialSheets.total*100):0;
+    var barS=document.getElementById('hist-efic-bar');if(barS)barS.style.width=pctS+'%';
+    var txtS=document.getElementById('hist-efic-txt');if(txtS)txtS.textContent=pctS+'% resueltas';
+    return;
+  }
+  // Fallback: calcular con lo que haya cargado en memoria
   var hoy=new Date();
   var total=solicitudes.length,resueltas=0,mes=0,hoyC=0;
   solicitudes.forEach(function(s){
@@ -1789,7 +1810,7 @@ function changeStatus(num){const r=rooms.find(x=>x.num===num);if(!r)return;const
   }}
 
 function navTo(el){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');navToPage(el.dataset.page);closeSidebar();}
-function navToPage(page){document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');x.style.display='';});var pg=document.getElementById('page-'+page);if(pg){pg.classList.add('active');pg.style.display='block';}const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='habitaciones'){cargarInfectologia();}if(page==='sector-mispedidos'){var fmp=document.getElementById('sector-form-mispedidos');if(fmp)fmp.style.display='block';cargarMisPedidos();}if(page==='sector-pedidos'){var sfEl=document.getElementById('sector-form');if(!sfEl||sfEl.style.display==='none'||document.getElementById('sector-success').style.display==='block')volverAElegir();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
+function navToPage(page){document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');x.style.display='';});var pg=document.getElementById('page-'+page);if(pg){pg.classList.add('active');pg.style.display='block';}const nav=document.querySelector(`[data-page="${page}"]`);if(nav){document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));nav.classList.add('active');}if(page==='solicitudes'){cargarSolicitudesDesdeSheets();}if(page==='dashboard'){cargarHistorial();}if(page==='habitaciones'){cargarInfectologia();}if(page==='sector-mispedidos'){var fmp=document.getElementById('sector-form-mispedidos');if(fmp)fmp.style.display='block';cargarMisPedidos();}if(page==='sector-pedidos'){var sfEl=document.getElementById('sector-form');if(!sfEl||sfEl.style.display==='none'||document.getElementById('sector-success').style.display==='block')volverAElegir();}if(page==='monitoreo'&&currentUser?.perfil==='jefe')renderMonitoreo();if(page==='personal')cargarPersonalDesdeSheets();if(page==='roperia'){
     const h=new Date().getHours();
     const esNoche=(h>=21||h<7);
     if(currentUser.perfil==='operario'&&!esNoche){
