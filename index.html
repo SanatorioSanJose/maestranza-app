@@ -466,7 +466,7 @@ textarea:focus{border-color:var(--blue);}
           <div class="card-body" id="dash-sol-preview"><div style="color:var(--text2);font-size:13px">Sin solicitudes pendientes.</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><span>📊 Intervenciones por Urgencia</span></div>
+          <div class="card-header"><span>📊 Intervenciones por Urgencia (histórico)</span></div>
           <div class="card-body" style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap">
             <canvas id="dash-pie-chart" width="160" height="160"></canvas>
             <div id="dash-pie-legend" style="font-size:12px;line-height:2"></div>
@@ -1034,7 +1034,7 @@ textarea:focus{border-color:var(--blue);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbyxgN5I3IjHn2H_91fDeHImSIV315eOtoVJk7nrso6xa_oqwD5dI_5z9ddl7XKZtdzM3Q/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzVvsh2uKA1WiWISMWTlHLfZNB4VFENLbxyPvAUQc6kE2e5yDoT7-wwVs3GlNCl1Lhy_Q/exec";
 let SECTOR_PINS={}; // cargado desde Sheets
 let SECTOR_ICONS={}; // cargado desde Sheets
 let currentUser=null,currentSector=null,selectedUrgency='',solicitudes=[],solId=1;
@@ -1432,7 +1432,13 @@ async function cargarHistorial(){
   const d=await sheetPost({action:'obtenerHistorial'});
   if(d&&d.ok&&typeof d.total!=='undefined'){
     historialSheets={total:Number(d.total)||0,resueltas:Number(d.resueltas)||0,mes:Number(d.mes)||0,hoy:Number(d.hoy)||0};
+    if(typeof d.urgCritico!=='undefined'){
+      historialSheets.urgCritico=Number(d.urgCritico)||0;
+      historialSheets.urgUrgente=Number(d.urgUrgente)||0;
+      historialSheets.urgNormal=Number(d.urgNormal)||0;
+    }
     renderHistorial();
+    renderPieChart();
   }
 }
 function animarContador(el,fin){
@@ -2155,9 +2161,18 @@ function renderPieChart() {
   var legend = document.getElementById('dash-pie-legend');
   if(!canvas || !legend) return;
   var ctx = canvas.getContext('2d');
-  var critico = solicitudes.filter(function(s){ return s.urgency==='critico'; }).length;
-  var urgente = solicitudes.filter(function(s){ return s.urgency==='urgente'; }).length;
-  var normal = solicitudes.filter(function(s){ return s.urgency==='normal'; }).length;
+  var critico, urgente, normal;
+  if(historialSheets && typeof historialSheets.urgCritico!=='undefined'){
+    // Desglose histórico completo desde Google Sheets
+    critico = historialSheets.urgCritico;
+    urgente = historialSheets.urgUrgente;
+    normal  = historialSheets.urgNormal;
+  } else {
+    // Fallback: solo lo cargado en memoria (activas)
+    critico = solicitudes.filter(function(s){ return s.urgency==='critico'; }).length;
+    urgente = solicitudes.filter(function(s){ return s.urgency==='urgente'; }).length;
+    normal = solicitudes.filter(function(s){ return s.urgency==='normal'; }).length;
+  }
   var total = critico + urgente + normal;
   if(total === 0) {
     ctx.clearRect(0,0,160,160);
